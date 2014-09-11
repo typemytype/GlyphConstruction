@@ -1,0 +1,59 @@
+# --------------
+# - Vietnamese -
+# --------------
+
+## small caps
+
+Abreveacute.sc = A.sc + breve.sc@center,top + acute.sc@center,top
+Abrevedotaccent.sc = A.sc + breve.sc@center,top + dotaccent.sc@center,top
+Abrevegrave.sc = A.sc + breve.sc@center,top + grave.sc@center,top
+Abrevehook.sc = A.sc + breve.sc@center,top + hook.sc@center,top
+Abrevetilde.sc = A.sc + breve.sc@center,top + tilde.sc@center,top
+Acircumflexacute.sc = A.sc + circumflex.sc@center,top+acute.sc@center,top
+Acircumflexdotaccent.sc = A.sc + circumflex.sc@center,top + dotaccent.sc@center,A.sc:bottom
+Acircumflexgrave.sc = A.sc + circumflex.sc@center,top + grave.sc@center,top
+Acircumflexhook.sc = A.sc + circumflex.sc@center,top + hook.sc@center,top
+Acircumflextilde.sc = A.sc + circumflex.sc@center,top + tilde.sc@center,top
+Adotaccent.sc = A.sc + dotaccent.sc@center,bottom
+Ahook.sc = A.sc + hook.sc@center,top
+Ecircumflexacute.sc = E.sc + circumflex.sc@center,top + acute.sc@center,top
+Ecircumflexdotaccent.sc = E.sc + circumflex.sc@center,top + dotaccent.sc@center,E.sc:bottom
+Ecircumflexgrave.sc = E.sc + circumflex.sc@center,top + grave.sc@center,top
+Ecircumflexhook.sc = E.sc + circumflex.sc@center,top + hook.sc@center,top
+Ecircumflextilde.sc = E.sc + circumflex.sc@center,top + tilde.sc@center,top
+Edotaccent.sc = E.sc + dotaccent.sc@center,bottom
+Ehook.sc = E.sc + hook.sc@center,top
+Etilde.sc = E.sc + tilde.sc@center,top
+Idotaccent.sc = I.sc + dotaccent.sc@center,bottom
+Ihook.sc = I.sc + hook.sc@center,top
+Ocircumflexacute.sc = O.sc + circumflex.sc@center,top + acute.sc@center,top
+Ocircumflexdotaccent.sc = O.sc + circumflex.sc@center,top + dotaccent.sc@O.sc:center,O.sc:bottom
+Ocircumflexgrave.sc = O.sc + circumflex.sc@center,top + grave.sc@center,top
+Ocircumflexhook.sc = O.sc + circumflex.sc@center,top + hook.sc@center,top
+Ocircumflextilde.sc = O.sc + circumflex.sc@center,top + tilde.sc@center,top
+Odotaccent.sc = O.sc + dotaccent.sc@center,bottom
+Ohook.sc = O.sc + hook.sc@center,top
+
+# create first
+Ohorn.sc = O.sc + horn.sc@right,innerTop
+
+Ohornacute.sc = Ohorn.sc + acute.sc@O.sc:center,O.sc:top
+Ohorndotaccent.sc = Ohorn.sc + dotaccent.sc@O.sc:center,O.sc:bottom
+Ohorngrave.sc = Ohorn.sc + grave.sc@O.sc:center,O.sc:top
+Ohornhook.sc = Ohorn.sc + hook.sc@O.sc:center,O.sc:top
+Udotaccent.sc = U.sc + dotaccent.sc@center,bottom
+Uhook.sc = U.sc + hook.sc@center,top
+
+# create first
+Uhorn.sc = U.sc + horn.sc@right,innerTop
+
+Uhornacute.sc = Uhorn.sc + acute.sc@U.sc:center,U.sc:top
+Uhorndotaccent.sc = Uhorn.sc + dotaccent.sc@U.sc:center,U.sc:bottom
+Uhorngrave.sc = Uhorn.sc + grave.sc@U.sc:center,U.sc:top
+Uhornhook.sc = Uhorn.sc + hook.sc@U.sc:center,U.sc:top
+Uhorntilde.sc = Uhorn.sc + tilde.sc@U.sc:center,U.sc:top
+Utilde.sc = U.sc + tilde.sc@center,top
+Ydotaccent.sc = Y.sc + dotaccent.sc@center,bottom
+Ygrave.sc = Y.sc + grave.sc@center,top
+Yhook.sc = Y.sc + hook.sc@center,top
+Ytilde.sc = Y.sc + tilde.sc@center,top

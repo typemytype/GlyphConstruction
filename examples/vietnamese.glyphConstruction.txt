@@ -1,0 +1,133 @@
+# --------------
+# - Vietnamese -
+# --------------
+
+# capitals
+# use .cap
+
+Abreveacute = A + breve.cap@center,top + acute.cap@center,top|1EAE
+Abrevedotaccent = A + breve.cap@center,top + dotaccent.cap@center,top|1EB6
+Abrevegrave = A + breve.cap@center,top + grave.cap@center,top|1EB0
+Abrevehook = A + breve.cap@center,top + hook.cap@center,top|1EB2
+Abrevetilde = A + breve.cap@center,top + tilde.cap@center,top|1EB4
+Acircumflexacute = A + circumflex.cap@center,top+acute.cap@center,top|1EA4
+Acircumflexdotaccent = A + circumflex.cap@center,top + dotaccent.cap@center,A:bottom|1EAC
+Acircumflexgrave = A + circumflex.cap@center,top + grave.cap@center,top|1EA6
+Acircumflexhook = A + circumflex.cap@center,top + hook.cap@center,top|1EA8
+Acircumflextilde = A + circumflex.cap@center,top + tilde.cap@center,top|1EAA
+Adotaccent = A + dotaccent.cap@center,bottom|1EA0
+Ahook = A + hook.cap@center,top|1EA2
+Ecircumflexacute = E + circumflex.cap@center,top + acute.cap@center,top|1EBE
+Ecircumflexdotaccent = E + circumflex.cap@center,top + dotaccent.cap@center,E:bottom|1EC6
+Ecircumflexgrave = E + circumflex.cap@center,top + grave.cap@center,top|1EC0
+Ecircumflexhook = E + circumflex.cap@center,top + hook.cap@center,top|1EC2
+Ecircumflextilde = E + circumflex.cap@center,top + tilde.cap@center,top|1EC4
+Edotaccent = E + dotaccent.cap@center,bottom|1EB8
+Ehook = E + hook.cap@center,top|1EBA
+Etilde = E + tilde.cap@center,top|1EBC
+Idotaccent = I + dotaccent.cap@center,bottom|1ECA
+Ihook = I + hook.cap@center,top|1EC8
+Ocircumflexacute = O + circumflex.cap@center,top + acute.cap@center,top|1ED0
+Ocircumflexdotaccent = O + circumflex.cap@center,top + dotaccent.cap@O:center,O:bottom|1ED8
+Ocircumflexgrave = O + circumflex.cap@center,top + grave.cap@center,top|1ED2
+Ocircumflexhook = O + circumflex.cap@center,top + hook.cap@center,top|1ED4
+Ocircumflextilde = O + circumflex.cap@center,top + tilde.cap@center,top|1ED6
+Odotaccent = O + dotaccent.cap@center,bottom|1ECC
+Ohook = O + hook.cap@center,top|1ECE
+
+# create Ohorn first
+Ohorn = O + horn.cap@right,innerTop|01A0
+
+Ohornacute = Ohorn + acute.cap@O:center,O:top|1EDA
+Ohorndotaccent = Ohorn + dotaccent.cap@O:center,O:bottom|1EE2
+Ohorngrave = Ohorn + grave.cap@O:center,O:top|1EDC
+Ohornhook = Ohorn + hook.cap@O:center,O:top|1EDE
+Udotaccent = U + dotaccent.cap@center,bottom|1EE4
+Uhook = U + hook.cap@center,top|1EE6
+
+# create Uhorn first
+Uhorn = U + horn.cap@right,innerTop|01AF
+
+Uhornacute = Uhorn + acute.cap@U:center,U:top|1EE8
+Uhorndotaccent = Uhorn + dotaccent.cap@U:center,U:bottom|1EF0
+Uhorngrave = Uhorn + grave.cap@U:center,U:top|1EEA
+Uhornhook = Uhorn + hook.cap@U:center,U:top|1EEC
+Uhorntilde = Uhorn + tilde.cap@U:center,U:top|1EEE
+Utilde = U + tilde.cap@center,top|0168
+Ydotaccent = Y + dotaccent.cap@center,bottom|1EF4
+Ygrave = Y + grave.cap@center,top|1EF2
+Yhook = Y + hook.cap@center,top|1EF6
+Ytilde = Y + tilde.cap@center,top|1EF8
+
+*
+*
+
+## lowercase
+
+abreveacute = a + breve@center,top + acute@center,top|1EAF
+abrevedotaccent = a + breve@center,top + dotaccent@center,a:bottom|1EB7
+abrevegrave = a + breve@center,top + grave@center,top|1EB1
+abrevehook = a + breve@center,top + hook@center,top|1EB3
+abrevetilde = a + breve@center,top + tilde@center,top|1EB5
+acircumflexacute = a + circumflex@center,top + acute@center,top|1EA5
+acircumflexdotaccent = a + circumflex@center,top + dotaccent@center,a:bottom|1EAD
+acircumflexgrave = a + circumflex@center,top + grave@center,top|1EA7
+acircumflexhook = a + circumflex@center,top + hook@center,top|1EA9
+acircumlfextilde = a + circumflex@center,top + tilde@center,top|1EAB
+adotaccent = a + dotaccent@center,bottom|1EA1
+ahook = a + hook@center,top|1EA3
+ecircumflexacute = e + circumflex@center,top + acute@center,top|1EBF
+ecircumflexdotaccent = e + circumflex@center,top + dotaccent@center,e:bottom|1EC7
+ecircumflexgrave = e + circumflex@center,top + grave@center,top|1EC1
+ecircumflexhook = e + circumflex@center,top + hook@center,top|1EC3
+ecircumflextilde = e + circumflex@center,top + tilde@center,top|1EC5
+edotaccent = e + dotaccent@center,bottom|1EB9
+ehook = e + hook@center,top|1EBB
+etilde = e + tilde@center,top|1EBD
+idotaccent = i + dotaccent@center,bottom|1ECB
+ihook = dotlessi + hook@center,top|1EC9
+ocircumflexacute = o + circumflex@center,top + acute@center,top|1ED1
+ocircumflexgrave = o + circumflex@center,top + grave@center,top|1ED3
+ocircumflexhook = o + circumflex@center,top + hook@center,top|1ED5
+ocircumflextilde = o + circumflex@center,top + tilde@center,top|1ED7
+ocircumlfexdotaccent = o + circumflex@center,top + dotaccent@center,o:bottom|1ED9
+odotaccent = o + dotaccent@center,bottom|1ECD
+ohook = o + hook@center,top|1ECF
+
+# create first
+ohorn = o + horn@right,innerTop|01A1
+
+ohorndotaccent = ohorn + dotaccent@o:center,o:bottom|1EE3
+ohorngrave = ohorn + grave@o:center,o:top|1EDD
+ohornhook = ohorn + hook@o:center,o:top|1EDF
+ohorntilde = ohorn + tilde@o:center,o:top|1EE1
+udotaccent = u + dotaccent@center,bottom|1EE5
+uhook = u + hook@center,top|1EE7
+
+# create first
+uhorn = u + horn@right,innerTop|01B0
+
+uhornacute = uhorn + acute@u:center,u:top|1EE9
+uhorndotaccent = uhorn + dotaccent@u:center,u:bottom|1EF1
+uhorngrave = uhorn + grave@u:center,u:top|1EEB
+uhornhook = uhorn + hook@u:center,u:top|1EED
+uhorntilde = uhorn + tilde@u:center,u:top|1EEF
+ydotaccent = y + dotaccent@center,bottom|1EF5
+ygrave = y + grave@center,top|1EF3
+yhook = y + hook @center,top|1EF7
+ytilde = y + tilde@center,top|1EF9
+
+
+dong =  dcroat + macron@center,bottom| 20AB
+
+
+
+
+
+
+
+
+
+
+
+

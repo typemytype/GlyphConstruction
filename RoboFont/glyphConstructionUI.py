@@ -35,7 +35,7 @@ from glyphConstructionLexer import GlyphConstructionLexer
 import glyphConstructionBuilder
 reload(glyphConstructionBuilder)
 
-from glyphConstructionBuilder import GlyphConstructionBuilder, MakeGlyphConstructionListFromString
+from glyphConstructionBuilder import GlyphConstructionBuilder, MakeGlyphConstructionListFromString, GlyphBuilderError
 
 from lib.scripting.codeEditor import CodeEditor
 
@@ -436,6 +436,7 @@ class GlyphBuilderController(BaseWindowController):
         toolbar = self.w.addToolbar(toolbarIdentifier="GlyphBuilderControllerToolbar", toolbarItems=toolbarItems, addStandardItems=False)
         
         self.constructions = CodeEditor((0, 0, -0, -0),constructions, lexer=GlyphConstructionLexer())
+        self.constructions.wrapWord(False)
         
         self.constructions.getNSScrollView().setBorderType_(NSNoBorder)
         self.preview = MultiLineView((0, 0, -0, -0), 
@@ -516,21 +517,26 @@ class GlyphBuilderController(BaseWindowController):
             return
         
         font = self.font.naked()
-        glyphRecords = []
-        constructions = MakeGlyphConstructionListFromString(sender.get())
-        
-        font = self.font.naked()
-        
         self._glyphs = []
-        
+        glyphRecords = []
         errors = []
         
+        try:
+            constructions = MakeGlyphConstructionListFromString(sender.get())
+        except GlyphBuilderError, err:
+            constructions = []
+            errors.append(str(err))
+                        
         for construction in constructions:
                         
             if not construction:
                 glyph = self.preview.createNewLineGlyph()
             else:
-                constructionGlyph = GlyphConstructionBuilder(construction, font)
+                try:
+                    constructionGlyph = GlyphConstructionBuilder(construction, font)
+                except GlyphBuilderError, err:
+                    errors.append(str(err))
+                    continue
                 
                 if constructionGlyph.name is None:
                     errors.append(construction)

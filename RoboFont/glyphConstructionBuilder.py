@@ -22,10 +22,13 @@ glyphMarkSuffixSplit = "!"
 glyphNameEscape = "/"
 escapeReplacment = "((ligatureEscape))"
 
+variableDeclarationStart = "$"
+variableDeclarationEnd = ""
 
 """
 
-Laringacute = L _ a + ring@center,top + acute@center,top | 159AFFF * 1, 0, 0, 1 # this is an example
+%variable = n
+Laringacute = L _ a + ring@center,top + acute@center,top | 159AFFF ! 1, 0, 0, 1 # this is an example
 
 """
 
@@ -101,6 +104,57 @@ class ConstructionGlyph(object):
     
     bounds = property(_get_bounds)
     
+    def _get_leftMargin(self):
+        bounds = self.bounds
+        if bounds is None:
+            return None
+        xMin, yMin, xMax, yMax = bounds
+        return xMin
+
+    def _set_leftMargin(self, value):
+        if value is None:
+            return
+        bounds = self.bounds
+        if bounds is None:
+            return
+        xMin, yMin, xMax, yMax = bounds
+        diff = value - xMin
+        self.move((diff, 0))
+        self.width += diff
+
+    leftMargin = property(_get_leftMargin, _set_leftMargin)
+
+    def _get_rightMargin(self):
+        bounds = self.bounds
+        if bounds is None:
+            return None
+        xMin, yMin, xMax, yMax = bounds
+        return self.width - xMax
+
+    def _set_rightMargin(self, value):
+        if value is None:
+            return
+        bounds = self.bounds
+        if bounds is None:
+            return
+        xMin, yMin, xMax, yMax = bounds
+        self.width = xMax + value
+
+    rightMargin = property(_get_rightMargin, _set_rightMargin)
+
+    def move(self, (moveX, moveY)):
+        oldBounds = self._bounds
+        for i in range(len(self.components)):
+            glyphName, (xx, xy, yx, yy, x, y) = self.components[i]
+            self.components[i] = glyphName, (xx, xy, yx, yy, x+moveX, y+moveY)
+        if oldBounds:
+            xMin, yMin, xMax, yMax = oldBounds
+            xMin += moveX
+            yMin += moveY
+            xMax += moveX
+            yMax += moveY
+            self._bounds = (xMin, yMin, xMax, yMax)
+
     def draw(self, pen):
         for glyphName, transformation in self.components:
             pen.addComponent(glyphName, transformation)
@@ -362,30 +416,39 @@ def parseMarks(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, advan
 
 reGlyphName = re.compile(r'([a-zA-Z_][a-zA-Z0-9_.]*|.notdef)')
 
-def parseWidth(construction, font):
-    widthValue = None
+def _parseGlyphMetric(construction, font, attr):
+    value = None
     if metricsSuffixSplit in construction:
-        construction, widthValue = construction.split(metricsSuffixSplit)
+        construction, value = construction.split(metricsSuffixSplit)
         try:
-            widthValue = float(widthValue)
+            value = float(value)
         except:
-            if widthValue in font:
-                width = font[widthValue].width            
+            if value in font:
+                value = getattr(font[value], attr)
             else:
                 lastIndex = 0
-                newText = "widthValue="
-                for i in reGlyphName.finditer(widthValue):
-                    newText += widthValue[lastIndex:i.start()]
+                newText = "value="
+                for i in reGlyphName.finditer(value):
+                    newText += value[lastIndex:i.start()]
                     glyphName = i.group()
                     if glyphName in font:
-                        newText += "%s" % font[glyphName].width
+                        newText += "%s" % getattr(font[glyphName], attr)
                     lastIndex = i.end()
-                newText += widthValue[lastIndex:]
+                newText += value[lastIndex:]
                 try:
                     exec(newText)
                 except:
-                    widthValue = None
-    return widthValue, construction
+                    value = None
+    return value, construction
+
+def parseWidth(construction, font):
+    return _parseGlyphMetric(construction, font, "width")
+
+def parseLeftMargin(construction, font):
+    return _parseGlyphMetric(construction, font, "leftMargin") 
+
+def parseRightMargin(construction, font):
+    return _parseGlyphMetric("%s%s" % (metricsSuffixSplit, construction), font, "rightMargin") 
 
 def parseUnicode(construction, font=None):
     unicode = None
@@ -416,7 +479,9 @@ def parseMark(construction, font=None):
 glyphAttrFuncMap = {
         "unicode" : parseUnicode,
         "mark" : parseMark,
-        "width" : parseWidth 
+        "width" : parseWidth,
+        "leftMargin" : parseLeftMargin,
+        "rightMargin" : parseRightMargin
     }
 
 def parseGlyphattributes(construction, font):
@@ -440,6 +505,12 @@ def parseGlyphattributes(construction, font):
         else:
             newConstruction += c
     values = {}
+    if "width" in attrs:
+        if positionXYSplit in attrs["width"]:
+            margins = attrs["width"].split(positionXYSplit)
+            if len(margins) == 2:
+                attrs["leftMargin"], attrs["rightMargin"] = margins
+                del attrs["width"]
     for attr, value in attrs.items():
         func = glyphAttrFuncMap[attr]
         value, _ = func(value, font)
@@ -518,13 +589,28 @@ def GlyphConstructionBuilder(construction, font):
             advanceWidth += width
             
     destination.width = advanceWidth
-    
     for key, value in glyphAttributes.items():
         setattr(destination, key, value)
-    
     return destination
 
+varialbesRE = re.compile(r"\%s\s*(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(?P<value>.*)" % variableDeclarationStart)
+
+def ParseVariables(txt):
+    variables = {}
+    for i in varialbesRE.finditer(txt):
+        name = i.group("name")
+        value = i.group("value")
+        variables[name] = value
+        txt = txt.replace(i.group(), "")
+    return txt, variables
+
 def MakeGlyphConstructionListFromString(txt):
+    txt, variables = ParseVariables(txt)
+    try:
+        txt = txt.format(**variables)
+    except KeyError, err:
+        raise GlyphBuilderError, "Variable %s is missing" % err
+
     lines = []
     for line in txt.split("\n"):
         line = line.strip()

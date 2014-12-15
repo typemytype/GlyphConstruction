@@ -3,7 +3,7 @@ from pygments import token
 
 from lib.scripting.codeEditor import CodeEditor, languagesIDEBehavior
 
-glyphConstructionAlignmentWords = ["top", "bottom", "center", "left", "right", "innerRight", "innerLeft", "innerTop", "innerBottom", "origin"]
+glyphConstructionAlignmentWords = ["top", "bottom", "center", "left", "right", "innerRight", "innerLeft", "innerTop", "innerBottom", "origin", "descender",  "xHeight", "capHeight", "ascender"]
 glyphConstructionOperations = [
     "=", "+", "|", "@", ":", ",", "_", "!", "^",
     "-", "/", "*" # math stuff"
@@ -32,9 +32,11 @@ class GlyphConstructionLexer(RegexLexer):
                     (r'#.*$', token.Comment),
                     (r'(\|)[\s|\\\s]*([a-fA-F0-9]{4,})', bygroups(token.Operator, token.Number.Hex)),
                     (r'%s' % ("\\"+"|\\".join(glyphConstructionOperations)), token.Operator),
-                    (r'([a-zA-Z_][a-zA-Z0-9_]*)((\s|\\\s)*=)',  bygroups(token.Keyword, token.Operator)),
+                    (r'([a-zA-Z_\{][a-zA-Z0-9_\{\}]*)((\s|\\\s)*=)',  bygroups(token.Keyword, token.Operator)),
                     (r'(%s)' % ("|".join(glyphConstructionAlignmentWords)), token.Name.Tag),
                     (r'\.([a-zA-Z_][a-zA-Z0-9_]*)?', token.String.Other),
+                    (r'(\$\s*[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(.*)', bygroups(token.Name.Function, token.String)),
+                    (r'\{[a-zA-Z_][a-zA-Z0-9_]*\}', token.Name.Function),
                     include('numbers'),
                     include('whitespace'),
                     (r'[a-zA-Z][a-zA-Z0-9]*', token.Name),  
@@ -52,7 +54,7 @@ class GlyphConstructionLexer(RegexLexer):
                     (r'\s+', token.Text),
                 ],
         }
-
+#r"\%(?P<name>[a-zA-Z_][a-zA-Z0-9]*)\s+\=\s+(?P<value>.*)")
 
 if __name__ == "__main__":
     

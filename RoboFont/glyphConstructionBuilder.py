@@ -162,10 +162,6 @@ class ConstructionGlyph(object):
     def drawPoints(self, pen):
         self.draw(pen)
     
-        
-        
-
-
 def parsePosition(markGlyph, font, positionName, direction, prefix="", isBase=False):        
     position = (0, 0)
     fixedPosition = False

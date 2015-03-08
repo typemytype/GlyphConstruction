@@ -1,11 +1,12 @@
 Glyph Construction
 ==================
 
-[write intro]
+[This is a draft]
 
-- a language to describe how a shape is constructed
-- doesnt contain any design
-- a *.glyphConstruction file should be interchangable between fonts
+- A language to describe how a shape is constructed.
+- Doesnt contain any design.
+- A *.glyphConstruction file should be interchangable between fonts.
+- Must be readable.
 
 A line starting with or anything after a `#` is a comment and will not be used during execution.
 
@@ -89,3 +90,20 @@ Example:
 
     ffi = f _ f _ i
 
+### Variables
+
+Variables are possible, the have to be decleared at the top of the document.
+
+Declaration:
+	
+	$name = something
+	
+Usage:
+
+	{name}	
+
+Example:
+
+	$myColorMark = 1, 0, 0, 1
+	
+	agrave = a + grave@center,top ! {myColorMark}

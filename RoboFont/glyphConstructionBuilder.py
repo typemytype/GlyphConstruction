@@ -27,8 +27,8 @@ variableDeclarationEnd = ""
 
 """
 
-%variable = n
-Laringacute = L _ a + ring@center,top + acute@center,top | 159AFFF ! 1, 0, 0, 1 # this is an example
+$variableName = n
+Laringacute = L _ a + ring@center,top + acute@center,top ^ 100, 100 | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a varialbe {variableName}
 
 """
 

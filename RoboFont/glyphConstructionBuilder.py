@@ -548,9 +548,8 @@ def GlyphConstructionBuilder(construction, font):
     #destination.unicode, construction = parseUnicode(construction)
     
     #metrics, construction = parseMetrics(construction, font)
-    
     construction = construction.replace("%s%s" %(glyphNameEscape, baseGlyphSplit), escapeReplacment)
-    
+
     baseGlyphs = construction.split(baseGlyphSplit)
     
     
@@ -566,7 +565,7 @@ def GlyphConstructionBuilder(construction, font):
         advanceHeight = 0
         
         for markGlyph in markGlyphs:
-            
+            markGlyph = markGlyph.replace(escapeReplacment, baseGlyphSplit)
             component, transformMatrix = parseMarks(baseMarkGlyph, markGlyph, font, markTransformMap, advanceWidth, advanceHeight)
             destination.addComponent(component, transformMatrix)
             

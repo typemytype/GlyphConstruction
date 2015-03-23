@@ -436,7 +436,7 @@ class GlyphBuilderController(BaseWindowController):
         toolbar = self.w.addToolbar(toolbarIdentifier="GlyphBuilderControllerToolbar", toolbarItems=toolbarItems, addStandardItems=False)
         
         self.constructions = CodeEditor((0, 0, -0, -0),constructions, lexer=GlyphConstructionLexer())
-        self.constructions.wrapWord(False)
+        #self.constructions.wrapWord(False) # in only availbel in the RoboFont 1.7 beta
         
         self.constructions.getNSScrollView().setBorderType_(NSNoBorder)
         self.preview = MultiLineView((0, 0, -0, -0), 

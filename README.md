@@ -20,7 +20,14 @@ Add one or more component to a glyph with a name `<destGlyphName>`
 Example:
 
     Aacute = A + acute
- 
+
+Optionally a suffix can be provided, it will be ignored when the mark glyph does not exist in the provided font.
+
+Example:
+
+    Aacute = A + acute.cap
+
+
 ### Unicodes
 
     <destGlyphName> = <glyphName> + <glyphName> | <unicode>
@@ -28,7 +35,41 @@ Example:
 Example:
 
     Aacute = A + acute | 00C1
-   
+
+### Mark Color
+
+    <destGlyphName> = <glyphName> + <glyphName> ! <rgba>
+
+Example:
+
+    Aacute = A + acute ! 1, 0, 0, 1
+
+### Metrics
+
+#### Width
+
+    <destGlyphName> = <glyphName> + <glyphName> ^ <width>
+
+Example:
+
+    Aacute = A + acute ^ 400
+    
+
+#### Left and Right Margins
+
+    <destGlyphName> = <glyphName> + <glyphName> ^ <leftmargin>, <rightMargin
+
+Example:
+
+    Aacute = A + acute ^ 30, 30
+
+Optionally it is possible to use some basic math, variables that refers to glyph names will take the width, leftMargin or rightMargin value of that glyph.
+
+Example:
+
+    Aacute = A + acute ^ A * 2 
+    Aacute = A + acute ^ A / 3, B * 2
+
 ### Positioning
 
 Will position the added component related to the current glyph.
@@ -55,8 +96,10 @@ A reference could be (in this order):
 
 * double anchor (with the _<anchorName> quotation)
 * a single anchor name
-* a guide name
-* a calculated word: **top**, **bottom**, **left**, **right**, **innerLeft**, **innerRight**, **center**
+* a local guide name
+* a global guide name
+* font info value: **descender**, **xHeight**, **capHeight**, **ascender**
+* a calculated word: **top**, **bottom**, **left**, **right**, **innerLeft**, **innerRight**, **center**, **origin**, **width**
 
 Example:
 
@@ -83,12 +126,18 @@ Example:
 Example:
 
     Aringacute = A + ring@center,top + acute@center,top
-   
+
+### Positioning formulas
+
+Example:
+
+    Aringacute = A + ring@center,`top+10` + acute@center,`top-10`
+
 ### Stacking Horizontally
 
 Example:
 
-    ffi = f _ f _ i
+    ffi = f & f & i
 
 ### Variables
 

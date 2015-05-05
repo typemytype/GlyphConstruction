@@ -17,16 +17,10 @@ from mojo.extensions import getExtensionDefault, setExtensionDefault, getExtensi
 from lib.UI.splitter import Splitter
 
 from lib.UI.enterTextEditor import EnterTextEditor
-from lib.UI.lineNumberRulerView import NSLineNumberRuler
 
 from lib.tools.misc import NSColorToRgba
 
 from lib.UI.statusBar import StatusBar
-
-from lib.baseObjects import CallbackWrapper
-
-from fontTools.pens.cocoaPen import CocoaPen
-
 
 import glyphConstructionLexer
 reload(glyphConstructionLexer)
@@ -35,7 +29,7 @@ from glyphConstructionLexer import GlyphConstructionLexer
 import glyphConstructionBuilder
 reload(glyphConstructionBuilder)
 
-from glyphConstructionBuilder import GlyphConstructionBuilder, MakeGlyphConstructionListFromString, GlyphBuilderError
+from glyphConstructionBuilder import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
 
 from lib.scripting.codeEditor import CodeEditor
 
@@ -184,6 +178,37 @@ L_aringacute=L_a+ring@center,top+acute@center,top
 
 constructions = ""
 
+class GlyphConstructorFont(object):
+    
+    def __init__(self, font):
+        self.font = font
+        self.glyphsDone = {}
+    
+    def __getattr__(self, attr):
+        return getattr(self.font, attr)
+            
+    def __getitem__(self, glyphName):
+        if glyphName in self.glyphsDone:
+            return self.glyphsDone[glyphName]
+        return self.font[glyphName]
+    
+    def __contains__(self, glyphName):
+        if glyphName in self.glyphsDone: 
+            return True
+        return glyphName in self.font
+    
+    def __len__(self):
+        return len(self.keys())
+        
+    def keys(self):
+        return set(self.font.keys() + self.glyphsDone.keys())
+    
+    def __iter__(self):
+        names = self.keys()
+        while names:
+            name = names[0]
+            yield self[name]
+            names = names[1:]
          
 class AnalyserTextEditor(EnterTextEditor):
     
@@ -503,7 +528,7 @@ class GlyphBuilderController(BaseWindowController):
         if font is not None:
             self.preview.setFont(font)
             self.font.naked().addObserver(self, "fontChanged", "Font.Changed")
-        self.construcstionsCallback(self.constructions)
+        self.constructionsCallback(self.constructions)
     
     def unsubscribeFont(self):
         if self.font is not None:
@@ -512,28 +537,31 @@ class GlyphBuilderController(BaseWindowController):
             self.font.removeObserver(self, notification="Font.Changed")
             self.font = None
     
-    def construcstionsCallback(self, sender, update=True):
+    def constructionsCallback(self, sender, update=True):
         if self.font is None:
             return
         
         font = self.font.naked()
+        
+        self.glyphConstructorFont = GlyphConstructorFont(font)
+        
         self._glyphs = []
-        glyphRecords = []
         errors = []
         
         try:
-            constructions = MakeGlyphConstructionListFromString(sender.get())
+            constructions = ParseGlyphConstructionListFromString(sender.get())
         except GlyphBuilderError, err:
             constructions = []
             errors.append(str(err))
                         
         for construction in constructions:
-                        
             if not construction:
                 glyph = self.preview.createNewLineGlyph()
+            elif construction in self.glyphConstructorFont.glyphsDone:
+                glyph = self.glyphConstructorFont.glyphsDone[construction]
             else:
                 try:
-                    constructionGlyph = GlyphConstructionBuilder(construction, font)
+                    constructionGlyph = GlyphConstructionBuilder(construction, self.glyphConstructorFont)
                 except GlyphBuilderError, err:
                     errors.append(str(err))
                     continue
@@ -547,12 +575,13 @@ class GlyphBuilderController(BaseWindowController):
                 glyph.unicode = constructionGlyph.unicode
                 glyph.note = constructionGlyph.note
                 glyph.mark = constructionGlyph.mark
-                glyph.setParent(font)
+                glyph.setParent(self.glyphConstructorFont)
                 glyph.dispatcher = font.dispatcher
-            
-                
+
                 glyph.width = constructionGlyph.width
                 constructionGlyph.draw(glyph.getPen())
+
+                self.glyphConstructorFont.glyphsDone[glyph.name] = glyph
             
             self._glyphs.append(glyph)
         
@@ -651,7 +680,7 @@ class GlyphBuilderController(BaseWindowController):
         
     
     def reload(self, sender=None, update=True):
-        self.construcstionsCallback(self.constructions, update)
+        self.constructionsCallback(self.constructions, update)
     
     def _saveFile(self, path):
         txt = self.constructions.get()

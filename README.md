@@ -94,7 +94,7 @@ Example:
 
 A reference could be (in this order):
 
-* double anchor (with the _<anchorName> quotation)
+* double anchor (with the `_<anchorName>` quotation)
 * a single anchor name
 * a local guide name
 * a global guide name

@@ -28,10 +28,8 @@ explicitMathStart = '`'
 explicitMathEnd = '`'
 
 """
-
 $variableName = n
-Laringacute = L & a + ring@~center,~`top+10` + acute@center,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a varialbe {variableName}
-
+Laringacute = L & a + ring@~center,~`top+10` + acute@center,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a variable {variableName}
 """
 
 # legal positions
@@ -42,11 +40,17 @@ legalGlyphMetricVerticalPositions = set("origin height".split(" "))
 legalBoundsPositions = set("left innerLeft right innerRight top innerTop bottom innerBottom".split(" "))
 legalCalculatablePositions = legalBoundsPositions | set(["center"])
 
-### math 
+
+# math
 
 def _intersectAngles(point1, angle1, point2, angle2):
     """
     Intersect two rays, described by a point and an angle.
+
+    >>> _intersectAngles((100, 100), 45, (100, 200), -45)
+    (150.00000000000094, 150.00000000000094)
+    >>> _intersectAngles((100, 100), 45, (100, 200), 45) == None
+    True
     """
     point1A = point1
     point2A = point2
@@ -55,9 +59,15 @@ def _intersectAngles(point1, angle1, point2, angle2):
     intersection = _intesectLines((point1A, point1B), (point2A, point2B))
     return intersection
 
+
 def _intesectLines((pt1, pt2), (pt3, pt4)):
     """
     Intersect two lines.
+
+    >>> _intesectLines(((100, 100), (200, 200)), ((100, 200), (200, 100)))
+    (150, 150)
+    >>> _intesectLines(((200, 100), (200, 200)), ((300, 200), (300, 200))) == None
+    True
     """
     denom = (pt1[0] - pt2[0]) * (pt3[1] - pt4[1]) - (pt1[1] - pt2[1]) * (pt3[0] - pt4[0])
     if _roundFloat(denom) == 0:
@@ -68,13 +78,16 @@ def _intesectLines((pt1, pt2), (pt3, pt4)):
     y /= denom
     return (x, y)
 
+
 def _roundFloat(f, error=10000.0):
     return round(f * error) / error
+
 
 def _diffPoint((x1, y1), (x2, y2)):
     return (x1 - x2, y1 - y2)
 
-## regex
+
+# regex
 
 if variableDeclarationEnd:
     variableDeclarationEnd = "\%s" % variableDeclarationEnd
@@ -82,19 +95,24 @@ varialbesRE = re.compile(r"\%s\s*(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(?P<val
 
 simpleVariableRe = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]*")
 
+percentageRe = re.compile(r"[0-9]*%")
+
 glyphNameRe = re.compile(r'([a-zA-Z_][a-zA-Z0-9_.]*|.notdef)')
 
 explicitMathRe = re.compile(r'\%s(?P<explicitMath>.*?)\%s' % (explicitMathStart, explicitMathEnd))
 
-## errors
 
-class GlyphBuilderError(Exception): 
+# error
+
+class GlyphBuilderError(Exception):
     pass
 
-## glyph object
+
+# glyph object
+
 
 class ConstructionGlyph(object):
-    
+
     """
     A Glyph like object able set some basic attributes, add components and draw.
     """
@@ -111,23 +129,23 @@ class ConstructionGlyph(object):
 
     def addComponent(self, glyphName, transformation):
         self.components.append((glyphName, transformation))
-    
+
     def __len__(self):
         return 0
-    
+
     def __iter__(self):
         while 0:
             yield
-    
+
     def _get_bounds(self):
         if self._bounds is None:
             pen = BoundsPen(self.getParent())
             self.draw(pen)
             self._bounds = pen.bounds
         return self._bounds
-    
+
     bounds = property(_get_bounds)
-    
+
     def _get_leftMargin(self):
         bounds = self.bounds
         if bounds is None:
@@ -182,19 +200,20 @@ class ConstructionGlyph(object):
     def draw(self, pen):
         for glyphName, transformation in self.components:
             pen.addComponent(glyphName, transformation)
-    
+
     def drawPoints(self, pen):
         self.draw(pen)
 
+
 class MathPoint(tuple):
-    
+
     """
     A math object for calculation with tuples.
     """
 
-    def __new__ (cls, point, allowTupleMathOnly=False):
+    def __new__(cls, point, allowTupleMathOnly=False):
         return super(MathPoint, cls).__new__(cls, point)
-        
+
     def __init__(self, point, allowTupleMathOnly=False):
         self.allowTupleMathOnly = allowTupleMathOnly
 
@@ -210,10 +229,10 @@ class MathPoint(tuple):
         if oy != 0:
             y = operation(y, oy)
         return self.__class__((x, y), self.allowTupleMathOnly)
-        
+
     def __add__(self, other):
         return self._operation(other, operator.add)
-    
+
     def __iadd__(self, other):
         return self._operation(other, operator.iadd)
 
@@ -222,40 +241,40 @@ class MathPoint(tuple):
 
     def __isub__(self, other):
         return self._operation(other, operator.isub)
-    
+
     def __mul__(self, other):
         return self._operation(other, operator.mul)
-  
+
     def __div__(self, other):
-        return self._operation(other, operator.div)          
-    
+        return self._operation(other, operator.div)
+
     def __truediv__(self, other):
-        return self._operation(other, operator.truediv) 
+        return self._operation(other, operator.truediv)
 
 
 def _parsePosition(name, position, angle, fixedPosition, glyph, font, direction, isBase, prefix, top, bottom, left, right, width, height):
     # glyph anchor + prefix
-    found = _findAnchor(glyph, "%s%s" %(prefix, name))
+    found = _findAnchor(glyph, "%s%s" % (prefix, name))
     if found is not None:
         return found, angle, fixedPosition
-        
+
     # glyph anchor
     found = _findAnchor(glyph, name)
     if found is not None:
         return found, angle, fixedPosition
-    
+
     # glyph guide + prefix
-    found = _findGuide(glyph, "%s%s" %(prefix, name))
+    found = _findGuide(glyph, "%s%s" % (prefix, name))
     if found is not None:
         position, angle = found
         return position, angle, fixedPosition
-    
+
     # glyph guide
     found = _findGuide(glyph, name)
     if found is not None:
         position, angle = found
         return position, angle, fixedPosition
-                        
+
     # font guide
     found = _findGuide(font, name)
     if found is not None:
@@ -284,40 +303,40 @@ def _parsePosition(name, position, angle, fixedPosition, glyph, font, direction,
             position = (0, getattr(glyph, "height", height))
         fixedPosition = True
         return position, angle, fixedPosition
-        
+
     # font metrics
     if name in legalFontInfoAttributes:
         found = _findFontInfoValue(font, name)
         if found is not None:
             _, value = found
             position = (0, value-bottom)
-            
-            #if isBase:
-            #    position = _diffPoint(found, (0, top))
-            #else:
-            #    position = _diffPoint(found, (0, bottom))
+
+            # if isBase:
+            #     position = _diffPoint(found, (0, top))
+            # else:
+            #     position = _diffPoint(found, (0, bottom))
             fixedPosition = True
             return position, angle, fixedPosition
 
     # calculate
-    centerValue = .5    
+    centerValue = .5
     if name.endswith("%"):
         try:
             centerValue = float(name[:-1]) * 0.01
             name = "center"
         except:
             pass
-    
+
     if name in legalCalculatablePositions:
         if name == "center":
             if isBase:
                 position = (left + width * centerValue, bottom + height * centerValue)
             else:
-                position = (left + width * centerValue + width - width * centerValue * 2,  
+                position = (left + width * centerValue + width - width * centerValue * 2,
                             bottom + height * centerValue + height - height * centerValue * 2)
-                
+
         elif name in legalBoundsPositions:
-            
+
             if direction == "y" and name == "top":
                 if isBase:
                     position = (0, top)
@@ -343,15 +362,16 @@ def _parsePosition(name, position, angle, fixedPosition, glyph, font, direction,
                 if isBase:
                     position = (right, 0)
                 else:
-                    position = (left, 0)                                         
+                    position = (left, 0)
             elif direction == "x" and name == "innerRight":
                 position = (right, 0)
     return position, angle, fixedPosition
 
+
 def parsePosition(markGlyph, font, positionName, direction, prefix="", isBase=False):
     position = (0, 0)
     fixedPosition = False
-    
+
     if direction == "x":
         italicAngle = getattr(font.info, "italicAngle", 0)
         if italicAngle is None:
@@ -359,27 +379,32 @@ def parsePosition(markGlyph, font, positionName, direction, prefix="", isBase=Fa
         angle = 90 + italicAngle
     else:
         angle = 0
-    
+
     if markGlyph not in font:
         return position, angle, fixedPosition
-        
+
     glyph = font[markGlyph]
-    
+
     bounds = glyph.bounds
     left = bottom = right = top = width = height = 0
     if bounds:
         left, bottom, right, top = bounds
         width = right - left
         height = top - bottom
-    
+
     names = simpleVariableRe.findall(positionName)
+    percentage = percentageRe.findall(positionName)
     nameSpace = dict()
 
     # try to convert to float
-    if not names:
-        exec("positionName=%s" % positionName)
+    if not names and not percentage:
+        # resolve simple math operations
+        try:
+            exec("positionName=%s" % positionName)
+        except:
+            pass
     try:
-        value = float(positionName)            
+        value = float(positionName)
         if direction == "x":
             position = (value-left, 0)
         elif direction == "y":
@@ -397,26 +422,28 @@ def parsePosition(markGlyph, font, positionName, direction, prefix="", isBase=Fa
             prefix=prefix,
             top=top,
             bottom=bottom,
-            left=left, 
-            right=right, 
+            left=left,
+            right=right,
             width=width,
             height=height
         )
 
-    for name in names:
+    for name in names + percentage:
         position, angle, fixedPosition = _parsePosition(name, position, angle, fixedPosition, **data)
         nameSpace[name] = MathPoint(position, not isBase and not fixedPosition)
-    
+
     try:
         exec("position=%s" % positionName, nameSpace)
     except ZeroDivisionError:
-        raise GlyphBuilderError, "ZeroDivisionError: integer division or modulo by zero in '%s'" % positionName
+        raise GlyphBuilderError("ZeroDivisionError: integer division or modulo by zero in '%s'" % positionName)
     except SyntaxError:
-        raise GlyphBuilderError, "SyntaxError: invalid syntax in '%s'" % positionName
+        if not percentage:
+            raise GlyphBuilderError("SyntaxError: invalid syntax in '%s'" % positionName)
     except:
-        raise GlyphBuilderError, "Something went wrong in '%s'" % positionName
-    position = nameSpace["position"]
+        raise GlyphBuilderError("Something went wrong in '%s'" % positionName)
+    position = nameSpace.get("position", position)
     return position, angle, fixedPosition
+
 
 def _findAnchor(glyph, name):
     anchors = glyph.anchors
@@ -424,6 +451,7 @@ def _findAnchor(glyph, name):
         if anchor.name == name:
             return (anchor.x, anchor.y)
     return None
+
 
 def _findGuide(glyph, name):
     if hasattr(glyph, "guides"):
@@ -433,25 +461,25 @@ def _findGuide(glyph, name):
                 return (guide.x, guide.y), guide.angle
     return None
 
+
 def _findFontInfoValue(font, name):
     value = getattr(font.info, name)
     if value is None:
         value = 0
     return (0, value)
 
-#def parseFlip(
 
 def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, advanceHeight):
     xx, xy, yx, yy, x, y = 1, 0, 0, 1, advanceWidth, advanceHeight
-    
+
     baseGlyphX = baseGlyphY = baseGlyph
     markFixedX = markFixedY = False
-    
+
     flipX = flipY = False
-    
+
     if positionSplit in markGlyph:
         markGlyph, position = markGlyph.split(positionSplit)
-        
+
         if positionXYSplit in position:
             positions = position.split(positionXYSplit)
             if len(positions) == 6:
@@ -463,29 +491,28 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             elif len(positions) == 2:
                 positionX, positionY = positions
             else:
-                raise GlyphBuilderError, "mark positions should have 6 or 2 options"
+                raise GlyphBuilderError("mark positions should have 6 or 2 options")
         else:
             positionX = positionY = position
-        
+
         if positionBaseSplit in positionX:
             baseGlyphX, positionX = positionX.split(positionBaseSplit)
-        
+
         if positionBaseSplit in positionY:
             baseGlyphY, positionY = positionY.split(positionBaseSplit)
-        
+
         if flipMarkGlyphSplit in positionX:
             flipX = True
             positionX = positionX.replace(flipMarkGlyphSplit, "")
-        
+
         if flipMarkGlyphSplit in positionY:
             flipY = True
             positionY = positionY.replace(flipMarkGlyphSplit, "")
-        
-        
+
         if positionX and positionY:
             baseX = baseY = 0
             markX = markY = 0
-        
+
             if markGlyph not in font:
                 if glyphSuffixSplit in markGlyph:
                     markGlyph = markGlyph.split(glyphSuffixSplit)[0]
@@ -495,7 +522,7 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             intersection = _intersectAngles(markPoint1, markAngle1, markPoint2, markAngle2)
             if intersection is not None:
                 markX, markY = intersection
-        
+
             if baseGlyphX in font and baseGlyphY in font:
                 basePoint1, baseAngle1, _ = parsePosition(baseGlyphX, font, positionX, direction="x", isBase=True)
                 basePoint2, baseAngle2, _ = parsePosition(baseGlyphY, font, positionY, direction="y", isBase=True)
@@ -508,24 +535,24 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
                 x += baseX - markX
             else:
                 x += markX
-        
-            if not markFixedY:            
+
+            if not markFixedY:
                 y += baseY - markY
             else:
                 y += markY
-        
+
         if not markFixedX:
             baseTransform = markTransformMap.get(baseGlyphX)
             if baseTransform:
                 x += baseTransform[4] - advanceWidth
-    
+
         if not markFixedY:
             baseTransform = markTransformMap.get(baseGlyphY)
             if baseTransform:
                 y += baseTransform[5] - advanceHeight
-    
+
     transformMatrix = (xx, xy, yx, yy, x, y)
-    print flipX, flipY
+
     if flipX:
         bounds = font[markGlyph].bounds
         if bounds:
@@ -539,7 +566,7 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             t = t.translate(0, -maxy)
             t = t.transform(bt)
             transformMatrix = t[:]
-            
+
     if flipY:
         bounds = font[markGlyph].bounds
         if bounds:
@@ -553,8 +580,6 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             t = t.translate(-maxx, 0)
             t = t.transform(bt)
             transformMatrix = t[:]
-            
-    
     return markGlyph, transformMatrix
 
 
@@ -584,16 +609,27 @@ def _parseGlyphMetric(construction, font, attr):
                     value = None
     return value, construction
 
+
 def parseWidth(construction, font):
     return _parseGlyphMetric(construction, font, "width")
 
+
 def parseLeftMargin(construction, font):
-    return _parseGlyphMetric(construction, font, "leftMargin") 
+    return _parseGlyphMetric(construction, font, "leftMargin")
+
 
 def parseRightMargin(construction, font):
-    return _parseGlyphMetric("%s%s" % (metricsSuffixSplit, construction), font, "rightMargin") 
+    return _parseGlyphMetric("%s%s" % (metricsSuffixSplit, construction), font, "rightMargin")
+
 
 def parseUnicode(construction, font=None):
+    """
+    Parse unicode from construction.
+    unicode splitter: |
+
+    >>> parseUnicode("agrave = a + grave | 00E0")
+    (224, 'agrave = a + grave ')
+    """
     unicode = None
     if unicodeSplit in construction:
         construction, unicode = construction.split(unicodeSplit)
@@ -603,7 +639,15 @@ def parseUnicode(construction, font=None):
             unicode = None
     return unicode, construction
 
+
 def parseMark(construction, font=None):
+    """
+    Parse mark from construction.
+    mark splitter: !
+
+    >>> parseMark("agrave = a + grave !1, 0, 0, 1")
+    ((1.0, 0.0, 0.0, 1.0), 'agrave = a + grave ')
+    """
     mark = None
     if glyphMarkSuffixSplit in construction:
         construction, markString = construction.split(glyphMarkSuffixSplit)
@@ -616,16 +660,18 @@ def parseMark(construction, font=None):
                 a = float(markString[3])
                 mark = r, g, b, a
             except:
-               mark = None
+                mark = None
     return mark, construction
 
+
 glyphAttrFuncMap = {
-        "unicode" : parseUnicode,
-        "mark" : parseMark,
-        "width" : parseWidth,
-        "leftMargin" : parseLeftMargin,
-        "rightMargin" : parseRightMargin
+        "unicode": parseUnicode,
+        "mark": parseMark,
+        "width": parseWidth,
+        "leftMargin": parseLeftMargin,
+        "rightMargin": parseRightMargin
     }
+
 
 def parseGlyphattributes(construction, font):
     attrs = {}
@@ -659,8 +705,17 @@ def parseGlyphattributes(construction, font):
         value, _ = func(value, font)
         values[attr] = value
     return values, newConstruction
-    
+
+
 def parseNote(construction):
+    """
+    Parse note from construction.
+    note splitter: #
+        * and must be the last part of the construction
+
+    >>> parseNote("agrave = a + grave # this is a note")
+    ('this is a note', 'agrave = a + grave ')
+    """
     note = ""
     if glyphCommentSuffixSplit in construction:
         construction, note = construction.split(glyphCommentSuffixSplit)
@@ -668,17 +723,37 @@ def parseNote(construction):
         note = note.strip()
     return note, construction
 
+
 def parseGlyphName(construction):
+    """
+    Parse glyph name from construction.
+    glyph name splitter: =
+
+    >>> parseGlyphName("agrave = a + grave")
+    ['agrave ', ' a + grave']
+    """
     return construction.split(glyphNameSplit)
 
 
 escapeMathOperatorMap = {
-        "+" : "<<add>>",
-        "-" : "<<sub>>"
+        "+": "<<add>>",
+        "-": "<<sub>>"
     }
-escapeMathOperatorMapReversed = {value : key for key, value in escapeMathOperatorMap.items()}
+
+escapeMathOperatorMapReversed = {value: key for key, value in escapeMathOperatorMap.items()}
+
 
 def forceEscapingMathOperations(data):
+    """
+    force escape math to restore it lateron,
+    as some operators are used inside a glyph construction,
+    especially the + and - .
+
+    >>> forceEscapingMathOperations("`10 + 5`")
+    '10 <<add>> 5'
+    >>> forceEscapingMathOperations("`10 - 5`")
+    '10 <<sub>> 5'
+    """
     result = ""
     index = 0
     for found in explicitMathRe.finditer(data):
@@ -691,13 +766,32 @@ def forceEscapingMathOperations(data):
     result += data[index:]
     return result
 
+
 def reEscapeMathOperations(data):
+    """
+    Re escape math back to readable and executable math.
+
+    >>> reEscapeMathOperations("10 <<add>> 5")
+    '10 + 5'
+    >>> reEscapeMathOperations("10 <<sub>> 5")
+    '10 - 5'
+    """
     for find, replace in escapeMathOperatorMapReversed.items():
-        data =  data.replace(find, replace)
+        data = data.replace(find, replace)
     return data
 
+
 def removeSpacesAndTabs(data):
+    """
+    Remove all tabs and spaces.
+
+    >>> removeSpacesAndTabs("a Sting With Spaces")
+    'aStingWithSpaces'
+    >>> removeSpacesAndTabs("a\tSting\tWith\tTabs")
+    'aStingWithTabs'
+    """
     return data.replace(" ", "").replace("\t", "")
+
 
 def GlyphConstructionBuilder(construction, font):
     # create a construction glyph
@@ -714,7 +808,7 @@ def GlyphConstructionBuilder(construction, font):
         return destination
     # remove all spaces and tabs
     construction = removeSpacesAndTabs(construction)
-    # escape math formulas inside a ` `  
+    # escape math formulas inside a ` `
     construction = forceEscapingMathOperations(construction)
     # extract the name
     destination.name, construction = parseGlyphName(construction)
@@ -722,44 +816,60 @@ def GlyphConstructionBuilder(construction, font):
     glyphAttributes, construction = parseGlyphattributes(construction, font)
     # split into base glyphs, ligatures
     baseGlyphs = construction.split(baseGlyphSplit)
-    
+
     advanceWidth = 0
     # start
     for baseGlyph in baseGlyphs:
         # split into mark glyphs
         markGlyphs = baseGlyph.split(markGlyphSplit)
-        baseGlyph = None    
+        baseGlyph = None
         baseMarkGlyph = None
         baseTransformMatrix = [1, 0, 0, 1, 0, 0]
         markTransformMap = {}
-        
+
         advanceHeight = 0
-        
+
         for markGlyph in markGlyphs:
             markGlyph = reEscapeMathOperations(markGlyph)
             component, transformMatrix = parsePositions(baseMarkGlyph, markGlyph, font, markTransformMap, advanceWidth, advanceHeight)
             destination.addComponent(component, transformMatrix)
 
             markTransformMap[component] = transformMatrix
-            
+
             baseMarkGlyph = component
-            
+
             if baseGlyph is None:
                 baseGlyph = component
                 baseTransformMatrix = transformMatrix
-            
+
         if baseGlyph in font:
             width = font[baseGlyph].width
             t = Transform(*baseTransformMatrix)
             width, y = t.transformPoint((width-advanceWidth, 0))
             advanceWidth += width
-            
+
     destination.width = advanceWidth
     for key, value in glyphAttributes.items():
         setattr(destination, key, value)
     return destination
 
+
 def ParseVariables(txt):
+    """
+    Parse all variables from all constructions and remove them.
+
+    >>> txt = unichr(10).join([
+    ...    "$name = test",
+    ...    "$positionX = center",
+    ...    "$positionY = 100",
+    ...    "aacute = a + acute@positionX, positionY"
+    ...    ])
+    >>> txt, variables = ParseVariables(txt)
+    >>> variables
+    {u'positionX': u'center', u'positionY': u'100', u'name': u'test'}
+    >>> txt.replace(unichr(10), "")
+    u'aacute = a + acute@positionX, positionY'
+    """
     variables = {}
     for i in varialbesRE.finditer(txt):
         name = i.group("name")
@@ -768,14 +878,35 @@ def ParseVariables(txt):
         txt = txt.replace(i.group(), "")
     return txt, variables
 
+
 def ParseGlyphConstructionListFromString(txt):
+    """
+    # Basic parsing with comment
+    >>> txt = unichr(10).join([
+    ...    "agrave = a + grave",
+    ...    "# a comment",
+    ...    "aacute = a + acute"
+    ...    ])
+    >>> ParseGlyphConstructionListFromString(txt)
+    [u'agrave = a + grave', u'aacute = a + acute']
+
+    # Basic parsing with variable
+    >>> txt = unichr(10).join([
+    ...    "$name = grave",
+    ...    "agrave = a + {name}",
+    ...    "# a comment",
+    ...    "aacute = a + acute"
+    ...    ])
+    >>> ParseGlyphConstructionListFromString(txt)
+    [u'agrave = a + grave', u'aacute = a + acute']
+    """
     # parse all variable out of the text
     txt, variables = ParseVariables(txt)
     try:
         # try to format the text with all the variables
         txt = txt.format(**variables)
     except KeyError, err:
-        raise GlyphBuilderError, "Variable %s is missing" % err
+        raise GlyphBuilderError("Variable %s is missing" % err)
     # split all the lines, one line -> one construction
     lines = []
     for line in txt.split("\n"):
@@ -792,3 +923,23 @@ def ParseGlyphConstructionListFromString(txt):
     while lines and not lines[-1]:
         lines.pop()
     return lines
+
+# -----
+# Tests
+# -----
+
+# def testParsing():
+#     """
+#     >>> txt = unichr(10).join([
+#     ...    "agrave = a + grave",
+#     ...    "# a comment",
+#     ...    "aacute = a + acute"
+#     ...    ])
+#     >>> ParseGlyphConstructionListFromString(txt)
+#     [u'agrave = a + grave', u'aacute = a + acute']
+#     """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

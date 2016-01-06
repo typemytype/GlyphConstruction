@@ -5,7 +5,7 @@ from lib.scripting.codeEditor import CodeEditor, languagesIDEBehavior
 
 glyphConstructionAlignmentWords = ["top", "bottom", "center", "left", "right", "innerRight", "innerLeft", "innerTop", "innerBottom", "origin", "descender",  "xHeight", "capHeight", "ascender"]
 glyphConstructionOperations = [
-    "=", "+", "|", "@", ":", ",", "&", "!", "^", "`",
+    "=", "+", "|", "@", ":", ",", "&", "!", "^", "`", "~",
     "-", "+", "/", "*" # math stuff"
     ]
 

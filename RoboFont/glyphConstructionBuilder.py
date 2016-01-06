@@ -19,6 +19,7 @@ glyphSuffixSplit = "."
 metricsSuffixSplit = "^"
 glyphCommentSuffixSplit = "#"
 glyphMarkSuffixSplit = "!"
+flipMarkGlyphSplit = "~"
 
 variableDeclarationStart = "$"
 variableDeclarationEnd = ""
@@ -29,7 +30,7 @@ explicitMathEnd = '`'
 """
 
 $variableName = n
-Laringacute = L & a + ring@center,`top+10` + acute@center,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a varialbe {variableName}
+Laringacute = L & a + ring@~center,~`top+10` + acute@center,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a varialbe {variableName}
 
 """
 
@@ -438,11 +439,15 @@ def _findFontInfoValue(font, name):
         value = 0
     return (0, value)
 
+#def parseFlip(
+
 def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, advanceHeight):
     xx, xy, yx, yy, x, y = 1, 0, 0, 1, advanceWidth, advanceHeight
     
     baseGlyphX = baseGlyphY = baseGlyph
     markFixedX = markFixedY = False
+    
+    flipX = flipY = False
     
     if positionSplit in markGlyph:
         markGlyph, position = markGlyph.split(positionSplit)
@@ -467,49 +472,89 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
         
         if positionBaseSplit in positionY:
             baseGlyphY, positionY = positionY.split(positionBaseSplit)
-                
-        baseX = baseY = 0
-        markX = markY = 0
         
-        if markGlyph not in font:
-            if glyphSuffixSplit in markGlyph:
-                markGlyph = markGlyph.split(glyphSuffixSplit)[0]
+        if flipMarkGlyphSplit in positionX:
+            flipX = True
+            positionX = positionX.replace(flipMarkGlyphSplit, "")
+        
+        if flipMarkGlyphSplit in positionY:
+            flipY = True
+            positionY = positionY.replace(flipMarkGlyphSplit, "")
+        
+        
+        if positionX and positionY:
+            baseX = baseY = 0
+            markX = markY = 0
+        
+            if markGlyph not in font:
+                if glyphSuffixSplit in markGlyph:
+                    markGlyph = markGlyph.split(glyphSuffixSplit)[0]
 
-        markPoint1, markAngle1, markFixedX = parsePosition(markGlyph, font, positionX, direction="x", prefix="_")
-        markPoint2, markAngle2, markFixedY = parsePosition(markGlyph, font, positionY, direction="y", prefix="_")
-        intersection = _intersectAngles(markPoint1, markAngle1, markPoint2, markAngle2)
-        if intersection is not None:
-            markX, markY = intersection
-        
-        if baseGlyphX in font and baseGlyphY in font:
-            basePoint1, baseAngle1, _ = parsePosition(baseGlyphX, font, positionX, direction="x", isBase=True)
-            basePoint2, baseAngle2, _ = parsePosition(baseGlyphY, font, positionY, direction="y", isBase=True)
-            intersection = _intersectAngles(basePoint1, baseAngle1, basePoint2, baseAngle2)
+            markPoint1, markAngle1, markFixedX = parsePosition(markGlyph, font, positionX, direction="x", prefix="_")
+            markPoint2, markAngle2, markFixedY = parsePosition(markGlyph, font, positionY, direction="y", prefix="_")
+            intersection = _intersectAngles(markPoint1, markAngle1, markPoint2, markAngle2)
             if intersection is not None:
-                baseX, baseY = intersection
+                markX, markY = intersection
+        
+            if baseGlyphX in font and baseGlyphY in font:
+                basePoint1, baseAngle1, _ = parsePosition(baseGlyphX, font, positionX, direction="x", isBase=True)
+                basePoint2, baseAngle2, _ = parsePosition(baseGlyphY, font, positionY, direction="y", isBase=True)
+                intersection = _intersectAngles(basePoint1, baseAngle1, basePoint2, baseAngle2)
+                if intersection is not None:
+                    baseX, baseY = intersection
 
-        # calculate the offset
+            # calculate the offset
+            if not markFixedX:
+                x += baseX - markX
+            else:
+                x += markX
+        
+            if not markFixedY:            
+                y += baseY - markY
+            else:
+                y += markY
+        
         if not markFixedX:
-            x += baseX - markX
-        else:
-            x += markX
-        
-        if not markFixedY:            
-            y += baseY - markY
-        else:
-            y += markY
-        
-    if not markFixedX:
-        baseTransform = markTransformMap.get(baseGlyphX)
-        if baseTransform:
-            x += baseTransform[4] - advanceWidth
+            baseTransform = markTransformMap.get(baseGlyphX)
+            if baseTransform:
+                x += baseTransform[4] - advanceWidth
     
-    if not markFixedY:
-        baseTransform = markTransformMap.get(baseGlyphY)
-        if baseTransform:
-            y += baseTransform[5] - advanceHeight
-
+        if not markFixedY:
+            baseTransform = markTransformMap.get(baseGlyphY)
+            if baseTransform:
+                y += baseTransform[5] - advanceHeight
+    
     transformMatrix = (xx, xy, yx, yy, x, y)
+    print flipX, flipY
+    if flipX:
+        bounds = font[markGlyph].bounds
+        if bounds:
+            minx, miny, maxx, maxy = bounds
+            bt = Transform(*transformMatrix)
+            minx, miny = bt.transformPoint((minx, miny))
+            maxx, maxy = bt.transformPoint((maxx, maxy))
+            t = Transform()
+            t = t.translate(0, miny)
+            t = t.scale(1, -1)
+            t = t.translate(0, -maxy)
+            t = t.transform(bt)
+            transformMatrix = t[:]
+            
+    if flipY:
+        bounds = font[markGlyph].bounds
+        if bounds:
+            minx, miny, maxx, maxy = bounds
+            bt = Transform(*transformMatrix)
+            minx, miny = bt.transformPoint((minx, miny))
+            maxx, maxy = bt.transformPoint((maxx, maxy))
+            t = Transform()
+            t = t.translate(minx, 0)
+            t = t.scale(-1, 1)
+            t = t.translate(-maxx, 0)
+            t = t.transform(bt)
+            transformMatrix = t[:]
+            
+    
     return markGlyph, transformMatrix
 
 
@@ -747,4 +792,3 @@ def ParseGlyphConstructionListFromString(txt):
     while lines and not lines[-1]:
         lines.pop()
     return lines
-

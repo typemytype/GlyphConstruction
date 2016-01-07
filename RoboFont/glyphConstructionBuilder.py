@@ -31,7 +31,7 @@ explicitMathEnd = '`'
 
 """
 $variableName = n
-Laringacute = L & a + ring@~center,~`top+10` + acute@center,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a variable {variableName}
+Laringacute = L & a + ring@~center,~`top+10` + acute.cap@height,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a variable {variableName}
 """
 
 # legal positions
@@ -1092,17 +1092,35 @@ def testGlyphConstructionBuilder_Positioning():
     """
     >>> font = testDummyFont()
 
+    # set mark at 0, 0
+
     >>> result = GlyphConstructionBuilder("agrave = a + grave @ 0, 0", font)
     >>> testDigestGlyph(result)
     ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, -100, -100))))
+
+    # postion mark at center, top
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave @ center, top", font)
     >>> testDigestGlyph(result)
     ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, -10, 100))))
 
+    # postion mark at center of 'i', top
+
     >>> result = GlyphConstructionBuilder("agrave = a + grave @i: center, top", font)
     >>> testDigestGlyph(result)
     ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 20, 100))))
+
+    # postion mark at center of 'i', top of 'i'
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave @i: center, i: top", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 20, 160))))
+
+    # postion mark at 100%
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave @100%", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 100, 100))))
     """
 
 

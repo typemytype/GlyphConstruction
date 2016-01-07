@@ -70,6 +70,14 @@ Example:
     Aacute = A + acute ^ A * 2 
     Aacute = A + acute ^ A / 3, B * 2
 
+### Ignore existing glyphs
+
+`?` followed by a glyph construction will check if the glyph name is already exists and ignore the construction.
+
+Example:
+	
+	?Aacute = A + acute
+
 ### Positioning
 
 Will position the added component related to the current glyph.
@@ -120,6 +128,22 @@ The current glyph is always the last component added. `Aacute = A + acute` Will 
 Example:
 
     Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom
+
+#### Flipping
+
+`~` followed by a positionig will flipping a component
+
+Example:
+
+	# flip horizontal
+	Aacute = A + acute@~center,top
+	
+	# flip vertical
+	Aacute = A + acute@center,~top
+
+	# flip both horizontal and vertical
+	Aacute = A + acute@~center,~top
+
 
 ### Stacking Vertically
 

@@ -1,5 +1,6 @@
 import weakref
 import re
+import os
 from math import cos, sin, radians
 import operator
 
@@ -20,6 +21,7 @@ metricsSuffixSplit = "^"
 glyphCommentSuffixSplit = "#"
 glyphMarkSuffixSplit = "!"
 flipMarkGlyphSplit = "~"
+glyphCheckIfExists = "?"
 
 variableDeclarationStart = "$"
 variableDeclarationEnd = ""
@@ -645,7 +647,7 @@ def parseMark(construction, font=None):
     Parse mark from construction.
     mark splitter: !
 
-    >>> parseMark("agrave = a + grave !1, 0, 0, 1")
+    >>> parseMark("agrave = a + grave ! 1, 0, 0, 1")
     ((1.0, 0.0, 0.0, 1.0), 'agrave = a + grave ')
     """
     mark = None
@@ -730,9 +732,11 @@ def parseGlyphName(construction):
     glyph name splitter: =
 
     >>> parseGlyphName("agrave = a + grave")
-    ['agrave ', ' a + grave']
+    ('agrave', ' a + grave')
     """
-    return construction.split(glyphNameSplit)
+    glyphName, construction = construction.split(glyphNameSplit)
+    glyphName = glyphName.strip()
+    return glyphName, construction
 
 
 escapeMathOperatorMap = {
@@ -879,8 +883,13 @@ def ParseVariables(txt):
     return txt, variables
 
 
-def ParseGlyphConstructionListFromString(txt):
+def ParseGlyphConstructionListFromString(source, font=None):
     """
+    Parse glyph constructions from a big text, could be a file path, file object or a string.
+    Optionally a font can be provided to check and ignore existing glyph names.
+
+    This returns a list of optimized glyph constructions.
+
     # Basic parsing with comment
     >>> txt = unichr(10).join([
     ...    "agrave = a + grave",
@@ -899,7 +908,43 @@ def ParseGlyphConstructionListFromString(txt):
     ...    ])
     >>> ParseGlyphConstructionListFromString(txt)
     [u'agrave = a + grave', u'aacute = a + acute']
+
+    # Parsing with ignore glyph existing glyph names without a font
+    >>> font = testDummyFont()
+
+    >>> txt = unichr(10).join([
+    ...    "$name = grave",
+    ...    "?agrave = a + {name}",
+    ...    "# a comment",
+    ...    "aacute = a + acute"
+    ...    ])
+    >>> ParseGlyphConstructionListFromString(txt)
+    [u'agrave = a + grave', u'aacute = a + acute']
+
+    # Parsing with ignore glyph existing glyph names
+    >>> txt = unichr(10).join([
+    ...    "$name = grave",
+    ...    # the next line will be ignored",
+    ...    "?agrave = a + {name}",
+    ...    "# a comment",
+    ...    "aacute = a + acute"
+    ...    ])
+    >>> ParseGlyphConstructionListFromString(txt, font)
+    [u'aacute = a + acute']
     """
+    txt = None
+    if isinstance(source, (str, unicode)):
+        if os.path.exists(source):
+            f = open(source)
+            txt = f.read()
+            f.close()
+        else:
+            txt = source
+    elif hasattr(source, "read"):
+        txt = source.read()
+    else:
+        raise GlyphBuilderError("Unreadable source: '%s'" % source)
+
     # parse all variable out of the text
     txt, variables = ParseVariables(txt)
     try:
@@ -913,8 +958,15 @@ def ParseGlyphConstructionListFromString(txt):
         # strip it
         line = line.strip()
         # do nothing if it is a comment
-        if line and line[0] == glyphCommentSuffixSplit:
-            continue
+        if line:
+            if line[0] == glyphCommentSuffixSplit:
+                continue
+            elif line[0] == glyphCheckIfExists:
+                if font:
+                    glyphName, _ = parseGlyphName(line[1:])
+                    if glyphName in font:
+                        continue
+                line = line[1:]
         # do nothing with empty lines when there is no line added
         if not line and not lines:
             continue
@@ -924,20 +976,134 @@ def ParseGlyphConstructionListFromString(txt):
         lines.pop()
     return lines
 
+
 # -----
 # Tests
 # -----
 
-# def testParsing():
-#     """
-#     >>> txt = unichr(10).join([
-#     ...    "agrave = a + grave",
-#     ...    "# a comment",
-#     ...    "aacute = a + acute"
-#     ...    ])
-#     >>> ParseGlyphConstructionListFromString(txt)
-#     [u'agrave = a + grave', u'aacute = a + acute']
-#     """
+def testDummyGlyph(glyph, i):
+    add = 20 * i
+    pen = glyph.getPen()
+    pen.moveTo((100, 100))
+    pen.lineTo((200+add, 100+add))
+    pen.lineTo((200+add, 200+add))
+    pen.closePath()
+
+
+def testDummyFont():
+    from defcon import Font
+    font = Font()
+    for i, glyphName in enumerate(("a", "grave", "f", "i", "agrave")):
+        font.newGlyph(glyphName)
+        testDummyGlyph(font[glyphName], i)
+        font[glyphName].width = 60 + 10*i
+    return font
+
+
+def testDigestGlyph(glyph):
+    from robofab.pens.digestPen import DigestPointPen
+    pen = DigestPointPen()
+    glyph.draw(pen)
+    return (
+            glyph.name,
+            glyph.width,
+            glyph.unicode,
+            glyph.mark,
+            glyph.note,
+            pen.getDigest()
+        )
+
+
+def testGlyphConstructionBuilder_GlyphAttributes():
+    """
+    >>> font = testDummyFont()
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 0, 0))))
+
+    # unicode
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, 224, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 0, 0))))
+
+    # mark
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave ! 1, 0, 0, 1", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, (1.0, 0.0, 0.0, 1.0), '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 0, 0))))
+
+    # note
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave # this is a note", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, 'this is a note', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 0, 0))))
+
+    # width
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave ^ 300", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 300.0, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 0, 0))))
+
+    # left and right margin
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave ^ 300, 200", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 620.0, None, None, '', (('a', (1, 0, 0, 1, 200, 0)), ('grave', (1, 0, 0, 1, 200, 0))))
+
+    # all glyph attributes
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave ^ 300, 200 ! 1, 0, 0, 1 | 00E0 # this is a note ", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 620.0, 224, (1.0, 0.0, 0.0, 1.0), 'this is a note', (('a', (1, 0, 0, 1, 200, 0)), ('grave', (1, 0, 0, 1, 200, 0))))
+
+    # all glyph attributes, different order
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0 ! 1, 0, 0, 1 ^ 300, 200 # this is a note ", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 620.0, 224, (1.0, 0.0, 0.0, 1.0), 'this is a note', (('a', (1, 0, 0, 1, 200, 0)), ('grave', (1, 0, 0, 1, 200, 0))))
+    """
+
+
+def testGlyphConstructionBuilder_Marks():
+    """
+    >>> font = testDummyFont()
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 0, 0))))
+
+    Multiple marks, same width, like staked accents
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave + anotherGlyph", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 0, 0)), ('anotherGlyph', (1, 0, 0, 1, 0, 0))))
+
+    Multiple marks, adjust width, like ligatures
+
+    >>> result = GlyphConstructionBuilder("f_f_i = f & f & i", font)
+    >>> testDigestGlyph(result)
+    ('f_f_i', 250, None, None, '', (('f', (1, 0, 0, 1, 0, 0)), ('f', (1, 0, 0, 1, 80, 0)), ('i', (1, 0, 0, 1, 160, 0))))
+    """
+
+
+def testGlyphConstructionBuilder_Positioning():
+    """
+    >>> font = testDummyFont()
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave @ 0, 0", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, -100, -100))))
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave @ center, top", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, -10, 100))))
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave @i: center, top", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0)), ('grave', (1, 0, 0, 1, 20, 100))))
+    """
 
 
 if __name__ == "__main__":

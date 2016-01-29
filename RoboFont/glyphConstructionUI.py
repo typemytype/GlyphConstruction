@@ -1,11 +1,6 @@
-
-
-
-## controller stuff
 from AppKit import *
 from vanilla import *
 from defconAppKit.windows.baseWindow import BaseWindowController
-from defconAppKit.controls.glyphLineView import GlyphLineView
 
 from mojo.events import addObserver, removeObserver
 from mojo.drawingTools import *
@@ -22,14 +17,13 @@ from lib.tools.misc import NSColorToRgba
 
 from lib.UI.statusBar import StatusBar
 
+import glyphConstructionBuilder
+reload(glyphConstructionBuilder)
+from glyphConstructionBuilder import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
+
 import glyphConstructionLexer
 reload(glyphConstructionLexer)
 from glyphConstructionLexer import GlyphConstructionLexer
-
-import glyphConstructionBuilder
-reload(glyphConstructionBuilder)
-
-from glyphConstructionBuilder import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
 
 from lib.scripting.codeEditor import CodeEditor
 

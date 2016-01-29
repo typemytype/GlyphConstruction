@@ -39,7 +39,7 @@ Gcommaaccent = G + commaaccent.cap@center,bottom|0122
 Gdotaccent = G + dotaccent.cap@center,top|0120
 Hbar = H + macron.cap@center,70%|0126
 Hcircumflex = H + circumflex.cap@center,top|0124
-IJ = I _ J|0132
+IJ = I & J|0132
 Iacute = I + acute.cap@center,top|00CD
 Ibreve = I + breve.cap@center,top|012C
 Icircumflex = I + circumflex.cap@center,top|00CE
@@ -101,10 +101,8 @@ Zacute = Z + acute.cap@center,top|0179
 Zcaron = Z + caron.cap@center,top|017D
 Zdotaccent = Z + dotaccent.cap@center,bottom|017B
 
-*
-*
-## lowercase
 
+# lowercase
 aacute = a + acute@center,top|00E1
 abreve = a + breve@center,top|0103
 acircumflex = a + circumflex@center,top|00E2
@@ -144,7 +142,7 @@ ibreve = dotlessi + breve@center,top|012D
 icircumflex = dotlessi + circumflex@center,top|00EE
 idieresis = dotlessi + dieresis@center,top|00EF
 igrave = dotlessi + grave@center,top|00EC
-ij = i _ j|0133
+ij = i & j|0133
 imacron = dotlessi + macron@center,top|012B
 iogonek = i + ogonek@ogonek,origin|012F
 itilde = dotlessi + tilde@center,top|0129

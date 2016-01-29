@@ -25,26 +25,27 @@ glyphConstructionOperations = [
 
     gb.explicitMathStart,
     gb.explicitMathEnd,
-    
-    "-", "+", "/", "*" # math stuff"
+
+    "-", "+", "/", "*"  # math stuff"
     ]
 
 languagesIDEBehavior["GlyphConstruction"] = {
-            "openToCloseMap" : {},
-            "indentWithEndOfLine" : [],
-            "comment" : "#",
-            "keywords" : glyphConstructionAlignmentWords + glyphConstructionOperations,
-            #"dropPathFormatting" : None
+            "openToCloseMap": {},
+            "indentWithEndOfLine": [],
+            "comment": "#",
+            "keywords": glyphConstructionAlignmentWords + glyphConstructionOperations,
+            # "dropPathFormatting" : None
         }
-        
+
+
 class GlyphConstructionLexer(RegexLexer):
-    
+
     name = "GlyphConstruction"
     aliases = ['GlyphConstruction', 'gc']
     filenames = ['*.glyphConstruction', "*.gc"]
-    
+
     tokens = {
-            'root' : [
+            'root': [
                     (r'\n', token.Text),
                     (r'#.*$', token.Comment),
                     (r'\.([a-zA-Z_][a-zA-Z0-9_]*)?', token.String.Other),
@@ -53,12 +54,12 @@ class GlyphConstructionLexer(RegexLexer):
                     (r'%s' % ("\\"+"|\\".join(glyphConstructionOperations)), token.Operator),
                     (r'(\?)?([a-zA-Z_\{][a-zA-Z0-9_.\{\}]*)((\s|\\\s)*=)',  bygroups(token.Name.Builtin, token.Keyword, token.Operator)),
                     (r'(%s)' % ("|".join(glyphConstructionAlignmentWords)), token.Name.Tag),
-                                      
+
                     (r'(\%s)(\s*[a-zA-Z_][a-zA-Z0-9_]*)\s*(\=)\s*(.*)(%s)' % (gb.variableDeclarationStart, gb.variableDeclarationEnd), bygroups(token.Name.Builtin, token.Name.Variable, token.Operator, token.String, token.Name.Builtin)),
                     (r'\{[a-zA-Z_][a-zA-Z0-9_]*\}', token.Name.Function),
                     include('numbers'),
                     include('whitespace'),
-                    (r'[a-zA-Z][a-zA-Z0-9]*', token.Name),  
+                    (r'[a-zA-Z][a-zA-Z0-9]*', token.Name),
                 ],
             'numbers': [
                     (r'(\d+\.\d*|\d*\.\d+)([eE][+-]?[0-9]+)?j?\%?', token.Number.Float),
@@ -75,9 +76,9 @@ class GlyphConstructionLexer(RegexLexer):
         }
 
 if __name__ == "__main__":
-    
+
     from vanilla import Window
-    
+
     t = """
 $name = test
 
@@ -88,12 +89,12 @@ $variableName = n
 Laringacute = L & a + ring@~center,~`top+10` + acute@center,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a variable {variableName}
 
 """
-    
+
     class Test:
-        
+
         def __init__(self):
             self.w = Window((400, 400), minSize=(300, 300))
             self.w.e = CodeEditor((0, 0, -0, -0), t, lexer=GlyphConstructionLexer())
             self.w.open()
-        
+
     Test()

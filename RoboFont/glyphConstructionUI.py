@@ -35,60 +35,56 @@ from lib.scripting.codeEditor import CodeEditor
 
 defaultKey = "com.typemytype.glyphBuilder"
 
-constructions = """
-# capitals
+constructions = """# capitals
 
 Agrave = A + grave.cap@center,top
 Aacute = A + acute.cap@center,top
 Acircumflex = A + circumflex.cap@center,top
 Atilde = A + tilde.cap@center,top
 Adieresis = A + dieresis.cap@center,top
-Aring  = A + ring.cap@center,top
+Aring = A + ring.cap@center,top
 
-Ccedilla =  C + cedilla.cap@center, bottom
+Ccedilla = C + cedilla.cap@center, bottom
 
-Egrave =  E + grave.cap@center, top
-Eacute =  E + acute.cap@center, top
+Egrave = E + grave.cap@center, top
+Eacute = E + acute.cap@center, top
 Ecircumflex = E + circumflex.cap@center, top
 Edieresis = E + dieresis.cap@center, top
 
-Igrave = I +  grave.cap@center, top
-Iacute = I +  acute.cap@center, top
-Icircumflex = I +  circumflex.cap@center, top
-Idieresis = I +  dieresis.cap@center, top
+Igrave = I + grave.cap@center, top
+Iacute = I + acute.cap@center, top
+Icircumflex = I + circumflex.cap@center, top
+Idieresis = I + dieresis.cap@center, top
 
 Ntilde = N + tilde@center,top
 
-Ograve = O +  grave.cap@center, top
-Oacute = O +  acute.cap@center, top
-Ocircumflex = O +  circumflex.cap@center, top
-Otilde = O +  tilde.cap@center, top
-Odieresis = O +  dieresis.cap@center, top
+Ograve = O + grave.cap@center, top
+Oacute = O + acute.cap@center, top
+Ocircumflex = O + circumflex.cap@center, top
+Otilde = O + tilde.cap@center, top
+Odieresis = O + dieresis.cap@center, top
 Oslash = O + slash@center,center
 
 
-Scaron =  S +  caron.cap@center, top
+Scaron = S + caron.cap@center, top
 
-Ugrave =  U +  grave.cap@center, top
-Uacute =  U +  acute.cap@center, top
-Ucircumflex =  U +  circumflex.cap@center, top
-Udieresis =  U +  dieresis.cap@center, top
+Ugrave = U + grave.cap@center, top
+Uacute = U + acute.cap@center, top
+Ucircumflex = U + circumflex.cap@center, top
+Udieresis = U + dieresis.cap@center, top
 
-Zcaron =  Z +  caron.cap@center, top
+Zcaron = Z + caron.cap@center, top
 
-* # new line
-* # new line
 
 # capitals ligatures
 
-F_L = F_L
-F_I = F_I
+F_L = F & L
+F_I = F & I
 
-AE = A_E@75%,origin
-OE = O_E@75%,origin
+AE = A & E@75%,origin
+OE = O & E@75%,origin
 
-* # new line
-* # new line
+
 
 # lowercase
 
@@ -104,7 +100,7 @@ aogonek = a + ogonek@innerRight,bottom
 aringacute = a + ring@center,top + acute@center,110%
 
 
-ccedilla=c+cedilla@center,bottom
+ccedilla=c + cedilla@center,bottom
 
 egrave = e + grave@center,top
 eacute = e + acute@center,top
@@ -138,42 +134,32 @@ zcaron = z + caron@center,top
 
 
 # lowercase ligatures
-* # new line
-* # new line
 
-fi = f_i
-fl = f_l
-f_f_i = f_f_i
-f_f_l = f_f_l
 
-ae = a_e@80%,orgin
+fi = f & i
+fl = f & l
+f_f_i = f & f & i
+f_f_l = f & f & l
 
-oe = o_e@80%,orgin
+ae = a & e@80%,orgin
+
+oe = o & e@80%,orgin
 
 # fractions
-* # new line
-* # new line
+
 onequarter = fraction@110%,origin + one.superior@innerLeft,innerTop + four.inferior@ fraction:innerRight,fraction:innerBottom
 
-* # new line
 onehalf = fraction@110%,origin + one.superior@innerLeft,innerTop + two.inferior@ fraction:innerRight,fraction:innerBottom
 
-* # new line
 threequarters = fraction@110%,origin + three.superior@innerLeft,innerTop + four.inferior@ fraction:innerRight,fraction:innerBottom
 
-* # new line
 percent = fraction@110%,origin + zero.superior@innerLeft,innerTop + zero.inferior@ fraction:innerRight,fraction:innerBottom
 
-* # new line
-perthousand = fraction@110%,origin + zero.superior@innerLeft,innerTop + zero.inferior@ fraction:innerRight,fraction:innerBottom _ zero.inferior@fraction:right,fraction:innerBottom
+perthousand = fraction@110%,origin + zero.superior@innerLeft,innerTop + zero.inferior@ fraction:innerRight,fraction:innerBottom & zero.inferior@fraction:right,fraction:innerBottom
 
 ## some test cases
 
-* # new line
-L_aringacute=L_a+ring@center,top+acute@center,top
-
-
-
+L_aringacute=L & a+ring@center,top+acute@center,top
 """
 
 constructions = ""

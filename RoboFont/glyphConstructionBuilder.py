@@ -1156,5 +1156,6 @@ def testGlyphConstructionBuilder_Positioning():
 
 
 if __name__ == "__main__":
+    import sys
     import doctest
-    doctest.testmod()
+    sys.exit(doctest.testmod().failed)

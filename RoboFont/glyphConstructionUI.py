@@ -1,5 +1,6 @@
 from AppKit import *
 from vanilla import *
+from vanilla.dialogs import getFile
 from defconAppKit.windows.baseWindow import BaseWindowController
 
 from mojo.events import addObserver, removeObserver
@@ -674,8 +675,9 @@ class GlyphBuilderController(BaseWindowController):
         f.close()
 
     def saveFile(self, sender=None):
-        preferredName = os.path.splitext(os.path.basename(self.font.path))[0]
-        if self.font is not None:
+        preferredName = None
+        if self.font is not None and self.font.path is not None:
+            preferredName = os.path.splitext(os.path.basename(self.font.path))[0]
             if self.fileNameKey in self.font.lib.keys():
                 # see if we have saved this file before and use that as first choice
                 preferredName = self.font.lib.get(self.fileNameKey)
@@ -691,7 +693,16 @@ class GlyphBuilderController(BaseWindowController):
             self.constructions.set(txt)
 
     def openFile(self, sender=None):
-        self.showGetFile(["glyphConstruction"], callback=self._openFile)
+        directory = fileName = None
+        if self.font is not None and self.font.path is not None:
+            if self.fileNameKey in self.font.lib.keys():
+                fileName = self.font.lib.get(self.fileNameKey, "")
+                fileName += ".glyphConstruction"
+                directory = os.path.dirname(self.font.path)
+                fileName = os.path.join(directory, fileName)
+                directory=None
+        getFile(fileTypes=["glyphConstruction"], parentWindow=self.w.getNSWindow(), directory=directory, fileName=fileName, resultCallback=self._openFile)
+        # self.showGetFile(["glyphConstruction"], callback=self._openFile)
 
     def analyse(self, sender=None):
         self.w.split.togglePane("analyser", False)

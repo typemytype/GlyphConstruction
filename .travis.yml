@@ -1,0 +1,17 @@
+language: python
+sudo: required
+python:
+  - "2.7"
+before_install:
+  - git clone https://github.com/robofab-developers/robofab.git
+  - git clone https://github.com/behdad/fonttools.git
+install:
+  - cd robofab; python install.py; cd ..
+  - cd fonttools; python setup.py install; cd ..
+  - pip install coveralls
+script:
+  - cd RoboFont
+  - coverage run --parallel-mode glyphConstructionBuilder.py
+after_success:
+  - coverage combine
+  - coveralls

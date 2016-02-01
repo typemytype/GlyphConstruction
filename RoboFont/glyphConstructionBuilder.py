@@ -51,7 +51,7 @@ def _intersectAngles(point1, angle1, point2, angle2):
 
     >>> _intersectAngles((100, 100), 45, (100, 200), -45)
     (150.00000000000094, 150.00000000000094)
-    >>> _intersectAngles((100, 100), 45, (100, 200), 45) == None
+    >>> _intersectAngles((100, 100), 45, (100, 200), 45) is None
     True
     """
     point1A = point1
@@ -68,7 +68,7 @@ def _intesectLines((pt1, pt2), (pt3, pt4)):
 
     >>> _intesectLines(((100, 100), (200, 200)), ((100, 200), (200, 100)))
     (150, 150)
-    >>> _intesectLines(((200, 100), (200, 200)), ((300, 200), (300, 200))) == None
+    >>> _intesectLines(((200, 100), (200, 200)), ((300, 200), (300, 200))) is None
     True
     """
     denom = (pt1[0] - pt2[0]) * (pt3[1] - pt4[1]) - (pt1[1] - pt2[1]) * (pt3[0] - pt4[0])
@@ -676,6 +676,37 @@ glyphAttrFuncMap = {
 
 
 def parseGlyphattributes(construction, font):
+    """
+    Parse glyph attributes from constructtion.
+    width splitter: ^ (could be a tuple referring to leftMargin and rightMargin)
+    mark splitter:  !
+    unicode splitter: |
+
+    >>> font = testDummyFont()
+    >>> parseGlyphattributes("name | 0000 ! 1, 0, 0, 1 ^ 100", font)
+    ({'width': 100.0, 'unicode': 0, 'mark': (1.0, 0.0, 0.0, 1.0)}, 'name ')
+
+    >>> parseGlyphattributes("name ! 1, 0, 0, 1 ^ 100 | 0000", font)
+    ({'width': 100.0, 'unicode': 0, 'mark': (1.0, 0.0, 0.0, 1.0)}, 'name ')
+
+    >>> parseGlyphattributes("name ^ 100 | 0000 ! 1, 0, 0, 1", font)
+    ({'width': 100.0, 'unicode': 0, 'mark': (1.0, 0.0, 0.0, 1.0)}, 'name ')
+
+    >>> parseGlyphattributes("name ^ 100 | 0000", font)
+    ({'width': 100.0, 'unicode': 0}, 'name ')
+
+    >>> parseGlyphattributes("name ^ 100", font)
+    ({'width': 100.0}, 'name ')
+
+    >>> parseGlyphattributes("name | 0000", font)
+    ({'unicode': 0}, 'name ')
+
+    >>> parseGlyphattributes("name ^ 100", font)
+    ({'width': 100.0}, 'name ')
+
+    >>> parseGlyphattributes("name ^ 10, 20", font)
+    ({'leftMargin': 10.0, 'rightMargin': 20.0}, 'name ')
+    """
     attrs = {}
     currentKey = None
     currentValue = ""

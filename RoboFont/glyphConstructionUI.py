@@ -26,6 +26,7 @@ reload(glyphConstructionLexer)
 from glyphConstructionLexer import GlyphConstructionLexer
 
 from lib.scripting.codeEditor import CodeEditor
+import os
 
 defaultKey = "com.typemytype.glyphBuilder"
 
@@ -397,6 +398,8 @@ class BuildGlyphsSheet(BaseWindowController):
 
 class GlyphBuilderController(BaseWindowController):
 
+    fileNameKey = "%s.lastSavedFileName" % defaultKey
+
     def __init__(self, font):
         self.font = None
         self._glyphs = []
@@ -663,14 +666,20 @@ class GlyphBuilderController(BaseWindowController):
         self.constructionsCallback(self.constructions, update)
 
     def _saveFile(self, path):
+        if self.font is not None:
+            self.font.lib[self.fileNameKey] = os.path.splitext(os.path.basename(path))[0]
         txt = self.constructions.get()
-
         f = open(path, "w")
         f.write(txt)
         f.close()
 
     def saveFile(self, sender=None):
-        self.showPutFile(["glyphConstruction"], callback=self._saveFile)
+        preferredName = os.path.splitext(os.path.basename(self.font.path))[0]
+        if self.font is not None:
+            if self.fileNameKey in self.font.lib.keys():
+                # see if we have saved this file before and use that as first choice
+                preferredName = self.font.lib.get(self.fileNameKey)
+        self.showPutFile(["glyphConstruction"], fileName=preferredName, callback=self._saveFile)
 
     def _openFile(self, paths):
         if paths:

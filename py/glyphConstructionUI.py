@@ -11,19 +11,11 @@ from mojo.glyphPreview import GlyphPreview
 from mojo.extensions import getExtensionDefault, setExtensionDefault, getExtensionDefaultColor, setExtensionDefaultColor
 
 from lib.UI.splitter import Splitter
-
 from lib.UI.enterTextEditor import EnterTextEditor
-
 from lib.tools.misc import NSColorToRgba
-
 from lib.UI.statusBar import StatusBar
 
-import glyphConstructionBuilder
-reload(glyphConstructionBuilder)
 from glyphConstructionBuilder import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
-
-import glyphConstructionLexer
-reload(glyphConstructionLexer)
 from glyphConstructionLexer import GlyphConstructionLexer
 
 from lib.scripting.codeEditor import CodeEditor
@@ -61,7 +53,6 @@ Otilde = O + tilde.cap@center, top
 Odieresis = O + dieresis.cap@center, top
 Oslash = O + slash@center,center
 
-
 Scaron = S + caron.cap@center, top
 
 Ugrave = U + grave.cap@center, top
@@ -71,7 +62,6 @@ Udieresis = U + dieresis.cap@center, top
 
 Zcaron = Z + caron.cap@center, top
 
-
 # capitals ligatures
 
 F_L = F & L
@@ -79,8 +69,6 @@ F_I = F & I
 
 AE = A & E@75%,origin
 OE = O & E@75%,origin
-
-
 
 # lowercase
 
@@ -95,8 +83,7 @@ abreve = a + breve@center,top
 aogonek = a + ogonek@innerRight,bottom
 aringacute = a + ring@center,top + acute@center,110%
 
-
-ccedilla=c + cedilla@center,bottom
+ccedilla =c + cedilla@center,bottom
 
 egrave = e + grave@center,top
 eacute = e + acute@center,top
@@ -107,7 +94,6 @@ ebreve = e + breve@center,top
 edotaccent = e + dotaccent@center,top
 eogonek = e + ogonek@center,bottom
 ecaron = e + caron@center,top
-
 
 igrave = dotlessi + grave@center,top
 iacute = dotlessi + acute@center,top
@@ -128,9 +114,7 @@ ydieresis = y + dieresis@center,top
 
 zcaron = z + caron@center,top
 
-
 # lowercase ligatures
-
 
 fi = f & i
 fl = f & l
@@ -138,19 +122,14 @@ f_f_i = f & f & i
 f_f_l = f & f & l
 
 ae = a & e@80%,orgin
-
 oe = o & e@80%,orgin
 
 # fractions
 
 onequarter = fraction@110%,origin + one.superior@innerLeft,innerTop + four.inferior@ fraction:innerRight,fraction:innerBottom
-
 onehalf = fraction@110%,origin + one.superior@innerLeft,innerTop + two.inferior@ fraction:innerRight,fraction:innerBottom
-
 threequarters = fraction@110%,origin + three.superior@innerLeft,innerTop + four.inferior@ fraction:innerRight,fraction:innerBottom
-
 percent = fraction@110%,origin + zero.superior@innerLeft,innerTop + zero.inferior@ fraction:innerRight,fraction:innerBottom
-
 perthousand = fraction@110%,origin + zero.superior@innerLeft,innerTop + zero.inferior@ fraction:innerRight,fraction:innerBottom & zero.inferior@fraction:right,fraction:innerBottom
 
 ## some test cases

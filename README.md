@@ -1,182 +1,149 @@
 Glyph Construction
 ==================
 
-[This is a draft]
+**Glyph Construction is a simple, human-readable, powerful language for describing how shapes are constructed.**
 
-- A language to describe how a shape is constructed.
-- Doesnt contain any design.
-- A *.glyphConstruction file should be interchangable between fonts.
-- Must be readable.
+Glyph Construction can be used to create new glyphs from components. It is specially useful for creating accented glyphs.
 
-A line starting with or anything after a `#` is a comment and will not be used during execution.
+Collections of Glyph Construction rules can be saved as `*.glyphConstruction` files, and can be shared between fonts.
 
+- - -
 
-### Assigning a construction to a glyph
+Below is an overview of the language, with some examples.
 
-    <destGlyphName> = <glyphName> + <glyphName>  
+## Assigning a construction to a glyph
 
-Add one or more component to a glyph with a name `<destGlyphName>`
+Build `<destGlyphName>` out of one or more components.
 
-Example:
-
+    <destGlyphName> = <glyphName> + <glyphName>
     Aacute = A + acute
 
-Optionally a suffix can be provided, it will be ignored when the mark glyph does not exist in the provided font.
+Optionally, a suffix can be provided. If a glyph with the given suffix does not exist in the font, the suffix is ignored.
 
-Example:
+	Aacute = A + acute.cap
 
-    Aacute = A + acute.cap
+## Comments
 
+A line starting with (or anything after) a `#` is a comment and will not be used during execution.
 
-### Unicodes
+    # this is a comment
+    Aacute = A + acute
+    Agrave = A + grave # this is also a comment
+
+## Unicodes
 
     <destGlyphName> = <glyphName> + <glyphName> | <unicode>
-
-Example:
-
     Aacute = A + acute | 00C1
 
-### Mark Color
+## Mark Color
 
     <destGlyphName> = <glyphName> + <glyphName> ! <rgba>
-
-Example:
-
     Aacute = A + acute ! 1, 0, 0, 1
 
-### Metrics
+## Metrics
 
-#### Width
+### Width
 
     <destGlyphName> = <glyphName> + <glyphName> ^ <width>
-
-Example:
-
     Aacute = A + acute ^ 400
-    
 
-#### Left and Right Margins
+### Left and Right Margins
 
-    <destGlyphName> = <glyphName> + <glyphName> ^ <leftmargin>, <rightMargin
-
-Example:
-
+    <destGlyphName> = <glyphName> + <glyphName> ^ <leftmargin>, <rightMargin>
     Aacute = A + acute ^ 30, 30
 
-Optionally it is possible to use some basic math, variables that refers to glyph names will take the width, leftMargin or rightMargin value of that glyph.
+Width and margin values can also be defined using basic maths and references to `width`, `leftMargin` or `rightMargin` of other glyphs.
 
-Example:
+    # width is equal to twice the width of A
+    Aacute = A + acute ^ A * 2
 
-    Aacute = A + acute ^ A * 2 
+    # left margin is equal to one third of the left margin of A
+    # right margin is equal to twice the right margin of B
     Aacute = A + acute ^ A / 3, B * 2
 
-### Ignore existing glyphs
+## Ignore existing glyphs
 
-`?` followed by a glyph construction will check if the glyph name is already exists and ignore the construction.
+Add `?` before a glyph construction rule to ignore this glyph if it already exists in the font.
 
-Example:
-	
-	?Aacute = A + acute
+    ?Aacute = A + acute
 
-### Positioning
+## Positioning
 
-Will position the added component related to the current glyph.
+The Glyph Construction language offers different ways to position the added components in relation to the current glyph.
 
-#### By Numbers
-
-Example:
+### By Numbers
 
     Aacute = A + acute@100
-
-Example:
-    
     Aacute = A + acute@100,100
 
-#### By Percentages   
-
-Example:
+### By Percentages
 
     Aacute = A + acute@50%,50%
-    
-#### By Reference  
+
+### By Reference
 
 A reference could be (in this order):
 
-* double anchor (with the `_<anchorName>` quotation)
-* a single anchor name
-* a local guide name
-* a global guide name
-* font info value: **descender**, **xHeight**, **capHeight**, **ascender**
-* a calculated word: **top**, **bottom**, **left**, **right**, **innerLeft**, **innerRight**, **center**, **origin**, **width**
+- double anchor (with the `_<anchorName>` notation)
+- a single anchor name
+- a local guide name
+- a global guide name 
+- a font dimension attribute: `descender`, `xHeight`, `capHeight`, `ascender`
+- a calculated reference position: `top`, `bottom`, `left`, `right`, `innerLeft`, `innerRight`, `center`, `origin`, `width`
 
-Example:
+```
+Aacute = A + acute@center,top
+```
 
-    Aacute = A + acute@center,top
+### By Transformation Matrix
 
-#### By Transformation Matrix
+`@` followed by a transformation matrix: 6 values `xx, xy, yx, yy, x, y`
 
-`@` followed by a transfromation matrix: 6 values `xx, xy, yx, yy, x, y`
+Aacute = A + acute@1, 0, 0, 1, 100, 100
 
-Example:
+### Change the current glyph
 
-    Aacute = A + acute@1, 0, 0, 1, 100, 100
+The current glyph is always the last component added.
 
-#### Change the current glyph
+For example, `Aacute = A + acute` will:
 
-The current glyph is always the last component added. `Aacute = A + acute` Will first add component with name `A` there is no current glyph. Adding component with name `acute`, the current glyph is `A`. Force the current glyph with `@<glyphName>:<pos>`
+- add component with name `A` (there is no current glyph)
+- add component with name `acute` (the current glyph is `A`)
+- force the current glyph with `@<glyphName>:<pos>`
 
-Example:
+Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom
 
-    Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom
-
-#### Flipping
+### Flipping
 
 `~` followed by a positionig will flipping a component
 
-Example:
-
 	# flip horizontal
 	Aacute = A + acute@~center,top
-	
+
 	# flip vertical
 	Aacute = A + acute@center,~top
 
 	# flip both horizontal and vertical
 	Aacute = A + acute@~center,~top
 
+## Stacking Vertically
 
-### Stacking Vertically
+	Aringacute = A + ring@center,top + acute@center,top
 
-Example:
+## Positioning formulas
 
-    Aringacute = A + ring@center,top + acute@center,top
+	Aringacute = A + ring@center,`top+10` + acute@center,`top-10`
 
-### Positioning formulas
+## Stacking Horizontally
 
-Example:
+	ffi = f & f & i
 
-    Aringacute = A + ring@center,`top+10` + acute@center,`top-10`
+## Variables
 
-### Stacking Horizontally
+Glyph Construction supports variables, which can be defined once at the top of the document and used multiple times.
 
-Example:
+	$name = something # declaration
+	{name} # usage
 
-    ffi = f & f & i
-
-### Variables
-
-Variables are possible, the have to be decleared at the top of the document.
-
-Declaration:
-	
-	$name = something
-	
-Usage:
-
-	{name}	
-
-Example:
-
-	$myColorMark = 1, 0, 0, 1
-	
-	agrave = a + grave@center,top ! {myColorMark}
+	$myColorMark = 1, 0, 0, 1 # declaration
+	agrave = a + grave@center,top ! {myColorMark} # usage

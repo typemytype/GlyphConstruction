@@ -6,13 +6,41 @@
 <link rel="stylesheet" href="GitHub-ReadMe.css">
 </head>
 <body>
-<h1>Glyph Construction</h1>
+<h1 id="glyph-construction">Glyph Construction<a class="headerlink" href="#glyph-construction" title="Permanent link">&para;</a></h1>
 <p><strong>Glyph Construction is a simple, human-readable, powerful language for describing how shapes are constructed.</strong></p>
 <p>Glyph Construction can be used to create new glyphs from components. It is specially useful for creating accented glyphs.</p>
 <p>Collections of Glyph Construction rules can be saved as <code>*.glyphConstruction</code> files, and can be shared between fonts.</p>
-<hr />
-<p>Below is an overview of the language, with some examples.</p>
-<h2>Assigning a construction to a glyph</h2>
+<div class="toc">
+<ul>
+<li><a href="#glyph-construction">Glyph Construction</a><ul>
+<li><a href="#assigning-a-construction-to-a-glyph">Assigning a construction to a glyph</a></li>
+<li><a href="#comments">Comments</a></li>
+<li><a href="#unicodes">Unicodes</a></li>
+<li><a href="#mark-color">Mark Color</a></li>
+<li><a href="#metrics">Metrics</a><ul>
+<li><a href="#width">Width</a></li>
+<li><a href="#left-and-right-margins">Left and Right Margins</a></li>
+</ul>
+</li>
+<li><a href="#ignore-existing-glyphs">Ignore existing glyphs</a></li>
+<li><a href="#positioning">Positioning</a><ul>
+<li><a href="#by-numbers">By Numbers</a></li>
+<li><a href="#by-percentages">By Percentages</a></li>
+<li><a href="#by-reference">By Reference</a></li>
+<li><a href="#by-transformation-matrix">By Transformation Matrix</a></li>
+<li><a href="#change-the-current-glyph">Change the current glyph</a></li>
+<li><a href="#flipping">Flipping</a></li>
+</ul>
+</li>
+<li><a href="#stacking-vertically">Stacking Vertically</a></li>
+<li><a href="#positioning-formulas">Positioning formulas</a></li>
+<li><a href="#stacking-horizontally">Stacking Horizontally</a></li>
+<li><a href="#variables">Variables</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2 id="assigning-a-construction-to-a-glyph">Assigning a construction to a glyph<a class="headerlink" href="#assigning-a-construction-to-a-glyph" title="Permanent link">&para;</a></h2>
 <p>Build <code>&lt;destGlyphName&gt;</code> out of one or more components.</p>
 <pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt;
 Aacute = A + acute
@@ -20,26 +48,26 @@ Aacute = A + acute
 <p>Optionally, a suffix can be provided. If a glyph with the given suffix does not exist in the font, the suffix is ignored.</p>
 <pre><code>Aacute = A + acute.cap
 </code></pre>
-<h2>Comments</h2>
+<h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
 <p>A line starting with (or anything after) a <code>#</code> is a comment and will not be used during execution.</p>
 <pre><code># this is a comment
 Aacute = A + acute
 Agrave = A + grave # this is also a comment
 </code></pre>
-<h2>Unicodes</h2>
+<h2 id="unicodes">Unicodes<a class="headerlink" href="#unicodes" title="Permanent link">&para;</a></h2>
 <pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; | &lt;unicode&gt;
 Aacute = A + acute | 00C1
 </code></pre>
-<h2>Mark Color</h2>
+<h2 id="mark-color">Mark Color<a class="headerlink" href="#mark-color" title="Permanent link">&para;</a></h2>
 <pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ! &lt;rgba&gt;
 Aacute = A + acute ! 1, 0, 0, 1
 </code></pre>
-<h2>Metrics</h2>
-<h3>Width</h3>
+<h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">&para;</a></h2>
+<h3 id="width">Width<a class="headerlink" href="#width" title="Permanent link">&para;</a></h3>
 <pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;width&gt;
 Aacute = A + acute ^ 400
 </code></pre>
-<h3>Left and Right Margins</h3>
+<h3 id="left-and-right-margins">Left and Right Margins<a class="headerlink" href="#left-and-right-margins" title="Permanent link">&para;</a></h3>
 <pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;leftmargin&gt;, &lt;rightMargin&gt;
 Aacute = A + acute ^ 30, 30
 </code></pre>
@@ -51,34 +79,34 @@ Aacute = A + acute ^ A * 2
 # right margin is equal to twice the right margin of B
 Aacute = A + acute ^ A / 3, B * 2
 </code></pre>
-<h2>Ignore existing glyphs</h2>
+<h2 id="ignore-existing-glyphs">Ignore existing glyphs<a class="headerlink" href="#ignore-existing-glyphs" title="Permanent link">&para;</a></h2>
 <p>Add <code>?</code> before a glyph construction rule to ignore this glyph if it already exists in the font.</p>
 <pre><code>?Aacute = A + acute
 </code></pre>
-<h2>Positioning</h2>
+<h2 id="positioning">Positioning<a class="headerlink" href="#positioning" title="Permanent link">&para;</a></h2>
 <p>The Glyph Construction language offers different ways to position the added components in relation to the current glyph.</p>
-<h3>By Numbers</h3>
+<h3 id="by-numbers">By Numbers<a class="headerlink" href="#by-numbers" title="Permanent link">&para;</a></h3>
 <pre><code>Aacute = A + acute@100
 Aacute = A + acute@100,100
 </code></pre>
-<h3>By Percentages</h3>
+<h3 id="by-percentages">By Percentages<a class="headerlink" href="#by-percentages" title="Permanent link">&para;</a></h3>
 <pre><code>Aacute = A + acute@50%,50%
 </code></pre>
-<h3>By Reference</h3>
+<h3 id="by-reference">By Reference<a class="headerlink" href="#by-reference" title="Permanent link">&para;</a></h3>
 <p>A reference could be (in this order):</p>
 <ul>
 <li>double anchor (with the <code>_&lt;anchorName&gt;</code> notation)</li>
 <li>a single anchor name</li>
 <li>a local guide name</li>
-<li>a global guide name </li>
+<li>a global guide name</li>
 <li>a font dimension attribute: <code>descender</code>, <code>xHeight</code>, <code>capHeight</code>, <code>ascender</code></li>
 <li>a calculated reference position: <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>, <code>innerLeft</code>, <code>innerRight</code>, <code>center</code>, <code>origin</code>, <code>width</code></li>
 </ul>
 <p><code>Aacute = A + acute@center,top</code></p>
-<h3>By Transformation Matrix</h3>
+<h3 id="by-transformation-matrix">By Transformation Matrix<a class="headerlink" href="#by-transformation-matrix" title="Permanent link">&para;</a></h3>
 <p><code>@</code> followed by a transformation matrix: 6 values <code>xx, xy, yx, yy, x, y</code></p>
 <p>Aacute = A + acute@1, 0, 0, 1, 100, 100</p>
-<h3>Change the current glyph</h3>
+<h3 id="change-the-current-glyph">Change the current glyph<a class="headerlink" href="#change-the-current-glyph" title="Permanent link">&para;</a></h3>
 <p>The current glyph is always the last component added.</p>
 <p>For example, <code>Aacute = A + acute</code> will:</p>
 <ul>
@@ -87,7 +115,7 @@ Aacute = A + acute@100,100
 <li>force the current glyph with <code>@&lt;glyphName&gt;:&lt;pos&gt;</code></li>
 </ul>
 <p>Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom</p>
-<h3>Flipping</h3>
+<h3 id="flipping">Flipping<a class="headerlink" href="#flipping" title="Permanent link">&para;</a></h3>
 <p><code>~</code> followed by a positionig will flipping a component</p>
 <pre><code># flip horizontal
 Aacute = A + acute@~center,top
@@ -98,16 +126,16 @@ Aacute = A + acute@center,~top
 # flip both horizontal and vertical
 Aacute = A + acute@~center,~top
 </code></pre>
-<h2>Stacking Vertically</h2>
+<h2 id="stacking-vertically">Stacking Vertically<a class="headerlink" href="#stacking-vertically" title="Permanent link">&para;</a></h2>
 <pre><code>Aringacute = A + ring@center,top + acute@center,top
 </code></pre>
-<h2>Positioning formulas</h2>
+<h2 id="positioning-formulas">Positioning formulas<a class="headerlink" href="#positioning-formulas" title="Permanent link">&para;</a></h2>
 <pre><code>Aringacute = A + ring@center,`top+10` + acute@center,`top-10`
 </code></pre>
-<h2>Stacking Horizontally</h2>
+<h2 id="stacking-horizontally">Stacking Horizontally<a class="headerlink" href="#stacking-horizontally" title="Permanent link">&para;</a></h2>
 <pre><code>ffi = f &amp; f &amp; i
 </code></pre>
-<h2>Variables</h2>
+<h2 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h2>
 <p>Glyph Construction supports variables, which can be defined once at the top of the document and used multiple times.</p>
 <pre><code>$name = something # declaration
 {name} # usage

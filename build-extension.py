@@ -17,8 +17,9 @@ extensionPath = os.path.join(basePath, 'GlyphConstruction.roboFontExt')
 # build documentation
 # -------------------
 
-import markdown
 import codecs
+import markdown
+from markdown.extensions.toc import TocExtension
 
 mdPath = os.path.join(basePath, 'README.md')
 htmlIndexPath = os.path.join(htmlPath, 'index.html')
@@ -37,8 +38,9 @@ htmlTemplate = '''\
 </html>
 '''
 
-md = codecs.open(mdPath, mode="r", encoding="utf-8").read()
-html = htmlTemplate % markdown.markdown(md)
+mdSrc = codecs.open(mdPath, mode="r", encoding="utf-8").read()
+M = markdown.Markdown(extensions=[TocExtension(permalink=True)])
+html = htmlTemplate % M.convert(mdSrc)
 htmlFile = codecs.open(htmlIndexPath, mode="w", encoding="utf-8")
 htmlFile.write(html)
 htmlFile.close()
@@ -64,7 +66,7 @@ B.addToMenu = [
         'shortKey'     : '',
     },
 ]
-B.license = open(licensePath).read()
+B.license = codecs.open(licensePath, mode="r", encoding="utf-8").read()
 B.repositoryURL = 'http://github.com/typemytype/GlyphConstruction/'
 B.summary = 'A simple, human-readable, powerful language for describing how shapes are constructed.'
 

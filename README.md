@@ -7,9 +7,7 @@ Glyph Construction can be used to create new glyphs from components. It is speci
 
 Collections of Glyph Construction rules can be saved as `*.glyphConstruction` files, and can be shared between fonts.
 
-- - -
-
-Below is an overview of the language, with some examples.
+[TOC]
 
 ## Assigning a construction to a glyph
 
@@ -87,7 +85,7 @@ A reference could be (in this order):
 - double anchor (with the `_<anchorName>` notation)
 - a single anchor name
 - a local guide name
-- a global guide name 
+- a global guide name
 - a font dimension attribute: `descender`, `xHeight`, `capHeight`, `ascender`
 - a calculated reference position: `top`, `bottom`, `left`, `right`, `innerLeft`, `innerRight`, `center`, `origin`, `width`
 

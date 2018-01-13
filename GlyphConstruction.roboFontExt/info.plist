@@ -13,6 +13,13 @@
 			<string></string>
 		</dict>
 	</array>
+	<key>com.robofontmechanic.Mechanic</key>
+	<dict>
+		<key>repository</key>
+		<string>http://github.com/typemytype/GlyphConstruction/</string>
+		<key>summary</key>
+		<string>A simple, human-readable, powerful language for describing how shapes are constructed.</string>
+	</dict>
 	<key>developer</key>
 	<string>Frederk Berlaen</string>
 	<key>developerURL</key>
@@ -30,7 +37,7 @@
 	<key>requiresVersionMinor</key>
 	<string>5</string>
 	<key>timeStamp</key>
-	<real>1515860378.6190369</real>
+	<real>1515862754.958688</real>
 	<key>version</key>
 	<string>0.1</string>
 </dict>

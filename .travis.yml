@@ -9,7 +9,7 @@ install:
   - pip install git+https://github.com/robofab-developers/fontPens.git
   - pip install coveralls
 script:
-  - cd Lib/glyphConstruction
+  - cd Lib
   - coverage run --parallel-mode glyphConstructionBuilder.py
 after_success:
   - coverage combine

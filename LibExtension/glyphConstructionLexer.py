@@ -2,40 +2,40 @@ from pygments.lexer import RegexLexer, include, bygroups
 from pygments import token
 
 from lib.scripting.codeEditor import CodeEditor, languagesIDEBehavior
-import glyphConstructionBuilder as gb
+import glyphConstruction as gc
 
-glyphConstructionAlignmentWords = list(gb.legalFontInfoAttributes | gb.legalGlyphMetricHorizontalPositions | gb.legalGlyphMetricVerticalPositions | gb.legalBoundsPositions | gb.legalCalculatablePositions)
+glyphConstructionAlignmentWords = list(gc.legalFontInfoAttributes | gc.legalGlyphMetricHorizontalPositions | gc.legalGlyphMetricVerticalPositions | gc.legalBoundsPositions | gc.legalCalculatablePositions)
 
 glyphConstructionOperations = [
-    gb.glyphNameSplit,
-    gb.unicodeSplit,
-    gb.baseGlyphSplit,
-    gb.markGlyphSplit,
-    gb.positionSplit,
-    gb.positionXYSplit,
-    gb.positionBaseSplit,
-    gb.glyphSuffixSplit,
-    gb.metricsSuffixSplit,
-    gb.glyphCommentSuffixSplit,
-    gb.glyphMarkSuffixSplit,
-    gb.flipMarkGlyphSplit,
+    gc.glyphNameSplit,
+    gc.unicodeSplit,
+    gc.baseGlyphSplit,
+    gc.markGlyphSplit,
+    gc.positionSplit,
+    gc.positionXYSplit,
+    gc.positionBaseSplit,
+    gc.glyphSuffixSplit,
+    gc.metricsSuffixSplit,
+    gc.glyphCommentSuffixSplit,
+    gc.glyphMarkSuffixSplit,
+    gc.flipMarkGlyphSplit,
 
-    # gb.variableDeclarationStart,
-    # gb.variableDeclarationEnd,
+    # gc.variableDeclarationStart,
+    # gc.variableDeclarationEnd,
 
-    gb.explicitMathStart,
-    gb.explicitMathEnd,
+    gc.explicitMathStart,
+    gc.explicitMathEnd,
 
     "-", "+", "/", "*"  # math stuff"
-    ]
+]
 
 languagesIDEBehavior["GlyphConstruction"] = {
-            "openToCloseMap": {},
-            "indentWithEndOfLine": [],
-            "comment": "#",
-            "keywords": glyphConstructionAlignmentWords + glyphConstructionOperations,
-            # "dropPathFormatting" : None
-        }
+    "openToCloseMap": {},
+    "indentWithEndOfLine": [],
+    "comment": "#",
+    "keywords": glyphConstructionAlignmentWords + glyphConstructionOperations,
+    # "dropPathFormatting" : None
+}
 
 
 class GlyphConstructionLexer(RegexLexer):
@@ -55,7 +55,7 @@ class GlyphConstructionLexer(RegexLexer):
                     (r'(\?)?([a-zA-Z_\{][a-zA-Z0-9_.\{\}]*)((\s|\\\s)*=)',  bygroups(token.Name.Builtin, token.Keyword, token.Operator)),
                     (r'(%s)' % ("|".join(glyphConstructionAlignmentWords)), token.Name.Tag),
 
-                    (r'(\%s)(\s*[a-zA-Z_][a-zA-Z0-9_]*)\s*(\=)\s*(.*)(%s)' % (gb.variableDeclarationStart, gb.variableDeclarationEnd), bygroups(token.Name.Builtin, token.Name.Variable, token.Operator, token.String, token.Name.Builtin)),
+                    (r'(\%s)(\s*[a-zA-Z_][a-zA-Z0-9_]*)\s*(\=)\s*(.*)(%s)' % (gc.variableDeclarationStart, gc.variableDeclarationEnd), bygroups(token.Name.Builtin, token.Name.Variable, token.Operator, token.String, token.Name.Builtin)),
                     (r'\{[a-zA-Z_][a-zA-Z0-9_]*\}', token.Name.Function),
                     include('numbers'),
                     include('whitespace'),
@@ -74,6 +74,7 @@ class GlyphConstructionLexer(RegexLexer):
                     (r'\s+', token.Text),
                 ],
         }
+
 
 if __name__ == "__main__":
 

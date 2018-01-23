@@ -17,7 +17,7 @@ from lib.UI.enterTextEditor import EnterTextEditor
 from lib.tools.misc import NSColorToRgba
 from lib.UI.statusBar import StatusBar
 
-from glyphConstructionBuilder import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
+from glyphConstruction import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
 from glyphConstructionLexer import GlyphConstructionLexer
 
 from lib.scripting.codeEditor import CodeEditor
@@ -134,12 +134,13 @@ threequarters = fraction@110%,origin + three.superior@innerLeft,innerTop + four.
 percent = fraction@110%,origin + zero.superior@innerLeft,innerTop + zero.inferior@ fraction:innerRight,fraction:innerBottom
 perthousand = fraction@110%,origin + zero.superior@innerLeft,innerTop + zero.inferior@ fraction:innerRight,fraction:innerBottom & zero.inferior@fraction:right,fraction:innerBottom
 
-## some test cases
+# some test cases
 
 L_aringacute=L & a+ring@center,top+acute@center,top
 """
 
 constructions = ""
+
 
 class GlyphConstructorFont(object):
 
@@ -173,6 +174,7 @@ class GlyphConstructorFont(object):
             yield self[name]
             names = names[1:]
 
+
 class AnalyserTextEditor(EnterTextEditor):
 
     def __init__(self, *args, **kwargs):
@@ -181,21 +183,23 @@ class AnalyserTextEditor(EnterTextEditor):
 
         try:
             self.getNSTextView().setUsesFindBar_(True)
-        except:
+        except Exception:
             self.getNSTextView().setUsesFindPanel_(True)
 
-        #basicAttrs = getBasicTextAttributes()
+        # basicAttrs = getBasicTextAttributes()
         font = NSFont.fontWithName_size_("Menlo", 10)
 
-        #self.getNSTextView().setTypingAttributes_(basicAttrs)
+        # self.getNSTextView().setTypingAttributes_(basicAttrs)
         self.getNSTextView().setFont_(font)
+
 
 def _stringDict(d, verb):
     out = []
     for key in sorted(d.keys()):
         value = d[key]
-        out.append("\tGlyph %s %s %s" %(key, verb, ", ".join(value)))
+        out.append("\tGlyph %s %s %s" % (key, verb, ", ".join(value)))
     return "\n".join(out)
+
 
 def analyseConstructions(font, constructionGlyphs):
     missingGlyphs = []
@@ -251,40 +255,40 @@ def analyseConstructions(font, constructionGlyphs):
 
     if doubleEntries:
         text += [
-                 "Double entries:",
-                 "---------------",
-                 "\t" + "\n\t".join(doubleEntries),
-                 "\n"
-                ]
+            "Double entries:",
+            "---------------",
+            "\t" + "\n\t".join(doubleEntries),
+            "\n"
+        ]
 
     if missingGlyphs:
         text += [
-                 "Missing Glyphs:",
-                 "---------------",
-                 "\t" + "\n\t".join(missingGlyphs),
-                 "\n"
-                ]
+            "Missing Glyphs:",
+            "---------------",
+            "\t" + "\n\t".join(missingGlyphs),
+            "\n"
+        ]
     if notMissingGlyphs:
         text += [
-                 "Existing Glyphs:",
-                 "---------------",
-                 "\t" + "\n\t".join(notMissingGlyphs),
-                 "\n"
-                ]
+            "Existing Glyphs:",
+            "---------------",
+            "\t" + "\n\t".join(notMissingGlyphs),
+            "\n"
+        ]
     if missingComponents:
         text += [
-                 "Existing Glyphs with Missing Components:",
-                 "----------------------------------------",
-                 _stringDict(missingComponents, "is missing"),
-                 "\n"
-                ]
+            "Existing Glyphs with Missing Components:",
+            "----------------------------------------",
+            _stringDict(missingComponents, "is missing"),
+            "\n"
+        ]
     if unusedComponents:
         text += [
-                 "Existing Glyphs with different components:",
-                 "------------------------------------------",
-                 _stringDict(unusedComponents, "has no"),
-                 "\n"
-                ]
+            "Existing Glyphs with different components:",
+            "------------------------------------------",
+            _stringDict(unusedComponents, "has no"),
+            "\n"
+        ]
 
     return "\n".join(text)
 
@@ -308,7 +312,7 @@ class BuildGlyphsSheet(BaseWindowController):
 
         y += 35
         self.w.markGlyphs = CheckBox((15, y, 200, 22), "Mark Glyphs", value=getExtensionDefault(self.overWriteKey, True), callback=self.markGlyphsCallback)
-        self.w.markGlyphColor = ColorWell((130, y-5, 50, 30), color=getExtensionDefaultColor(self.markColorKey, NSColor.redColor()))
+        self.w.markGlyphColor = ColorWell((130, y - 5, 50, 30), color=getExtensionDefaultColor(self.markColorKey, NSColor.redColor()))
 
         self.w.markGlyphColor.enable(getExtensionDefault(self.overWriteKey, True))
 
@@ -378,6 +382,7 @@ class BuildGlyphsSheet(BaseWindowController):
 
         self.w.close()
 
+
 class GlyphBuilderController(BaseWindowController):
 
     fileNameKey = "%s.lastSavedFileName" % defaultKey
@@ -389,81 +394,85 @@ class GlyphBuilderController(BaseWindowController):
         statusBarHeight = 20
 
         self.w = Window((900, 700), "Glyph Builder", minSize=(400, 400))
-        self.w.getNSWindow().setCollectionBehavior_(128) #NSWindowCollectionBehaviorFullScreenPrimary
+        self.w.getNSWindow().setCollectionBehavior_(128)  # NSWindowCollectionBehaviorFullScreenPrimary
 
         toolbarItems = [
-                        dict(itemIdentifier="save",
-                            label="Save",
-                            imageNamed="toolbarScriptSave",
-                            callback=self.saveFile,
-                            ),
-                        dict(itemIdentifier="open",
-                            label="Open",
-                            imageNamed="toolbarScriptOpen",
-                            callback=self.openFile,
-                            ),
-                        dict(itemIdentifier=NSToolbarSpaceItemIdentifier),
-                        dict(itemIdentifier="reload",
-                            label="Update",
-                            imageNamed="toolbarScriptReload",
-                            callback=self.reload,
-                            ),
-                        dict(itemIdentifier=NSToolbarSpaceItemIdentifier),
-                        dict(itemIdentifier="analyse",
-                            label="Analyse",
-                            imageNamed="prefToolbarSort",
-                            callback=self.analyse,
-                            ),
-                        dict(itemIdentifier=NSToolbarFlexibleSpaceItemIdentifier),
-                        dict(itemIdentifier="buildGlyphs",
-                             label="Build Glyphs",
-                             imageNamed="toolbarRun",
-                             callback=self.generateGlyphs
-                             ),
-                        ]
-        toolbar = self.w.addToolbar(toolbarIdentifier="GlyphBuilderControllerToolbar", toolbarItems=toolbarItems, addStandardItems=False)
+            dict(
+                itemIdentifier="save",
+                label="Save",
+                imageNamed="toolbarScriptSave",
+                callback=self.saveFile,
+            ),
+            dict(
+                itemIdentifier="open",
+                label="Open",
+                imageNamed="toolbarScriptOpen",
+                callback=self.openFile,
+            ),
+            dict(itemIdentifier=NSToolbarSpaceItemIdentifier),
+            dict(
+                itemIdentifier="reload",
+                label="Update",
+                imageNamed="toolbarScriptReload",
+                callback=self.reload,
+            ),
+            dict(itemIdentifier=NSToolbarSpaceItemIdentifier),
+            dict(
+                itemIdentifier="analyse",
+                label="Analyse",
+                imageNamed="prefToolbarSort",
+                callback=self.analyse,
+            ),
+            dict(itemIdentifier=NSToolbarFlexibleSpaceItemIdentifier),
+            dict(
+                itemIdentifier="buildGlyphs",
+                label="Build Glyphs",
+                imageNamed="toolbarRun",
+                callback=self.generateGlyphs
+            ),
+        ]
+        self.w.addToolbar(toolbarIdentifier="GlyphBuilderControllerToolbar", toolbarItems=toolbarItems, addStandardItems=False)
 
-        self.constructions = CodeEditor((0, 0, -0, -0),constructions, lexer=GlyphConstructionLexer())
-        #self.constructions.wrapWord(False) # in only availbel in the RoboFont 1.7 beta
+        self.constructions = CodeEditor((0, 0, -0, -0), constructions, lexer=GlyphConstructionLexer())
+        # self.constructions.wrapWord(False) # in only availbel in the RoboFont 1.7 beta
 
         self.constructions.getNSScrollView().setBorderType_(NSNoBorder)
-        self.preview = MultiLineView((0, 0, -0, -0),
-                                     pointSize=50,
-                                     lineHeight=500,
-                                     applyKerning=False,
-                                     displayOptions={"Beam" : False,
-                                                     "displayMode" : "Multi Line"},
-                                     selectionCallback=self.previewSelectionCallback)
-
+        self.preview = MultiLineView(
+            (0, 0, -0, -0),
+            pointSize=50,
+            lineHeight=500,
+            applyKerning=False,
+            displayOptions={
+                "Beam": False,
+                "displayMode": "Multi Line"
+            },
+            selectionCallback=self.previewSelectionCallback
+        )
 
         self.analyser = AnalyserTextEditor((0, 0, -0, -0), readOnly=True)
         self.analyserPreview = Group((0, 0, -0, -0))
 
-
         self.analyserPreview.construction = GlyphPreview((0, 0, -0, -0), contourColor=NSColor.redColor(), componentColor=NSColor.redColor())
         self.analyserPreview.construction.getNSView()._buffer = 100
-        self.analyserPreview.origin = GlyphPreview((0, 0, -0, -0),contourColor=NSColor.blackColor(), componentColor=NSColor.blackColor())
+        self.analyserPreview.origin = GlyphPreview((0, 0, -0, -0), contourColor=NSColor.blackColor(), componentColor=NSColor.blackColor())
         self.analyserPreview.origin.getNSView()._buffer = 100
 
         self.analyserPreview.build = Button((10, -25, -10, 19), "Build", sizeStyle="small", callback=self.buildSingleGlyph)
         self.analyserPreview.build.enable(False)
 
         paneDescriptions = [
-                    dict(view=self.analyser, identifier="analyserText", canCollapse=False, minSize=100),
-                    dict(view=self.analyserPreview, identifier="analyserPreview", canCollapse=False, minSize=100),
-                    ]
-
+            dict(view=self.analyser, identifier="analyserText", canCollapse=False, minSize=100),
+            dict(view=self.analyserPreview, identifier="analyserPreview", canCollapse=False, minSize=100),
+        ]
         self.analyserSplit = Splitter((0, 0, -0, -statusBarHeight), paneDescriptions=paneDescriptions, drawBorderLine=False, isVertical=False, dividerThickness=1)
 
-
         paneDescriptions = [
-                    dict(view=self.constructions, identifier="constructions", canCollapse=False, minSize=200, maxSize=600, liveResizeable=False),
-                    dict(view=self.preview, identifier="preview", canCollapse=False, minSize=300, liveResizeable=True),
-                    dict(view=self.analyserSplit, identifier="analyser", canCollapse=True, minSize=100, maxSize=300, liveResizeable=False)
-                    ]
-
+            dict(view=self.constructions, identifier="constructions", canCollapse=False, minSize=200, maxSize=600, liveResizeable=False),
+            dict(view=self.preview, identifier="preview", canCollapse=False, minSize=300, liveResizeable=True),
+            dict(view=self.analyserSplit, identifier="analyser", canCollapse=True, minSize=100, maxSize=300, liveResizeable=False)
+        ]
         self.w.split = Splitter((0, 0, -0, -statusBarHeight), paneDescriptions=paneDescriptions, drawBorderLine=False, dividerThickness=1)
-        #self.w.split.showPane("analyser", True)
+        # self.w.split.showPane("analyser", True)
 
         self.w.statusBar = StatusBar((0, -statusBarHeight, -0, statusBarHeight))
         self.w.statusBar.hiddenReload = Button((0, 0, -0, -0), "Reload", self.reload)
@@ -513,7 +522,7 @@ class GlyphBuilderController(BaseWindowController):
 
         try:
             constructions = ParseGlyphConstructionListFromString(sender.get(), font)
-        except GlyphBuilderError, err:
+        except GlyphBuilderError as err:
             constructions = []
             errors.append(str(err))
 
@@ -525,15 +534,15 @@ class GlyphBuilderController(BaseWindowController):
             else:
                 try:
                     constructionGlyph = GlyphConstructionBuilder(construction, self.glyphConstructorFont)
-                except GlyphBuilderError, err:
+                except GlyphBuilderError as err:
                     errors.append(str(err))
                     continue
 
                 if constructionGlyph.name is None:
                     errors.append(construction)
                     continue
-                
-                if RoboFontVersion < 2:
+
+                if RoboFontVersion < "2.0":
                     glyph = font._instantiateGlyphObject()
                 else:
                     glyph = font.layers.defaultLayer.instantiateGlyphObject()
@@ -541,7 +550,7 @@ class GlyphBuilderController(BaseWindowController):
                 glyph.unicode = constructionGlyph.unicode
                 glyph.note = constructionGlyph.note
                 glyph.mark = constructionGlyph.mark
-                if RoboFontVersion < 2:
+                if RoboFontVersion < "2.0":
                     glyph.setParent(self.glyphConstructorFont)
                     glyph.dispatcher = font.dispatcher
                 else:
@@ -556,15 +565,15 @@ class GlyphBuilderController(BaseWindowController):
             self._glyphs.append(glyph)
 
         if errors:
-            print "Errors:"
-            print "\n".join(errors)
+            print("Errors:")
+            print("\n".join(errors))
 
         if update:
             self.preview.set(self._glyphs)
 
         self.analyser.set(analyseConstructions(font, self._glyphs))
 
-    ## preview
+    # preview
 
     def previewSelectionCallback(self, sender):
 
@@ -582,17 +591,16 @@ class GlyphBuilderController(BaseWindowController):
 
         status = []
 
-
         if glyph is not None:
             width = _niceNumber(glyph.width)
             leftMargin = _niceNumber(glyph.leftMargin)
             rightMargin = _niceNumber(glyph.rightMargin)
 
             status = [
-                 glyph.name,
-                 "width: %s left: %s right: %s" % (width, leftMargin, rightMargin),
-                 "components: %s" % (", ".join([component.baseGlyph for component in glyph.components]))
-                 ]
+                glyph.name,
+                "width: %s left: %s right: %s" % (width, leftMargin, rightMargin),
+                "components: %s" % (", ".join([component.baseGlyph for component in glyph.components]))
+            ]
             if glyph.unicode:
                 status.append("unicode: %04X" % glyph.unicode)
             if glyph.note:
@@ -616,7 +624,6 @@ class GlyphBuilderController(BaseWindowController):
         else:
             self.analyserPreview.origin.setGlyph(None)
 
-
     def buildSingleGlyph(self, sender):
         glyph = self.preview.getSelectedGlyph()
         if glyph is None:
@@ -635,7 +642,7 @@ class GlyphBuilderController(BaseWindowController):
             dest.mark = glyph.mark
         dest.width = glyph.width
 
-    ## toolbar
+    # toolbar
 
     def generateGlyphs(self, sender):
         self.reload(update=False)
@@ -647,7 +654,6 @@ class GlyphBuilderController(BaseWindowController):
             return
 
         BuildGlyphsSheet(self._glyphs, self.font, self.w)
-
 
     def reload(self, sender=None, update=True):
         self.constructionsCallback(self.constructions, update)
@@ -686,7 +692,7 @@ class GlyphBuilderController(BaseWindowController):
                 fileName += ".glyphConstruction"
                 directory = os.path.dirname(self.font.path)
                 fileName = os.path.join(directory, fileName)
-                directory=None
+                directory = None
         getFile(fileTypes=["glyphConstruction"], parentWindow=self.w.getNSWindow(), directory=directory, fileName=fileName, resultCallback=self._openFile)
         # self.showGetFile(["glyphConstruction"], callback=self._openFile)
 
@@ -694,7 +700,7 @@ class GlyphBuilderController(BaseWindowController):
         self.w.split.togglePane("analyser", False)
         self.reload()
 
-    ## notifications
+    # notifications
 
     def fontChanged(self, notification):
         self.reload()
@@ -704,7 +710,6 @@ class GlyphBuilderController(BaseWindowController):
         self.subscribeFont(font)
 
     def fontResignCurrent(self, notification):
-        font = notification["font"]
         self.unsubscribeFont()
 
     def windowCloseCallback(self, sender):
@@ -712,5 +717,6 @@ class GlyphBuilderController(BaseWindowController):
         removeObserver(self, "fontBecameCurrent")
         removeObserver(self, "fontResignCurrent")
         super(GlyphBuilderController, self).windowCloseCallback(sender)
+
 
 GlyphBuilderController(CurrentFont())

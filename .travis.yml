@@ -2,17 +2,14 @@ language: python
 sudo: required
 python:
   - "2.7"
-before_install:
-  - git clone https://github.com/typesupply/defcon.git
-  - git clone https://github.com/robofab-developers/robofab.git
-  - git clone https://github.com/behdad/fonttools.git
+  - "3.6"
 install:
-  - cd defcon; python setup.py install; cd ..
-  - cd robofab; python install.py; cd ..
-  - cd fonttools; python setup.py install; cd ..
+  - pip install defcon
+  - pip install fonttools
+  - pip install git+https://github.com/robofab-developers/fontPens.git
   - pip install coveralls
 script:
-  - cd RoboFont
+  - cd Lib/glyphConstruction
   - coverage run --parallel-mode glyphConstructionBuilder.py
 after_success:
   - coverage combine

@@ -1,6 +1,10 @@
-'''build RoboFont Extension'''
+'''
+build RoboFont Extension
+Run inside RoboFont
+'''
 
 import os
+import shutil
 from mojo.extensions import ExtensionBundle
 
 # ----------
@@ -8,10 +12,11 @@ from mojo.extensions import ExtensionBundle
 # ----------
 
 basePath = os.path.dirname(__file__)
-libPath = os.path.join(basePath, 'py')
+libPath = os.path.join(basePath, 'LibExtension')
 htmlPath = os.path.join(basePath, 'html')
 licensePath = os.path.join(basePath, 'LICENSE')
 extensionPath = os.path.join(basePath, 'GlyphConstruction.roboFontExt')
+modulePath = os.path.join(basePath, "Lib", "glyphConstruction.py")
 
 # -------------------
 # build documentation
@@ -38,9 +43,11 @@ htmlTemplate = '''\
 </html>
 '''
 
-mdSrc = codecs.open(mdPath, mode="r", encoding="utf-8").read()
+with codecs.open(mdPath, mode="r", encoding="utf-8") as f:
+    mdSrc = f.read()
 M = markdown.Markdown(extensions=[TocExtension(permalink=True)])
 html = htmlTemplate % M.convert(mdSrc)
+
 htmlFile = codecs.open(htmlIndexPath, mode="w", encoding="utf-8")
 htmlFile.write(html)
 htmlFile.close()
@@ -66,7 +73,9 @@ B.addToMenu = [
         'shortKey'     : '',
     },
 ]
-B.license = codecs.open(licensePath, mode="r", encoding="utf-8").read()
+
+with codecs.open(licensePath, mode="r", encoding="utf-8") as f:
+    B.license = f.read()
 B.repositoryURL = 'http://github.com/typemytype/GlyphConstruction/'
 B.summary = 'A simple, human-readable, powerful language for describing how shapes are constructed.'
 
@@ -74,8 +83,15 @@ B.summary = 'A simple, human-readable, powerful language for describing how shap
 # build extension
 # ---------------
 
-print 'building extension...',
+print('building extension...', end=" ")
 B.save(extensionPath, libPath=libPath, htmlPath=htmlPath)
-print 'done!'
-print
-print B.validationErrors()
+
+print('copy module...', end=" ")
+destModulePath = os.path.join(B.libPath(), "glyphConstruction.py")
+if os.path.exists(destModulePath):
+    os.path.remove(destModulePath)
+shutil.copy(modulePath, destModulePath)
+
+print('done!')
+print()
+print(B.validationErrors())

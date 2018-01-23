@@ -10,5 +10,6 @@ setup(
     description='Letter shape description language',
     long_description='Letter shape description language',
     install_requires=[],
+    py_modules=["glyphConstruction"],
     package_dir={'': 'Lib'}
 )

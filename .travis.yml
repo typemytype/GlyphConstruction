@@ -10,7 +10,7 @@ install:
   - pip install coveralls
 script:
   - cd Lib
-  - coverage run --parallel-mode glyphConstructionBuilder.py
+  - coverage run --parallel-mode glyphConstruction.py
 after_success:
   - coverage combine
   - coveralls

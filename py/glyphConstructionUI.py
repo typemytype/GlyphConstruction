@@ -1,8 +1,10 @@
 from AppKit import *
+import weakref
 from vanilla import *
 from vanilla.dialogs import getFile
 from defconAppKit.windows.baseWindow import BaseWindowController
 
+from mojo.roboFont import version as RoboFontVersion
 from mojo.events import addObserver, removeObserver
 from mojo.drawingTools import *
 from mojo.UI import MultiLineView
@@ -162,7 +164,7 @@ class GlyphConstructorFont(object):
         return len(self.keys())
 
     def keys(self):
-        return set(self.font.keys() + self.glyphsDone.keys())
+        return set(list(self.font.keys()) + list(self.glyphsDone.keys()))
 
     def __iter__(self):
         names = self.keys()
@@ -387,9 +389,7 @@ class GlyphBuilderController(BaseWindowController):
         statusBarHeight = 20
 
         self.w = Window((900, 700), "Glyph Builder", minSize=(400, 400))
-
-        if NSApp().runningOnLion():
-            self.w.getNSWindow().setCollectionBehavior_(128) #NSWindowCollectionBehaviorFullScreenPrimary
+        self.w.getNSWindow().setCollectionBehavior_(128) #NSWindowCollectionBehaviorFullScreenPrimary
 
         toolbarItems = [
                         dict(itemIdentifier="save",
@@ -532,14 +532,21 @@ class GlyphBuilderController(BaseWindowController):
                 if constructionGlyph.name is None:
                     errors.append(construction)
                     continue
-
-                glyph = font._instantiateGlyphObject()
+                
+                if RoboFontVersion < 2:
+                    glyph = font._instantiateGlyphObject()
+                else:
+                    glyph = font.layers.defaultLayer.instantiateGlyphObject()
                 glyph.name = constructionGlyph.name
                 glyph.unicode = constructionGlyph.unicode
                 glyph.note = constructionGlyph.note
                 glyph.mark = constructionGlyph.mark
-                glyph.setParent(self.glyphConstructorFont)
-                glyph.dispatcher = font.dispatcher
+                if RoboFontVersion < 2:
+                    glyph.setParent(self.glyphConstructorFont)
+                    glyph.dispatcher = font.dispatcher
+                else:
+                    glyph._font = weakref.ref(self.glyphConstructorFont)
+                    # glyph._dispatcher = font._dispatcher
 
                 glyph.width = constructionGlyph.width
                 constructionGlyph.draw(glyph.getPen())

@@ -455,12 +455,16 @@ def _findAnchor(glyph, name):
     return None
 
 
-def _findGuide(glyph, name):
-    if hasattr(glyph, "guides"):
-        guides = glyph.guides
-        for guide in guides:
-            if guide.name == name:
-                return (guide.x, guide.y), guide.angle
+def _findGuide(obj, name):
+    guides = []
+    if hasattr(obj, "guidelines"):
+        guides = obj.guidelines
+    elif hasattr(obj, "guides"):
+        guides = obj.guides
+
+    for guide in guides:
+        if guide.name == name:
+            return (guide.x, guide.y), guide.angle
     return None
 
 

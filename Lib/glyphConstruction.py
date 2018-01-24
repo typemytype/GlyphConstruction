@@ -98,7 +98,7 @@ def _diffPoint(pt1, pt2):
 # regex
 
 if variableDeclarationEnd:
-    variableDeclarationEnd = "\%s" % variableDeclarationEnd
+    variableDeclarationEnd = r"\%s" % variableDeclarationEnd
 varialbesRE = re.compile(r"\%s\s*(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(?P<value>.*)%s" % (variableDeclarationStart, variableDeclarationEnd))
 
 simpleVariableRe = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]*")

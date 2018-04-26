@@ -97,7 +97,7 @@ Aacute = A + acute@center,top
 
 `@` followed by a transformation matrix: 6 values `xx, xy, yx, yy, x, y`
 
-Aacute = A + acute@1, 0, 0, 1, 100, 100
+	Aacute = A + acute@1, 0, 0, 1, 100, 100
 
 ### Change the current glyph
 
@@ -109,7 +109,7 @@ For example, `Aacute = A + acute` will:
 - add component with name `acute` (the current glyph is `A`)
 - force the current glyph with `@<glyphName>:<pos>`
 
-Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom
+	Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom
 
 ### Flipping
 

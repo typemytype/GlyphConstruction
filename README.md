@@ -107,7 +107,7 @@ For example, `Aacute = A + acute` will:
 
 - add component with name `A` (there is no current glyph)
 - add component with name `acute` (the current glyph is `A`)
-- force the current glyph with `@<glyphName>:<pos>`
+- force the current glyph with `@<glyphName>:<pos>`  
 
 	Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom
 

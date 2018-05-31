@@ -98,7 +98,7 @@ def _diffPoint(pt1, pt2):
 # regex
 
 if variableDeclarationEnd:
-    variableDeclarationEnd = "\%s" % variableDeclarationEnd
+    variableDeclarationEnd = r"\%s" % variableDeclarationEnd
 varialbesRE = re.compile(r"\%s\s*(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(?P<value>.*)%s" % (variableDeclarationStart, variableDeclarationEnd))
 
 simpleVariableRe = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]*")
@@ -983,9 +983,8 @@ def ParseGlyphConstructionListFromString(source, font=None):
     txt = None
     if isinstance(source, basestring):
         if os.path.exists(source):
-            f = open(source)
-            txt = f.read()
-            f.close()
+            with open(source) as f:
+                txt = f.read()
         else:
             txt = source
     elif hasattr(source, "read"):

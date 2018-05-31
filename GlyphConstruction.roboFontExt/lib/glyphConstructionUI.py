@@ -1,3 +1,4 @@
+from fontTools.misc.py23 import *
 from AppKit import *
 import weakref
 from vanilla import *

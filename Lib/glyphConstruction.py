@@ -983,9 +983,8 @@ def ParseGlyphConstructionListFromString(source, font=None):
     txt = None
     if isinstance(source, basestring):
         if os.path.exists(source):
-            f = open(source)
-            txt = f.read()
-            f.close()
+            with open(source) as f:
+                txt = f.read()
         else:
             txt = source
     elif hasattr(source, "read"):

@@ -34,6 +34,15 @@ Aacute = A + acute
 Agrave = A + grave # this is also a comment
 ```
 
+## Notes
+
+A comment `#` at the end of a glyph construction is a note.
+
+```
+<destGlyphName> = <glyphName> + <glyphName> # <note>
+Aacute = A + acute # this is a note
+```
+
 ## Unicodes
 
 ```

@@ -514,11 +514,11 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             baseGlyphY, positionY = positionY.split(positionBaseSplit)
 
         if flipMarkGlyphSplit in positionX:
-            flipX = True
+            flipY = True
             positionX = positionX.replace(flipMarkGlyphSplit, "")
 
         if flipMarkGlyphSplit in positionY:
-            flipY = True
+            flipX = True
             positionY = positionY.replace(flipMarkGlyphSplit, "")
 
         if positionX and positionY:

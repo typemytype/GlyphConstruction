@@ -31,7 +31,7 @@ A line starting with (or anything after) a `#` is a comment and will not be used
 ```
 # this is a comment
 Aacute = A + acute
-Agrave = A + grave # this is also a comment
+Agrave = A + grave # this is a note
 ```
 
 ## Notes

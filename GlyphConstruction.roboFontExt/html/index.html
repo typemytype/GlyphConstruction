@@ -15,9 +15,6 @@
 <li><a href="#glyph-construction">Glyph Construction</a><ul>
 <li><a href="#assigning-a-construction-to-a-glyph">Assigning a construction to a glyph</a></li>
 <li><a href="#comments">Comments</a></li>
-</ul>
-</li>
-<li><a href="#this-is-a-comment">this is a comment</a><ul>
 <li><a href="#notes">Notes</a></li>
 <li><a href="#unicodes">Unicodes</a></li>
 <li><a href="#mark-color">Mark Color</a></li>
@@ -26,11 +23,7 @@
 <li><a href="#left-and-right-margins">Left and Right Margins</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#width-is-equal-to-twice-the-width-of-a">width is equal to twice the width of A</a></li>
-<li><a href="#left-margin-is-equal-to-one-third-of-the-left-margin-of-a">left margin is equal to one third of the left margin of A</a></li>
-<li><a href="#right-margin-is-equal-to-twice-the-right-margin-of-b">right margin is equal to twice the right margin of B</a><ul>
+<li><a href="#decompose-glyph">Decompose glyph</a></li>
 <li><a href="#ignore-existing-glyphs">Ignore existing glyphs</a></li>
 <li><a href="#positioning">Positioning</a><ul>
 <li><a href="#by-numbers">By Numbers</a></li>
@@ -41,14 +34,12 @@
 <li><a href="#flipping">Flipping</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#flip-horizontal">flip horizontal</a></li>
-<li><a href="#flip-vertical">flip vertical</a></li>
-<li><a href="#flip-both-horizontal-and-vertical">flip both horizontal and vertical</a><ul>
 <li><a href="#stacking-vertically">Stacking Vertically</a></li>
 <li><a href="#positioning-formulas">Positioning formulas</a></li>
-<li><a href="#stacking-horizontally">Stacking Horizontally</a></li>
+<li><a href="#stacking-horizontally">Stacking Horizontally</a><ul>
+<li><a href="#apply-kerning-while-stacking-horizontally">Apply kerning while stacking horizontally</a></li>
+</ul>
+</li>
 <li><a href="#variables">Variables</a></li>
 </ul>
 </li>
@@ -56,52 +47,78 @@
 </div>
 <h2 id="assigning-a-construction-to-a-glyph">Assigning a construction to a glyph<a class="headerlink" href="#assigning-a-construction-to-a-glyph" title="Permanent link">&para;</a></h2>
 <p>Build <code>&lt;destGlyphName&gt;</code> out of one or more components.</p>
-<p><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt;
-Aacute = A + acute</code></p>
+<pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt;
+Aacute = A + acute
+</code></pre>
+
 <p>Optionally, a suffix can be provided. If a glyph with the given suffix does not exist in the font, the suffix is ignored.</p>
-<p><code>Aacute = A + acute.cap</code></p>
+<pre><code>Aacute = A + acute.cap
+</code></pre>
+
 <h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
 <p>A line starting with (or anything after) a <code>#</code> is a comment and will not be used during execution.</p>
-<p>```</p>
-<h1 id="this-is-a-comment">this is a comment<a class="headerlink" href="#this-is-a-comment" title="Permanent link">&para;</a></h1>
-<p>Aacute = A + acute
-Agrave = A + grave # this is also a comment
-```</p>
+<pre><code># this is a comment
+Aacute = A + acute
+Agrave = A + grave # this is a note
+</code></pre>
+
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
 <p>A comment <code>#</code> at the end of a glyph construction is a note.</p>
-<p><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; # &lt;note&gt;
-Aacute = A + acute # this is a note</code></p>
+<pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; # &lt;note&gt;
+Aacute = A + acute # this is a note
+</code></pre>
+
 <h2 id="unicodes">Unicodes<a class="headerlink" href="#unicodes" title="Permanent link">&para;</a></h2>
-<p><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; | &lt;unicode&gt;
-Aacute = A + acute | 00C1</code></p>
+<pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; | &lt;unicode&gt;
+Aacute = A + acute | 00C1
+</code></pre>
+
 <h2 id="mark-color">Mark Color<a class="headerlink" href="#mark-color" title="Permanent link">&para;</a></h2>
-<p><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ! &lt;rgba&gt;
-Aacute = A + acute ! 1, 0, 0, 1</code></p>
+<pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ! &lt;rgba&gt;
+Aacute = A + acute ! 1, 0, 0, 1
+</code></pre>
+
 <h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">&para;</a></h2>
 <h3 id="width">Width<a class="headerlink" href="#width" title="Permanent link">&para;</a></h3>
-<p><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;width&gt;
-Aacute = A + acute ^ 400</code></p>
+<pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;width&gt;
+Aacute = A + acute ^ 400
+</code></pre>
+
 <h3 id="left-and-right-margins">Left and Right Margins<a class="headerlink" href="#left-and-right-margins" title="Permanent link">&para;</a></h3>
-<p><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;leftmargin&gt;, &lt;rightMargin&gt;
-Aacute = A + acute ^ 30, 30</code></p>
+<pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;leftmargin&gt;, &lt;rightMargin&gt;
+Aacute = A + acute ^ 30, 30
+</code></pre>
+
 <p>Width and margin values can also be defined using basic maths and references to <code>width</code>, <code>leftMargin</code> or <code>rightMargin</code> of other glyphs.</p>
-<p>```</p>
-<h1 id="width-is-equal-to-twice-the-width-of-a">width is equal to twice the width of A<a class="headerlink" href="#width-is-equal-to-twice-the-width-of-a" title="Permanent link">&para;</a></h1>
-<p>Aacute = A + acute ^ A * 2</p>
-<h1 id="left-margin-is-equal-to-one-third-of-the-left-margin-of-a">left margin is equal to one third of the left margin of A<a class="headerlink" href="#left-margin-is-equal-to-one-third-of-the-left-margin-of-a" title="Permanent link">&para;</a></h1>
-<h1 id="right-margin-is-equal-to-twice-the-right-margin-of-b">right margin is equal to twice the right margin of B<a class="headerlink" href="#right-margin-is-equal-to-twice-the-right-margin-of-b" title="Permanent link">&para;</a></h1>
-<p>Aacute = A + acute ^ A / 3, B * 2
-```</p>
+<pre><code># width is equal to twice the width of A
+Aacute = A + acute ^ A * 2
+
+# left margin is equal to one third of the left margin of A
+# right margin is equal to twice the right margin of B
+Aacute = A + acute ^ A / 3, B * 2
+</code></pre>
+
+<h2 id="decompose-glyph">Decompose glyph<a class="headerlink" href="#decompose-glyph" title="Permanent link">&para;</a></h2>
+<p>Add <code>*</code> before a glyph construcntion rule to explicityly tell the constructor to decompose the final result.</p>
+<pre><code>*agrave = a + grave
+</code></pre>
+
 <h2 id="ignore-existing-glyphs">Ignore existing glyphs<a class="headerlink" href="#ignore-existing-glyphs" title="Permanent link">&para;</a></h2>
 <p>Add <code>?</code> before a glyph construction rule to ignore this glyph if it already exists in the font.</p>
-<p><code>?Aacute = A + acute</code></p>
+<pre><code>?Aacute = A + acute
+</code></pre>
+
 <h2 id="positioning">Positioning<a class="headerlink" href="#positioning" title="Permanent link">&para;</a></h2>
 <p>The Glyph Construction language offers different ways to position the added components in relation to the current glyph.</p>
 <h3 id="by-numbers">By Numbers<a class="headerlink" href="#by-numbers" title="Permanent link">&para;</a></h3>
-<p><code>Aacute = A + acute@100
-Aacute = A + acute@100,100</code></p>
+<pre><code>Aacute = A + acute@100
+Aacute = A + acute@100,100
+</code></pre>
+
 <h3 id="by-percentages">By Percentages<a class="headerlink" href="#by-percentages" title="Permanent link">&para;</a></h3>
-<p><code>Aacute = A + acute@50%,50%</code></p>
+<pre><code>Aacute = A + acute@50%,50%
+</code></pre>
+
 <h3 id="by-reference">By Reference<a class="headerlink" href="#by-reference" title="Permanent link">&para;</a></h3>
 <p>A reference could be (in this order):</p>
 <ul>
@@ -112,10 +129,14 @@ Aacute = A + acute@100,100</code></p>
 <li>a font dimension attribute: <code>descender</code>, <code>xHeight</code>, <code>capHeight</code>, <code>ascender</code></li>
 <li>a calculated reference position: <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>, <code>innerLeft</code>, <code>innerRight</code>, <code>center</code>, <code>origin</code>, <code>width</code></li>
 </ul>
-<p><code>Aacute = A + acute@center,top</code></p>
+<pre><code>Aacute = A + acute@center,top
+</code></pre>
+
 <h3 id="by-transformation-matrix">By Transformation Matrix<a class="headerlink" href="#by-transformation-matrix" title="Permanent link">&para;</a></h3>
 <p><code>@</code> followed by a transformation matrix: 6 values <code>xx, xy, yx, yy, x, y</code></p>
-<p><code>Aacute = A + acute@1, 0, 0, 1, 100, 100</code></p>
+<pre><code>Aacute = A + acute@1, 0, 0, 1, 100, 100
+</code></pre>
+
 <h3 id="change-the-current-glyph">Change the current glyph<a class="headerlink" href="#change-the-current-glyph" title="Permanent link">&para;</a></h3>
 <p>The current glyph is always the last component added.</p>
 <p>For example, <code>Aacute = A + acute</code> will:</p>
@@ -124,30 +145,45 @@ Aacute = A + acute@100,100</code></p>
 <li>add component with name <code>acute</code> (the current glyph is <code>A</code>)</li>
 <li>force the current glyph with <code>@&lt;glyphName&gt;:&lt;pos&gt;</code></li>
 </ul>
-<p><code>Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom</code></p>
+<pre><code>Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom
+</code></pre>
+
 <h3 id="flipping">Flipping<a class="headerlink" href="#flipping" title="Permanent link">&para;</a></h3>
 <p><code>~</code> followed by a position will flip a component:</p>
-<p>```</p>
-<h1 id="flip-horizontal">flip horizontal<a class="headerlink" href="#flip-horizontal" title="Permanent link">&para;</a></h1>
-<p>Aacute = A + acute@~center,top</p>
-<h1 id="flip-vertical">flip vertical<a class="headerlink" href="#flip-vertical" title="Permanent link">&para;</a></h1>
-<p>Aacute = A + acute@center,~top</p>
-<h1 id="flip-both-horizontal-and-vertical">flip both horizontal and vertical<a class="headerlink" href="#flip-both-horizontal-and-vertical" title="Permanent link">&para;</a></h1>
-<p>Aacute = A + acute@~center,~top
-```</p>
+<pre><code># flip horizontal
+Aacute = A + acute@~center,top
+
+# flip vertical
+Aacute = A + acute@center,~top
+
+# flip both horizontal and vertical
+Aacute = A + acute@~center,~top
+</code></pre>
+
 <h2 id="stacking-vertically">Stacking Vertically<a class="headerlink" href="#stacking-vertically" title="Permanent link">&para;</a></h2>
-<p><code>Aringacute = A + ring@center,top + acute@center,top</code></p>
+<pre><code>Aringacute = A + ring@center,top + acute@center,top
+</code></pre>
+
 <h2 id="positioning-formulas">Positioning formulas<a class="headerlink" href="#positioning-formulas" title="Permanent link">&para;</a></h2>
-<p><code>Aringacute = A + ring@center,`top+10` + acute@center,`top-10`</code></p>
+<pre><code>Aringacute = A + ring@center,`top+10` + acute@center,`top-10`
+</code></pre>
+
 <h2 id="stacking-horizontally">Stacking Horizontally<a class="headerlink" href="#stacking-horizontally" title="Permanent link">&para;</a></h2>
-<p><code>ffi = f &amp; f &amp; i</code></p>
+<pre><code>ffi = f &amp; f &amp; i
+</code></pre>
+
+<h3 id="apply-kerning-while-stacking-horizontally">Apply kerning while stacking horizontally<a class="headerlink" href="#apply-kerning-while-stacking-horizontally" title="Permanent link">&para;</a></h3>
+<p>Start a sub-glyphConstruction with a backslash to indicate kerning should be applied while stacking horizotally.</p>
+<pre><code>A_V = A &amp;\ V
+</code></pre>
+
 <h2 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h2>
 <p>Glyph Construction supports variables, which can be defined once at the top of the document and used multiple times.</p>
-<p>```
-$name = something # declaration
-{name} # usage</p>
-<p>$myColorMark = 1, 0, 0, 1 # declaration
+<pre><code>$name = something # declaration
+{name} # usage
+
+$myColorMark = 1, 0, 0, 1 # declaration
 agrave = a + grave@center,top ! {myColorMark} # usage
-```</p>
+</code></pre>
 </body>
 </html>

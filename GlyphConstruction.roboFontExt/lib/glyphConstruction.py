@@ -9,7 +9,9 @@ from fontTools.misc.py23 import basestring
 
 from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
+from fontTools.pens.transformPen import TransformPen
 
+from ufoLib.pointPen import SegmentToPointPen
 
 # splitters
 
@@ -26,6 +28,9 @@ glyphCommentSuffixSplit = "#"
 glyphMarkSuffixSplit = "!"
 flipMarkGlyphSplit = "~"
 glyphCheckIfExists = "?"
+shouldDecomposeResult = "*"
+applyKerningSplit = "\\"
+glyphAtrributeAlternateSplit = "'"
 
 variableDeclarationStart = "$"
 variableDeclarationEnd = ""
@@ -125,15 +130,28 @@ class ConstructionGlyph(object):
     A Glyph like object able set some basic attributes, add components and draw.
     """
 
-    def __init__(self, parent):
-        self.getParent = weakref.ref(parent)
+    def __init__(self, glyphset):
+        self._glyphset = weakref.ref(glyphset)
         self.name = None
         self.width = 0
         self.unicode = None
         self.components = []
         self.note = ""
-        self.mark = None
+        self.markColor = None
         self._bounds = None
+
+        self._shouldDecompose = False
+
+    def _get_glyphset(self):
+        return self._glyphset()
+
+    glyphset = property(_get_glyphset, doc="Return the glyph set the glyph belongs to.")
+
+    def getParent(self):
+        """
+        Deprecated fallback callback.
+        """
+        return self.glyphset
 
     def addComponent(self, glyphName, transformation):
         self.components.append((glyphName, transformation))
@@ -208,9 +226,19 @@ class ConstructionGlyph(object):
 
     def draw(self, pen):
         for glyphName, transformation in self.components:
-            pen.addComponent(glyphName, transformation)
+            if self._shouldDecompose:
+                try:
+                    glyph = self.glyphset[glyphName]
+                except KeyError:
+                    continue
+                tPen = TransformPen(pen, transformation)
+                glyph.draw(tPen)
 
-    def drawPoints(self, pen):
+            else:
+                pen.addComponent(glyphName, transformation)
+
+    def drawPoints(self, pointPen):
+        pen = SegmentToPointPen(pointPen)
         self.draw(pen)
 
 
@@ -595,6 +623,12 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
     return markGlyph, transformMatrix
 
 
+glyphAttributeAlternateMap = dict(
+    leftMargin="rightMargin",
+    rightMargin="leftMargin"
+)
+
+
 def _parseGlyphMetric(construction, font, attr):
     value = None
     construction = reEscapeMathOperations(construction)
@@ -607,16 +641,25 @@ def _parseGlyphMetric(construction, font, attr):
                 value = getattr(font[value], attr)
             else:
                 lastIndex = 0
-                newText = "value="
+                newText = "result="
+                glyphAttribute = attr
                 for i in glyphNameRe.finditer(value):
                     newText += value[lastIndex:i.start()]
                     glyphName = i.group()
+                    try:
+                        if value[i.end()] == glyphAtrributeAlternateSplit:
+                            glyphAttribute = glyphAttributeAlternateMap.get(attr, attr)
+                    except IndexError:
+                        pass
                     if glyphName in font:
-                        newText += "%s" % getattr(font[glyphName], attr)
+                        newText += "%s" % getattr(font[glyphName], glyphAttribute)
                     lastIndex = i.end()
                 newText += value[lastIndex:]
+                newText = newText.replace(glyphAtrributeAlternateSplit, "")
                 try:
-                    exec(newText)
+                    namespace = dict()
+                    exec(newText, namespace)
+                    value = namespace["result"]
                 except Exception:
                     value = None
     return value, construction
@@ -627,11 +670,14 @@ def parseWidth(construction, font):
 
 
 def parseLeftMargin(construction, font):
-    return _parseGlyphMetric(construction, font, "leftMargin")
+    glyphAttribute = "leftMargin"
+    return _parseGlyphMetric(construction, font, glyphAttribute)
 
 
 def parseRightMargin(construction, font):
-    return _parseGlyphMetric("%s%s" % (metricsSuffixSplit, construction), font, "rightMargin")
+    construction = "%s%s" % (metricsSuffixSplit, construction)
+    glyphAttribute = "rightMargin"
+    return _parseGlyphMetric(construction, font, glyphAttribute)
 
 
 def parseUnicode(construction, font=None):
@@ -678,7 +724,7 @@ def parseMark(construction, font=None):
 
 glyphAttrFuncMap = {
     "unicode": parseUnicode,
-    "mark": parseMark,
+    "markColor": parseMark,
     "width": parseWidth,
     "leftMargin": parseLeftMargin,
     "rightMargin": parseRightMargin
@@ -693,31 +739,46 @@ def parseGlyphattributes(construction, font):
     unicode splitter: |
 
     >>> font = testDummyFont()
-    >>> data, name = parseGlyphattributes("name | 0000 ! 1, 0, 0, 1 ^ 100", font)
+    >>> data, name = parseGlyphattributes(removeSpacesAndTabs("name | 0000 ! 1, 0, 0, 1 ^ 100"), font)
     >>> sorted(data.items()), name
-    ([('mark', (1.0, 0.0, 0.0, 1.0)), ('unicode', 0), ('width', 100.0)], 'name ')
+    ([('markColor', (1.0, 0.0, 0.0, 1.0)), ('unicode', 0), ('width', 100.0)], 'name')
 
-    >>> data, name = parseGlyphattributes("name ! 1, 0, 0, 1 ^ 100 | 0000", font)
+    >>> data, name = parseGlyphattributes(removeSpacesAndTabs("name ! 1, 0, 0, 1 ^ 100 | 0000"), font)
     >>> sorted(data.items()), name
-    ([('mark', (1.0, 0.0, 0.0, 1.0)), ('unicode', 0), ('width', 100.0)], 'name ')
+    ([('markColor', (1.0, 0.0, 0.0, 1.0)), ('unicode', 0), ('width', 100.0)], 'name')
 
-    >>> parseGlyphattributes("name ^ 100 | 0000 ! 1, 0, 0, 1", font)
-    ({'width': 100.0, 'unicode': 0, 'mark': (1.0, 0.0, 0.0, 1.0)}, 'name ')
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 100 | 0000 ! 1, 0, 0, 1"), font)
+    ({'width': 100.0, 'unicode': 0, 'markColor': (1.0, 0.0, 0.0, 1.0)}, 'name')
 
-    >>> parseGlyphattributes("name ^ 100 | 0000", font)
-    ({'width': 100.0, 'unicode': 0}, 'name ')
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 100 | 0000"), font)
+    ({'width': 100.0, 'unicode': 0}, 'name')
 
-    >>> parseGlyphattributes("name ^ 100", font)
-    ({'width': 100.0}, 'name ')
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 100"), font)
+    ({'width': 100.0}, 'name')
 
-    >>> parseGlyphattributes("name | 0000", font)
-    ({'unicode': 0}, 'name ')
+    >>> parseGlyphattributes(removeSpacesAndTabs("name | 0000"), font)
+    ({'unicode': 0}, 'name')
 
-    >>> parseGlyphattributes("name ^ 100", font)
-    ({'width': 100.0}, 'name ')
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 100"), font)
+    ({'width': 100.0}, 'name')
 
-    >>> parseGlyphattributes("name ^ 10, 20", font)
-    ({'leftMargin': 10.0, 'rightMargin': 20.0}, 'name ')
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 10, 20"), font)
+    ({'leftMargin': 10.0, 'rightMargin': 20.0}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a, 20"), font)
+    ({'leftMargin': 100, 'rightMargin': 20.0}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a, agrave"), font)
+    ({'leftMargin': 100, 'rightMargin': -180}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a+10, agrave"), font)
+    ({'leftMargin': 110, 'rightMargin': -180}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a', agrave"), font)
+    ({'leftMargin': -140, 'rightMargin': -180}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a', agrave'"), font)
+    ({'leftMargin': -140, 'rightMargin': 100}, 'name')
     """
     attrs = {}
     currentKey = None
@@ -728,7 +789,7 @@ def parseGlyphattributes(construction, font):
             currentKey = "width"
             currentValue = ""
         elif c == glyphMarkSuffixSplit:
-            currentKey = "mark"
+            currentKey = "markColor"
             currentValue = ""
         elif c == unicodeSplit:
             currentKey = "unicode"
@@ -767,6 +828,103 @@ def parseNote(construction):
         # remove trailing spaces
         note = note.strip()
     return note, construction
+
+
+def kernValueForGlyphPair(font, pair):
+    """
+    Return the kerning value of pair of glyph names.
+    Also use groups to search for the kerning value.
+
+    >>> import defcon
+    >>> font = defcon.Font()
+    >>> font.kerning["A", "V"] = -100
+    >>> # groups
+    >>> font.groups["public.kern1.A"] = ["A", "Agrave", "Atilde"]
+    >>> font.groups["public.kern2.V"] = ["V", "V.alt1", "V.alt2"]
+    >>> # group kerning
+    >>> font.kerning[("public.kern1.A", "public.kern2.V")] = 200
+    >>> # exceptions
+    >>> font.kerning["Agrave", "public.kern2.V"] = 300
+    >>> font.kerning["public.kern1.A", "V.alt2"] = 400
+
+    >>> kernValueForGlyphPair(font, ("A", "V"))
+    -100
+    >>> kernValueForGlyphPair(font, ("A", "B"))
+    0
+
+    >>> kernValueForGlyphPair(font, ("A", "V.alt1"))
+    200
+    >>> kernValueForGlyphPair(font, ("A", "V.alt2"))
+    400
+    >>> kernValueForGlyphPair(font, ("Agrave", "V"))
+    300
+    >>> kernValueForGlyphPair(font, ("Atilde", "V"))
+    200
+    >>> kernValueForGlyphPair(font, ("Atilde", "V.alt2"))
+    400
+    >>> kernValueForGlyphPair(font, ("Agrave", "V"))
+    300
+    >>> kernValueForGlyphPair(font, ("Agrave", "V.alt1"))
+    300
+    >>> kernValueForGlyphPair(font, ("Atilde", "V.alt1"))
+    200
+    """
+    side1Prefix = "public.kern1."
+    side2Prefix = "public.kern2."
+
+    if pair in font.kerning:
+        # the pair exists
+        kern = font.kerning[pair]
+    else:
+        side1, side2 = pair
+        groupName1 = groupName2 = None
+        groupName1Found = groupName2Found = False
+        for groupName, group in font.groups.items():
+            if not groupName1Found and groupName.startswith(side1Prefix) and side1 in group:
+                groupName1 = groupName
+                groupName1Found = True
+            if not groupName2Found and groupName.startswith(side2Prefix) and side2 in group:
+                groupName2 = groupName
+                groupName2Found = True
+            if groupName1Found and groupName2Found:
+                break
+        if (side1, groupName2) in font.kerning:
+            kern = font.kerning[side1, groupName2]
+        elif (groupName1, side2) in font.kerning:
+            kern = font.kerning[groupName1, side2]
+        else:
+            kern = font.kerning.get((groupName1, groupName2))
+
+    if kern is None:
+        kern = 0
+    return kern
+
+
+def parseApplyKerning(construction):
+    """
+    Parse construction and return if the construction has the \\ prefix,
+    indicating horizontal kerning should be applied.
+
+    >>> parseApplyKerning(r"\\a+grave")
+    (True, 'a+grave')
+    >>> parseApplyKerning("a+grave")
+    (False, 'a+grave')
+    """
+    return applyKerningSplit in construction, construction.replace(applyKerningSplit, "")
+
+
+def parseShouldDecompose(construction):
+    """
+    Parse construction and return if the construction should be decomposed at the end.
+
+    >>> parseShouldDecompose("*agrave=a+grave")
+    (True, 'agrave=a+grave')
+
+    >>> parseShouldDecompose("agrave=a+grave")
+    (False, 'agrave=a+grave')
+
+    """
+    return construction[0] == shouldDecomposeResult, construction.replace(shouldDecomposeResult, "")
 
 
 def parseGlyphName(construction):
@@ -848,6 +1006,8 @@ def GlyphConstructionBuilder(construction, font):
         construction = str(construction)
     except Exception:
         return destination
+    # parse decomposing
+    shouldDecompose, construction = parseShouldDecompose(construction)
     # parse the note
     destination.note, construction = parseNote(construction)
     # check if there is a = sing
@@ -865,8 +1025,10 @@ def GlyphConstructionBuilder(construction, font):
     baseGlyphs = construction.split(baseGlyphSplit)
 
     advanceWidth = 0
+    previousBaseGlyph = None
     # start
     for baseGlyph in baseGlyphs:
+        applyKerning, baseGlyph = parseApplyKerning(baseGlyph)
         # split into mark glyphs
         markGlyphs = baseGlyph.split(markGlyphSplit)
         baseGlyph = None
@@ -879,15 +1041,21 @@ def GlyphConstructionBuilder(construction, font):
         for markGlyph in markGlyphs:
             markGlyph = reEscapeMathOperations(markGlyph)
             component, transformMatrix = parsePositions(baseMarkGlyph, markGlyph, font, markTransformMap, advanceWidth, advanceHeight)
-            destination.addComponent(component, transformMatrix)
-
-            markTransformMap[component] = transformMatrix
 
             baseMarkGlyph = component
 
             if baseGlyph is None:
                 baseGlyph = component
+                if applyKerning:
+                    kern = kernValueForGlyphPair(font, (previousBaseGlyph, baseGlyph))
+                    if kern:
+                        t = Transform(*transformMatrix).translate(kern, 0)
+                        transformMatrix = t[:]
+
                 baseTransformMatrix = transformMatrix
+
+            destination.addComponent(component, transformMatrix)
+            markTransformMap[component] = transformMatrix
 
         if baseGlyph in font:
             width = font[baseGlyph].width
@@ -895,9 +1063,13 @@ def GlyphConstructionBuilder(construction, font):
             width, y = t.transformPoint((width - advanceWidth, 0))
             advanceWidth += width
 
+        previousBaseGlyph = baseGlyph
+
     destination.width = advanceWidth
     for key, value in glyphAttributes.items():
         setattr(destination, key, value)
+    if shouldDecompose:
+        destination._shouldDecompose = True
     return destination
 
 
@@ -1050,12 +1222,12 @@ def testDummyFont():
 def testDigestGlyph(glyph):
     from fontPens.digestPointPen import DigestPointPen
     pen = DigestPointPen()
-    glyph.draw(pen)
+    glyph.drawPoints(pen)
     return (
         glyph.name,
         glyph.width,
         glyph.unicode,
-        glyph.mark,
+        glyph.markColor,
         glyph.note,
         pen.getDigest()
     )
@@ -1168,6 +1340,16 @@ def testGlyphConstructionBuilder_Positioning():
     >>> result = GlyphConstructionBuilder("agrave = a + grave @100%", font)
     >>> testDigestGlyph(result)
     ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 100, 100), None)))
+
+    # decompose
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+
+    >>> result = GlyphConstructionBuilder("*agrave = a + grave", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('beginPath', None), ((100, 100), 'line', False, None), ((200, 100), 'line', False, None), ((200, 200), 'line', False, None), 'endPath', ('beginPath', None), ((100, 100), 'line', False, None), ((220, 120), 'line', False, None), ((220, 220), 'line', False, None), 'endPath'))
     """
 
 

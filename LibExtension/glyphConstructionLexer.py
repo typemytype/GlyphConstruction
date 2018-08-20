@@ -19,12 +19,16 @@ glyphConstructionOperations = [
     gc.glyphCommentSuffixSplit,
     gc.glyphMarkSuffixSplit,
     gc.flipMarkGlyphSplit,
+    gc.applyKerningSplit,
+    gc.glyphAtrributeAlternateSplit,
+    gc.shouldDecomposeResult,
 
     # gc.variableDeclarationStart,
     # gc.variableDeclarationEnd,
 
     gc.explicitMathStart,
     gc.explicitMathEnd,
+
 
     "-", "+", "/", "*"  # math stuff"
 ]

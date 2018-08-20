@@ -359,10 +359,10 @@ class BuildGlyphsSheet(BaseWindowController):
 
             construction.draw(glyph.getPen())
 
-            if construction.mark:
-                glyph.mark = construction.mark
+            if construction.markColor:
+                glyph.markColor = construction.markColor
             elif markColor:
-                glyph.mark = markColor
+                glyph.markColor = markColor
 
         font.naked().releaseHeldNotifications()
 
@@ -550,7 +550,7 @@ class GlyphBuilderController(BaseWindowController):
                 glyph.name = constructionGlyph.name
                 glyph.unicode = constructionGlyph.unicode
                 glyph.note = constructionGlyph.note
-                glyph.mark = constructionGlyph.mark
+                glyph.markColor = constructionGlyph.markColor
                 if RoboFontVersion < "2.0":
                     glyph.setParent(self.glyphConstructorFont)
                     glyph.dispatcher = font.dispatcher
@@ -606,8 +606,8 @@ class GlyphBuilderController(BaseWindowController):
                 status.append("unicode: %04X" % glyph.unicode)
             if glyph.note:
                 status.append("note: %s" % (glyph.note[:30] + (glyph.note[30:] and unichr(0x2026))))
-            if glyph.mark:
-                status.append("mark: %s" % ", ".join([str(c) for c in glyph.mark]))
+            if glyph.markColor:
+                status.append("mark: %s" % ", ".join([str(c) for c in glyph.markColor]))
 
         self.w.statusBar.set(status)
 
@@ -639,8 +639,8 @@ class GlyphBuilderController(BaseWindowController):
 
         dest.unicode = glyph.unicode
         dest.note = glyph.note
-        if glyph.mark:
-            dest.mark = glyph.mark
+        if glyph.markColor:
+            dest.markColor = glyph.markColor
         dest.width = glyph.width
 
     # toolbar

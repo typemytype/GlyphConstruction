@@ -25,6 +25,7 @@ modulePath = os.path.join(basePath, "Lib", "glyphConstruction.py")
 import codecs
 import markdown
 from markdown.extensions.toc import TocExtension
+from markdown.extensions.fenced_code import FencedCodeExtension
 
 mdPath = os.path.join(basePath, 'README.md')
 htmlIndexPath = os.path.join(htmlPath, 'index.html')
@@ -45,7 +46,7 @@ htmlTemplate = '''\
 
 with codecs.open(mdPath, mode="r", encoding="utf-8") as f:
     mdSrc = f.read()
-M = markdown.Markdown(extensions=[TocExtension(permalink=True)])
+M = markdown.Markdown(extensions=[TocExtension(permalink=True), FencedCodeExtension()])
 html = htmlTemplate % M.convert(mdSrc)
 
 htmlFile = codecs.open(htmlIndexPath, mode="w", encoding="utf-8")

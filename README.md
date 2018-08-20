@@ -84,6 +84,14 @@ Aacute = A + acute ^ A * 2
 Aacute = A + acute ^ A / 3, B * 2
 ```
 
+## Decompose glyph
+
+Add `*` before a glyph construcntion rule to explicityly tell the constructor to decompose the final result.
+
+```
+*agrave = a + grave
+```
+
 ## Ignore existing glyphs
 
 Add `?` before a glyph construction rule to ignore this glyph if it already exists in the font.
@@ -177,6 +185,14 @@ Aringacute = A + ring@center,`top+10` + acute@center,`top-10`
 
 ```
 ffi = f & f & i
+```
+
+### Apply kerning while stacking horizontally
+
+Start a sub-glyphConstruction with a backslash to indicate kerning should be applied while stacking horizotally.
+
+```
+A_V = A &\ V
 ```
 
 ## Variables

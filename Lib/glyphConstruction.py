@@ -685,17 +685,17 @@ def parseUnicode(construction, font=None):
     Parse unicode from construction.
     unicode splitter: |
 
-    >>> parseUnicode("agrave = a + grave | 00E0")
-    (224, 'agrave = a + grave ')
+    >>> parseUnicode(removeSpacesAndTabs("agrave = a + grave | 00E0"))
+    (224, 'agrave=a+grave')
     """
-    unicode = None
+    unicodeValue = None
     if unicodeSplit in construction:
-        construction, unicode = construction.split(unicodeSplit)
+        construction, unicodeValue = construction.split(unicodeSplit)
         try:
-            unicode = int(unicode, 16)
+            unicodeValue = int(unicodeValue, 16)
         except Exception:
-            unicode = None
-    return unicode, construction
+            unicodeValue = None
+    return unicodeValue, construction
 
 
 def parseMark(construction, font=None):
@@ -703,8 +703,8 @@ def parseMark(construction, font=None):
     Parse mark from construction.
     mark splitter: !
 
-    >>> parseMark("agrave = a + grave ! 1, 0, 0, 1")
-    ((1.0, 0.0, 0.0, 1.0), 'agrave = a + grave ')
+    >>> parseMark(removeSpacesAndTabs("agrave = a + grave ! 1, 0, 0, 1"))
+    ((1.0, 0.0, 0.0, 1.0), 'agrave=a+grave')
     """
     mark = None
     if glyphMarkSuffixSplit in construction:

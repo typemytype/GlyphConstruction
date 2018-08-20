@@ -246,6 +246,30 @@ class MathPoint(tuple):
 
     """
     A math object for calculation with tuples.
+
+    >>> point1 = MathPoint((100, 100))
+    >>> point2 = MathPoint((200, 200))
+
+    >>> point1 + point2
+    (300, 300)
+    >>> point1 - point2
+    (-100, -100)
+    >>> point1 * 2
+    (200, 200)
+    >>> point1 / 2
+    (50.0, 50.0)
+    >>> point1 += 30, 30
+    >>> point1
+    (130, 130)
+    >>> point1 -= 40
+    >>> point1
+    (90, 90)
+    >>> point1 *= 2
+    >>> point1
+    (180, 180)
+    >>> point1 /= 2
+    >>> point1
+    (90.0, 90.0)
     """
 
     def __new__(cls, point, allowTupleMathOnly=False):

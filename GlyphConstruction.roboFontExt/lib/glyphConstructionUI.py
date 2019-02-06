@@ -453,9 +453,11 @@ class GlyphBuilderController(BaseWindowController):
         self.analyser = AnalyserTextEditor((0, 0, -0, -0), readOnly=True)
         self.analyserPreview = Group((0, 0, -0, -0))
 
-        self.analyserPreview.construction = GlyphPreview((0, 0, -0, -0), contourColor=NSColor.redColor(), componentColor=NSColor.redColor())
+        constructionColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(0, 0, 0, .6)
+        self.analyserPreview.construction = GlyphPreview((0, 0, -0, -0), contourColor=constructionColor, componentColor=constructionColor)
         self.analyserPreview.construction.getNSView()._buffer = 100
-        self.analyserPreview.origin = GlyphPreview((0, 0, -0, -0), contourColor=NSColor.blackColor(), componentColor=NSColor.blackColor())
+        originColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(1, 0, 0, .6)
+        self.analyserPreview.origin = GlyphPreview((0, 0, -0, -0), contourColor=originColor, componentColor=originColor)
         self.analyserPreview.origin.getNSView()._buffer = 100
 
         self.analyserPreview.build = Button((10, -25, -10, 19), "Build", sizeStyle="small", callback=self.buildSingleGlyph)

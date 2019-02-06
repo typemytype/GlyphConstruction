@@ -798,6 +798,9 @@ def parseGlyphattributes(construction, font):
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a+10, agrave"), font)
     ({'leftMargin': 110, 'rightMargin': -180}, 'name')
 
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a*2, agrave"), font)
+    ({'leftMargin': 200, 'rightMargin': -180}, 'name')
+
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a', agrave"), font)
     ({'leftMargin': -140, 'rightMargin': -180}, 'name')
 
@@ -947,8 +950,13 @@ def parseShouldDecompose(construction):
     >>> parseShouldDecompose("agrave=a+grave")
     (False, 'agrave=a+grave')
 
+    >>> parseShouldDecompose("agrave=a+grave^10*10")
+    (False, 'agrave=a+grave^10*10')
     """
-    return construction[0] == shouldDecomposeResult, construction.replace(shouldDecomposeResult, "")
+    shouldDecompose = construction[0] == shouldDecomposeResult
+    if shouldDecompose:
+        construction = construction[1:]
+    return shouldDecompose, construction
 
 
 def parseGlyphName(construction):

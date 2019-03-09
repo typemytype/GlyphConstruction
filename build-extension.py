@@ -36,7 +36,7 @@ htmlTemplate = '''\
 <head>
 <meta charset="UTF-8">
 <title>Glyph Construction</title>
-<link rel="stylesheet" href="GitHub-ReadMe.css">
+<link rel="stylesheet" href="github-markdown.css">
 </head>
 <body>
 %s

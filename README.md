@@ -7,7 +7,32 @@ Glyph Construction can be used to create new glyphs from components. It is speci
 
 Collections of Glyph Construction rules can be saved as `*.glyphConstruction` files, and can be shared between fonts.
 
-[TOC]
+## Table of Contents
+
+- [Assigning a construction to a glyph](#assigning-a-construction-to-a-glyph)
+- [Comments](#comments)
+- [Notes](#notes)
+- [Unicodes](#unicodes)
+- [Mark Color](#mark-color)
+- [Metrics](#metrics)
+    - [Width](#width)
+    - [Left and Right Margins](#left-and-right-margins)
+- [Decompose glyph](#decompose-glyph)
+- [Ignore existing glyphs](#ignore-existing-glyphs)
+- [Positioning](#positioning)
+    - [By Numbers](#by-numbers)
+    - [By Percentages](#by-percentages)
+    - [By Reference](#by-reference)
+    - [By Transformation Matrix](#by-transformation-matrix)
+    - [Change the current glyph](#change-the-current-glyph)
+    - [Flipping](#flipping)
+- [Stacking Vertically](#stacking-vertically)
+- [Positioning formulas](#positioning-formulas)
+- [Stacking Horizontally](#stacking-horizontally)
+    - [Apply kerning while stacking horizontally](#apply-kerning-while-stacking-horizontally)
+- [Variables](#variables)
+
+- - -
 
 ## Assigning a construction to a glyph
 

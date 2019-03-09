@@ -3,16 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <title>Glyph Construction</title>
-<link rel="stylesheet" href="GitHub-ReadMe.css">
+<link rel="stylesheet" href="github-markdown.css">
+<style>
+  html {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .headerlink {
+    opacity: 0.0;
+  }
+  body h1:hover a.headerlink,
+  body h2:hover a.headerlink,
+  body h3:hover a.headerlink,
+  body h4:hover a.headerlink {
+    opacity: 1.0;
+  }
+</style>
 </head>
 <body>
 <h1 id="glyph-construction">Glyph Construction<a class="headerlink" href="#glyph-construction" title="Permanent link">&para;</a></h1>
 <p><strong>Glyph Construction is a simple, human-readable, powerful language for describing how shapes are constructed.</strong></p>
 <p>Glyph Construction can be used to create new glyphs from components. It is specially useful for creating accented glyphs.</p>
 <p>Collections of Glyph Construction rules can be saved as <code>*.glyphConstruction</code> files, and can be shared between fonts.</p>
-<div class="toc">
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="#glyph-construction">Glyph Construction</a><ul>
 <li><a href="#assigning-a-construction-to-a-glyph">Assigning a construction to a glyph</a></li>
 <li><a href="#comments">Comments</a></li>
 <li><a href="#notes">Notes</a></li>
@@ -42,9 +56,7 @@
 </li>
 <li><a href="#variables">Variables</a></li>
 </ul>
-</li>
-</ul>
-</div>
+<hr />
 <h2 id="assigning-a-construction-to-a-glyph">Assigning a construction to a glyph<a class="headerlink" href="#assigning-a-construction-to-a-glyph" title="Permanent link">&para;</a></h2>
 <p>Build <code>&lt;destGlyphName&gt;</code> out of one or more components.</p>
 <pre><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt;

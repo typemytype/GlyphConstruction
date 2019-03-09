@@ -354,7 +354,8 @@ class BuildGlyphsSheet(BaseWindowController):
             glyph.clear()
 
             glyph.width = construction.width
-            glyph.unicode = construction.unicode
+            if construction.unicode is not None:
+                glyph.unicode = construction.unicode
             glyph.note = construction.note
 
             construction.draw(glyph.getPen())

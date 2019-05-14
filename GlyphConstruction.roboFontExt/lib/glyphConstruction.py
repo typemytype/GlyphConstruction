@@ -10,8 +10,7 @@ from fontTools.misc.py23 import basestring
 from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.transformPen import TransformPen
-
-from ufoLib.pointPen import SegmentToPointPen
+from fontTools.ufoLib.pointPen import SegmentToPointPen
 
 # splitters
 

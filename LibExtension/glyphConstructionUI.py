@@ -305,11 +305,13 @@ class BuildGlyphsSheet(BaseWindowController):
         self.font = font
         self.constructions = constructions
 
-        self.w = Sheet((300, 120), parentWindow=parentWindow)
-
+        self.w = Sheet((300, 170), parentWindow=parentWindow)
         getExtensionDefault, setExtensionDefault, getExtensionDefaultColor, setExtensionDefaultColor
         y = 15
         self.w.overWrite = CheckBox((15, y, 200, 22), "Overwrite Existing Glyphs", value=getExtensionDefault(self.overWriteKey, True))
+
+        y += 35
+        self.w.autoUnicodes = CheckBox((15, y, 200, 22), "Auto Unicodes", value=True)
 
         y += 35
         self.w.markGlyphs = CheckBox((15, y, 200, 22), "Mark Glyphs", value=getExtensionDefault(self.overWriteKey, True), callback=self.markGlyphsCallback)
@@ -332,6 +334,8 @@ class BuildGlyphsSheet(BaseWindowController):
     def buildCallback(self, sender):
 
         overWrite = self.w.overWrite.get()
+        autoUnicodes = self.w.autoUnicodes.get()
+
         markColor = None
         if self.w.markGlyphs.get():
             markColor = NSColorToRgba(self.w.markGlyphColor.get())
@@ -354,7 +358,12 @@ class BuildGlyphsSheet(BaseWindowController):
             glyph.clear()
 
             glyph.width = construction.width
-            glyph.unicode = construction.unicode
+
+            if autoUnicodes and construction.unicode is None:
+                glyph.autoUnicodes()
+            else:
+                glyph.unicode = construction.unicode
+
             glyph.note = construction.note
 
             construction.draw(glyph.getPen())
@@ -458,7 +467,7 @@ class GlyphBuilderController(BaseWindowController):
         self.analyserPreview.origin = GlyphPreview((0, 0, -0, -0), contourColor=NSColor.blackColor(), componentColor=NSColor.blackColor())
         self.analyserPreview.origin.getNSView()._buffer = 100
 
-        self.analyserPreview.build = Button((10, -25, -10, 19), "Build", sizeStyle="small", callback=self.buildSingleGlyph)
+        self.analyserPreview.build = Button((10, -30, -10, 20), "Build", sizeStyle="small", callback=self.buildSingleGlyph)
         self.analyserPreview.build.enable(False)
 
         paneDescriptions = [

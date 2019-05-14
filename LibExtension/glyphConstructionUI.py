@@ -361,7 +361,7 @@ class BuildGlyphsSheet(BaseWindowController):
             construction.draw(glyph.getPen())
 
             if construction.markColor:
-                glyph.markColor = construction.markColor
+                glyph.markColor = tuple(construction.markColor)
             elif markColor:
                 glyph.markColor = markColor
 

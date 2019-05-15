@@ -1,7 +1,3 @@
-from importlib import reload
-import glyphConstruction
-reload(glyphConstruction)
-
 from fontTools.misc.py23 import *
 from AppKit import *
 import weakref

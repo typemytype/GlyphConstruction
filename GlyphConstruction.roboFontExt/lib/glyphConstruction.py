@@ -11,7 +11,12 @@ from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.transformPen import TransformPen
 
-from ufoLib.pointPen import SegmentToPointPen
+try:
+    # >= RF3.2
+    from fontTools.ufoLib.pointPen import SegmentToPointPen
+except:
+    # < RF3.2
+    from ufoLib.pointPen import SegmentToPointPen
 
 # splitters
 
@@ -1030,7 +1035,7 @@ def removeSpacesAndTabs(data):
     return data.replace(" ", "").replace("\t", "")
 
 
-def GlyphConstructionBuilder(construction, font):
+def GlyphConstructionBuilder(construction, font, characterMap=None):
     # create a construction glyph
     destination = ConstructionGlyph(font)
     # test if the input is a proper string
@@ -1100,6 +1105,10 @@ def GlyphConstructionBuilder(construction, font):
     destination.width = advanceWidth
     for key, value in glyphAttributes.items():
         setattr(destination, key, value)
+
+    if characterMap and destination.name in characterMap:
+        destination.unicodes = [characterMap[destination.name]]
+
     if shouldDecompose:
         destination._shouldDecompose = True
     return destination

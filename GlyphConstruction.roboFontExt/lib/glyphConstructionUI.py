@@ -1,3 +1,7 @@
+from importlib import reload
+import glyphConstruction
+reload(glyphConstruction)
+
 from fontTools.misc.py23 import *
 from AppKit import *
 import weakref
@@ -16,6 +20,7 @@ from mojo.extensions import getExtensionDefault, setExtensionDefault, getExtensi
 from lib.UI.splitter import Splitter
 from lib.UI.enterTextEditor import EnterTextEditor
 from lib.tools.misc import NSColorToRgba
+from lib.tools.glyphList import GN2UV
 from lib.UI.statusBar import StatusBar
 
 from glyphConstruction import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
@@ -305,11 +310,13 @@ class BuildGlyphsSheet(BaseWindowController):
         self.font = font
         self.constructions = constructions
 
-        self.w = Sheet((300, 120), parentWindow=parentWindow)
-
+        self.w = Sheet((300, 170), parentWindow=parentWindow)
         getExtensionDefault, setExtensionDefault, getExtensionDefaultColor, setExtensionDefaultColor
         y = 15
         self.w.overWrite = CheckBox((15, y, 200, 22), "Overwrite Existing Glyphs", value=getExtensionDefault(self.overWriteKey, True))
+
+        y += 35
+        self.w.autoUnicodes = CheckBox((15, y, 200, 22), "Auto Unicodes", value=True)
 
         y += 35
         self.w.markGlyphs = CheckBox((15, y, 200, 22), "Mark Glyphs", value=getExtensionDefault(self.overWriteKey, True), callback=self.markGlyphsCallback)
@@ -332,9 +339,14 @@ class BuildGlyphsSheet(BaseWindowController):
     def buildCallback(self, sender):
 
         overWrite = self.w.overWrite.get()
+
         markColor = None
         if self.w.markGlyphs.get():
             markColor = NSColorToRgba(self.w.markGlyphColor.get())
+
+        characterMap = None
+        if self.w.autoUnicodes.get():
+            characterMap = GN2UV
 
         progress = self.startProgress("Building Glyphs...", len(self.constructions))
 
@@ -354,7 +366,14 @@ class BuildGlyphsSheet(BaseWindowController):
             glyph.clear()
 
             glyph.width = construction.width
-            glyph.unicode = construction.unicode
+
+            if construction.unicode is not None:
+                glyph.unicode = construction.unicode
+            elif characterMap and construction.name in characterMap:
+                glyph.unicode = characterMap[construction.name]
+            else:
+                glyph.unicode = None
+
             glyph.note = construction.note
 
             construction.draw(glyph.getPen())
@@ -460,7 +479,7 @@ class GlyphBuilderController(BaseWindowController):
         self.analyserPreview.origin = GlyphPreview((0, 0, -0, -0), contourColor=originColor, componentColor=originColor)
         self.analyserPreview.origin.getNSView()._buffer = 100
 
-        self.analyserPreview.build = Button((10, -25, -10, 19), "Build", sizeStyle="small", callback=self.buildSingleGlyph)
+        self.analyserPreview.build = Button((10, -30, -10, 20), "Build", sizeStyle="small", callback=self.buildSingleGlyph)
         self.analyserPreview.build.enable(False)
 
         paneDescriptions = [
@@ -536,7 +555,7 @@ class GlyphBuilderController(BaseWindowController):
                 glyph = self.glyphConstructorFont.glyphsDone[construction]
             else:
                 try:
-                    constructionGlyph = GlyphConstructionBuilder(construction, self.glyphConstructorFont)
+                    constructionGlyph = GlyphConstructionBuilder(construction, self.glyphConstructorFont, characterMap=None)
                 except GlyphBuilderError as err:
                     errors.append(str(err))
                     continue

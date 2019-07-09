@@ -218,7 +218,7 @@ Glyph Construction supports variables, which can be defined once at the top of t
 - - -
 
 
-Glyph Builder interface
+Glyph Builder interface
 -----------------------
 
 To install the Glyph Construction extension in RoboFont, follow the instructions provided in the links below:

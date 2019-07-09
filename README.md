@@ -9,12 +9,12 @@ Collections of Glyph Construction rules can be saved as `*.glyphConstruction` fi
 
 This repository contains:
 
-glyphConstruction module
-: A Python library to parse glyph construction rules and build new glyphs in a given UFO font.
-
-Glyph Construction extension
-: A RoboFont extension which includes the Python module and the Glyph Builder, a visual glyph construction editor with live preview.
-
+<dl>
+<dt><a href='Lib/glyphConstruction.py'>glyphConstruction module</a></dt>
+<dd>A Python library to parse glyph construction rules and build new glyphs in a given font.</dd>
+<dt><a href='GlyphConstruction.roboFontExt'>Glyph Construction extension</a></dt>
+<dd>A RoboFont extension which includes the Glyph Builder, a visual glyph construction editor with live preview.</dd>
+</dl>
 
 
 Table of Contents
@@ -44,12 +44,12 @@ Table of Contents
         - [Apply kerning while stacking horizontally](#apply-kerning-while-stacking-horizontally)
     - [Variables](#variables)
 - [Glyph Builder interface](#glyph-builder-interface)
-    - [Toolbar](#)
-    - [Rules editor](#)
-    - [Preview](#)
-    - [Analysis](#)
-    - [Selection preview](#)
-    - [Status bar](#)
+    - [Toolbar](#toolbar)
+    - [Rules editor](#rules-editor)
+    - [Preview](#preview)
+    - [Analysis](#analysis)
+    - [Selection preview](#selection-preview)
+    - [Status bar](#status-bar)
 
 
 - - -
@@ -237,24 +237,27 @@ Here’s a description of each part of the Glyph Builder interface:
 
 The toolbar at the top of the window gives access to the following actions:
 
-Save
-: Save all rules as a `.glyphConstruction` file.
+<dl>
+    
+<dt>Save</dt>
+<dd>Save all rules as a <code>.glyphConstruction</code> file.</dd>
 
-Open
-: Open an existing `.glyphConstruction` file.
+<dt>Open</dt>
+<dd>Open an existing <code>.glyphConstruction</code> file.</dd>
 
-Update
-: Update the contents of the *Preview* and *Analysis* columns.
+<dt>Update</dt>
+<dd>Update the contents of the <em>Preview</em> and <em>Analysis</em> columns.</dd>
 
-Analyse
-: Show/hide the Analysis column.
+<dt>Analyse</dt>
+<dd>Show/hide the <em>Analysis</em> column.</dd>
                        
-Build Glyphs
-: Build all described glyphs in the current font.
+<dt>Build Glyphs</dt>
+<dd>Build all described glyphs in the current font.</dd>
 
-Build
-: Build only the selected glyph.
+<dt>Build</dt>
+<dd>Build only the selected glyph.</dd>
 
+</dl>
 
 ### Rules editor
 

@@ -621,7 +621,7 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
                 y += baseTransform[5] - advanceHeight
 
     transformMatrix = (xx, xy, yx, yy, x, y)
-
+    unflippedMatrix = transformMatrix
     if flipX:
         bounds = font[markGlyph].bounds
         if bounds:
@@ -649,6 +649,8 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             t = t.translate(-maxx, 0)
             t = t.transform(bt)
             transformMatrix = t[:]
+
+    markTransformMap[markGlyph] = unflippedMatrix
     return markGlyph, transformMatrix
 
 
@@ -1090,15 +1092,14 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
                         transformMatrix = t[:]
 
                 baseTransformMatrix = transformMatrix
-
             destination.addComponent(component, transformMatrix)
-            markTransformMap[component] = transformMatrix
 
         if baseGlyph in font:
             width = font[baseGlyph].width
             t = Transform(*baseTransformMatrix)
-            width, y = t.transformPoint((width - advanceWidth, 0))
-            advanceWidth += width
+            x0, y = t.transformPoint((0, 0))
+            x1, y = t.transformPoint((width, 0))
+            advanceWidth += abs(x1 - x0)
 
         previousBaseGlyph = baseGlyph
 

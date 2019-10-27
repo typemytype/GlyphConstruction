@@ -43,6 +43,9 @@ variableDeclarationEnd = ""
 explicitMathStart = '`'
 explicitMathEnd = '`'
 
+explicitGlyphNameStart = '"'
+explicitGlyphNameEnd = '"'
+
 """
 $variableName = n
 Laringacute = L & a + ring@~center,~`top+10` + acute.cap@height,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a variable {variableName}
@@ -118,6 +121,8 @@ percentageRe = re.compile(r"[0-9]*%")
 glyphNameRe = re.compile(r'([a-zA-Z_][a-zA-Z0-9_.]*|.notdef)')
 
 explicitMathRe = re.compile(r'\%s(?P<explicitMath>.*?)\%s' % (explicitMathStart, explicitMathEnd))
+
+explicitGlyphNameRe = re.compile(r'\%s(?P<explicitGlyphName>.*?)\%s' % (explicitGlyphNameStart, explicitGlyphNameEnd))
 
 
 # error
@@ -564,10 +569,20 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
         else:
             positionX = positionY = position
 
-        if positionBaseSplit in positionX:
+        explicitBaseSplit = explicitGlyphNameRe.search(positionX)
+        if explicitBaseSplit is not None:
+            explicitBaseGlyphX = positionX[explicitBaseSplit.start(): explicitBaseSplit.end()]
+            positionX = positionX.replace(explicitBaseGlyphX + positionBaseSplit, "")
+            baseGlyphX = explicitBaseSplit.group("explicitGlyphName")
+        elif positionBaseSplit in positionX:
             baseGlyphX, positionX = positionX.split(positionBaseSplit)
 
-        if positionBaseSplit in positionY:
+        explicitBaseSplit = explicitGlyphNameRe.search(positionY)
+        if explicitBaseSplit is not None:
+            explicitBaseGlyphY = positionY[explicitBaseSplit.start(): explicitBaseSplit.end()]
+            positionY = positionY.replace(explicitBaseGlyphY + positionBaseSplit, "")
+            baseGlyphY = explicitBaseSplit.group("explicitGlyphName")
+        elif positionBaseSplit in positionY:
             baseGlyphY, positionY = positionY.split(positionBaseSplit)
 
         if flipMarkGlyphSplit in positionX:

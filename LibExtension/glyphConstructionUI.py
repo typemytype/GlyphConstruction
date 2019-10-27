@@ -19,6 +19,11 @@ from lib.tools.misc import NSColorToRgba
 from lib.tools.glyphList import GN2UV
 from lib.UI.statusBar import StatusBar
 
+# debug only
+# import glyphConstruction
+# import importlib
+# importlib.reload(glyphConstruction)
+
 from glyphConstruction import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
 from glyphConstructionLexer import GlyphConstructionLexer
 

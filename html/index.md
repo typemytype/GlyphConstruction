@@ -161,7 +161,6 @@ A reference could be (in this order):
 
 #### Change the current glyph
 
-
 The current glyph is always the last component added.
 
 For example, `Aacute = A + acute` will:
@@ -172,6 +171,11 @@ For example, `Aacute = A + acute` will:
 Force the current glyph with `@<glyphName>:<pos>`:
 
     Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom
+
+The forced `glyphName` can also be escapped with <code>`</code> in case the glyph name
+contains a `:`
+
+    Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@`O:latn`:center,bottom
 
 #### Flipping
 

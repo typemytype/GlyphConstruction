@@ -28,7 +28,8 @@ glyphConstructionOperations = [
 
     gc.explicitMathStart,
     gc.explicitMathEnd,
-
+    gc.explicitGlyphNameStart,
+    gc.explicitGlyphNameEnd,
 
     "-", "+", "/", "*"  # math stuff"
 ]

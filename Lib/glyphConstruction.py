@@ -237,14 +237,16 @@ class ConstructionGlyph(object):
 
     def draw(self, pen):
         for glyphName, transformation in self.components:
-            if glyphName in self.glyphset:
-                if self._shouldDecompose:
+            if self._shouldDecompose:
+                try:
                     glyph = self.glyphset[glyphName]
-                    tPen = TransformPen(pen, transformation)
-                    glyph.draw(tPen)
+                except KeyError:
+                    continue
+                tPen = TransformPen(pen, transformation)
+                glyph.draw(tPen)
 
-                else:
-                    pen.addComponent(glyphName, transformation)
+            else:
+                pen.addComponent(glyphName, transformation)
 
     def drawPoints(self, pointPen):
         pen = SegmentToPointPen(pointPen)

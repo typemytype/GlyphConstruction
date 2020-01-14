@@ -1160,7 +1160,7 @@ def ParseVariables(txt):
     >>> txt, variables = ParseVariables(txt)
     >>> variables == {'positionX': 'center', 'positionY': '100', 'name': 'test'}
     True
-    >>> txt.replace(unichr(10), "") == u'aacute = a + acute@positionX, positionY'
+    >>> txt.replace(unichr(10), "") == 'aacute = a + acute@positionX, positionY'
     True
     """
     variables = {}

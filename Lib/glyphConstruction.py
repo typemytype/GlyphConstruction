@@ -777,6 +777,23 @@ glyphAttrFuncMap = {
 }
 
 
+def parseBaseGlyphs(construction):
+    """
+    Parse all glyph parts from construction.
+    base glyph splitter: &
+
+    >>> parseBaseGlyphs("")
+    []
+    >>> parseBaseGlyphs(removeSpacesAndTabs("a & b"))
+    ['a', 'b']
+    >>> parseBaseGlyphs(removeSpacesAndTabs("a & b & c"))
+    ['a', 'b', 'c']
+    """
+    if not construction:
+        return []
+    return construction.split(baseGlyphSplit)
+
+
 def parseGlyphattributes(construction, font):
     """
     Parse glyph attributes from constructtion.
@@ -1075,8 +1092,8 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
     destination.name, construction = parseGlyphName(construction)
     # extract glyph attributes
     glyphAttributes, construction = parseGlyphattributes(construction, font)
-    # split into base glyphs, ligatures
-    baseGlyphs = construction.split(baseGlyphSplit)
+    # extract base glyphs, ligatures
+    baseGlyphs = parseBaseGlyphs(construction)
 
     advanceWidth = 0
     previousBaseGlyph = None
@@ -1141,7 +1158,7 @@ def ParseVariables(txt):
     ...    "aacute = a + acute@positionX, positionY"
     ...    ])
     >>> txt, variables = ParseVariables(txt)
-    >>> variables == {u'positionX': u'center', u'positionY': u'100', u'name': u'test'}
+    >>> variables == {'positionX': 'center', 'positionY': '100', 'name': 'test'}
     True
     >>> txt.replace(unichr(10), "") == u'aacute = a + acute@positionX, positionY'
     True
@@ -1170,7 +1187,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     ...    "aacute = a + acute"
     ...    ])
     >>> result = ParseGlyphConstructionListFromString(txt)
-    >>> result == [u'agrave = a + grave', u'aacute = a + acute']
+    >>> result == ['agrave = a + grave', 'aacute = a + acute']
     True
 
     # Basic parsing with variable
@@ -1181,7 +1198,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     ...    "aacute = a + acute"
     ...    ])
     >>> result = ParseGlyphConstructionListFromString(txt)
-    >>> result == [u'agrave = a + grave', u'aacute = a + acute']
+    >>> result == ['agrave = a + grave', 'aacute = a + acute']
     True
 
     # Parsing with ignore glyph existing glyph names without a font
@@ -1194,7 +1211,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     ...    "aacute = a + acute"
     ...    ])
     >>> result = ParseGlyphConstructionListFromString(txt)
-    >>> result == [u'agrave = a + grave', u'aacute = a + acute']
+    >>> result == ['agrave = a + grave', 'aacute = a + acute']
     True
 
     # Parsing with ignore glyph existing glyph names
@@ -1206,7 +1223,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     ...    "aacute = a + acute"
     ...    ])
     >>> result = ParseGlyphConstructionListFromString(txt, font)
-    >>> result == [u'aacute = a + acute']
+    >>> result == ['aacute = a + acute']
     True
     """
     txt = None

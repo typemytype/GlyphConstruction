@@ -10,11 +10,12 @@ from fontTools.misc.py23 import basestring
 from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.transformPen import TransformPen
+from fontTools.pens.recordingPen import RecordingPen
 
 try:
     # >= RF3.2
     from fontTools.ufoLib.pointPen import SegmentToPointPen
-except:
+except ImportError:
     # < RF3.2
     from ufoLib.pointPen import SegmentToPointPen
 
@@ -32,8 +33,6 @@ metricsSuffixSplit = "^"
 glyphCommentSuffixSplit = "#"
 glyphMarkSuffixSplit = "!"
 flipMarkGlyphSplit = "~"
-glyphCheckIfExists = "?"
-shouldDecomposeResult = "*"
 applyKerningSplit = "\\"
 glyphAtrributeAlternateSplit = "'"
 
@@ -45,6 +44,14 @@ explicitMathEnd = '`'
 
 explicitGlyphNameStart = '"'
 explicitGlyphNameEnd = '"'
+
+
+#flags
+
+shouldCheckGlyphExists = "?"
+shouldAddSourceGlyphIfExists = ">"
+shouldDecomposeResult = "*"
+
 
 """
 $variableName = n
@@ -148,9 +155,9 @@ class ConstructionGlyph(object):
         self.components = []
         self.note = ""
         self.markColor = None
+        self.source = RecordingPen()
         self._bounds = None
-
-        self._shouldDecompose = False
+        self.shouldDecompose = False
 
     def _get_glyphset(self):
         return self._glyphset()
@@ -165,13 +172,6 @@ class ConstructionGlyph(object):
 
     def addComponent(self, glyphName, transformation):
         self.components.append((glyphName, transformation))
-
-    def __len__(self):
-        return 0
-
-    def __iter__(self):
-        while 0:
-            yield
 
     def _get_bounds(self):
         if self._bounds is None:
@@ -226,6 +226,9 @@ class ConstructionGlyph(object):
         for i in range(len(self.components)):
             glyphName, (xx, xy, yx, yy, x, y) = self.components[i]
             self.components[i] = glyphName, (xx, xy, yx, yy, x + moveX, y + moveY)
+        source = RecordingPen()
+        self.source.replay(TransformPen(source, [1, 0, 0, 1, moveX, moveY]))
+        self.source = source
         if oldBounds:
             xMin, yMin, xMax, yMax = oldBounds
             xMin += moveX
@@ -235,8 +238,9 @@ class ConstructionGlyph(object):
             self._bounds = (xMin, yMin, xMax, yMax)
 
     def draw(self, pen):
+        self.source.replay(pen)
         for glyphName, transformation in self.components:
-            if self._shouldDecompose:
+            if self.shouldDecompose:
                 try:
                     glyph = self.glyphset[glyphName]
                 except KeyError:
@@ -979,23 +983,68 @@ def parseApplyKerning(construction):
     return applyKerningSplit in construction, construction.replace(applyKerningSplit, "")
 
 
-def parseShouldDecompose(construction):
+class ConstructionFlags(set):
+
+    allFlags = set((shouldDecomposeResult, shouldAddSourceGlyphIfExists))
+
+    @property
+    def shouldDecompose(self):
+        return shouldDecomposeResult in self
+
+    @property
+    def shouldAddSourceGlyphIfExists(self):
+        return shouldAddSourceGlyphIfExists in self
+
+
+def parseFlags(construction):
     """
-    Parse construction and return if the construction should be decomposed at the end.
+    Parse construction and return all optional flags.
+    * shouldDecomposeResult
+    * shouldAddSourceGlyphIfExists
 
-    >>> parseShouldDecompose("*agrave=a+grave")
-    (True, 'agrave=a+grave')
+    >>> flags, construction = parseFlags("foo=bar")
+    >>> flags.shouldDecompose, flags.shouldAddSourceGlyphIfExists, construction
+    (False, False, 'foo=bar')
 
-    >>> parseShouldDecompose("agrave=a+grave")
-    (False, 'agrave=a+grave')
+    >>> flags, construction = parseFlags("*foo=bar")
+    >>> flags.shouldDecompose, flags.shouldAddSourceGlyphIfExists, construction
+    (True, False, 'foo=bar')
 
-    >>> parseShouldDecompose("agrave=a+grave^10*10")
-    (False, 'agrave=a+grave^10*10')
+    >>> flags, construction = parseFlags(">foo=bar")
+    >>> flags.shouldDecompose, flags.shouldAddSourceGlyphIfExists, construction
+    (False, True, 'foo=bar')
+
+    >>> flags, construction = parseFlags("*>foo=bar")
+    >>> flags.shouldDecompose, flags.shouldAddSourceGlyphIfExists, construction
+    (True, True, 'foo=bar')
+
+    >>> flags, construction = parseFlags(">*foo=bar")
+    >>> flags.shouldDecompose,flags.shouldAddSourceGlyphIfExists, construction
+    (True, True, 'foo=bar')
     """
-    shouldDecompose = construction[0] == shouldDecomposeResult
-    if shouldDecompose:
+    foundFlags = ConstructionFlags()
+    while construction[0] in ConstructionFlags.allFlags:
+        foundFlags.add(construction[0])
         construction = construction[1:]
-    return shouldDecompose, construction
+    return foundFlags, construction
+
+# def parseShouldDecompose(construction):
+#     """
+#     Parse construction and return if the construction should be decomposed at the end.
+
+#     >>> parseShouldDecompose("*agrave=a+grave")
+#     (True, 'agrave=a+grave')
+
+#     >>> parseShouldDecompose("agrave=a+grave")
+#     (False, 'agrave=a+grave')
+
+#     >>> parseShouldDecompose("agrave=a+grave^10*10")
+#     (False, 'agrave=a+grave^10*10')
+#     """
+#     shouldDecompose = construction[0] == shouldDecomposeResult
+#     if shouldDecompose:
+#         construction = construction[1:]
+#     return shouldDecompose, construction
 
 
 def parseGlyphName(construction):
@@ -1077,8 +1126,8 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
         construction = str(construction)
     except Exception:
         return destination
-    # parse decomposing
-    shouldDecompose, construction = parseShouldDecompose(construction)
+    # parse flags
+    flags, construction = parseFlags(construction)
     # parse the note
     destination.note, construction = parseNote(construction)
     # check if there is a = sing
@@ -1098,6 +1147,8 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
     advanceWidth = 0
     previousBaseGlyph = None
     # start
+    if flags.shouldAddSourceGlyphIfExists and destination.name in font:
+        font[destination.name].draw(destination.source)
     for baseGlyph in baseGlyphs:
         applyKerning, baseGlyph = parseApplyKerning(baseGlyph)
         # split into mark glyphs
@@ -1142,8 +1193,7 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
     if characterMap and destination.name in characterMap:
         destination.unicodes = [characterMap[destination.name]]
 
-    if shouldDecompose:
-        destination._shouldDecompose = True
+    destination.shouldDecompose = flags.shouldDecompose
     return destination
 
 
@@ -1254,7 +1304,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
         if line:
             if line[0] == glyphCommentSuffixSplit:
                 continue
-            elif line[0] == glyphCheckIfExists:
+            elif line[0] == shouldCheckGlyphExists:
                 if font:
                     glyphName, _ = parseGlyphName(line[1:])
                     if glyphName in font:
@@ -1424,6 +1474,28 @@ def testGlyphConstructionBuilder_Positioning():
     >>> result = GlyphConstructionBuilder("*agrave = a + grave", font)
     >>> testDigestGlyph(result)
     ('agrave', 60, None, None, '', (('beginPath', None), ((100, 100), 'line', False, None), ((200, 100), 'line', False, None), ((200, 200), 'line', False, None), 'endPath', ('beginPath', None), ((100, 100), 'line', False, None), ((220, 120), 'line', False, None), ((220, 220), 'line', False, None), 'endPath'))
+    """
+
+
+def testGlyphConstructionBuilder_():
+    """
+    >>> font = testDummyFont()
+
+    >>> result = GlyphConstructionBuilder("space = ^ 100", font)
+    >>> testDigestGlyph(result)
+    ('space', 100.0, None, None, '', ())
+
+    >>> result = GlyphConstructionBuilder(">a = ^ 11, 22", font)
+    >>> testDigestGlyph(result)
+    ('a', 133.0, None, None, '', (('beginPath', None), ((11.0, 100), 'line', False, None), ((111.0, 100), 'line', False, None), ((111.0, 200), 'line', False, None), 'endPath'))
+    >>> result.leftMargin
+    11.0
+    >>> result.rightMargin
+    22.0
+
+    >>> result = GlyphConstructionBuilder(">doesNotExits = ^ 11, 22", font)
+    >>> testDigestGlyph(result)
+    ('doesNotExits', 0, None, None, '', ())
     """
 
 

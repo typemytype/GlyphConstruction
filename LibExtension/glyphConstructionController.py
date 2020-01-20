@@ -220,7 +220,6 @@ dontMarkGlyphRE = re.compile(
 )
 
 
-
 class GlyphConstructorFont(object):
 
     def __init__(self, font):

@@ -34,6 +34,7 @@
 </ul>
 </li>
 <li><a href="#decompose-glyph">Decompose glyph</a></li>
+<li><a href="#add-source-glyph">Add Source glyph</a></li>
 <li><a href="#ignore-existing-glyphs">Ignore existing glyphs</a></li>
 <li><a href="#positioning">Positioning</a><ul>
 <li><a href="#by-numbers">By Numbers</a></li>
@@ -130,6 +131,14 @@
 <h3 id="decompose-glyph">Decompose glyph</h3>
 <p>Add <code>*</code> before a glyph construction rule to explicitly tell the constructor to decompose the final result.</p>
 <div class="codehilite"><pre><span></span><span class="err">*agrave = a + grave</span>
+</pre></div>
+
+
+<h3 id="add-source-glyph">Add Source Glyph</h3>
+<p>Add <code>&gt;</code> before a glyph construction rule to include the source font glyph name in the final result.</p>
+<div class="codehilite"><pre><span></span><span class="err"># include the the drawing of the source font &#39;a&#39; </span>
+<span class="err"># and set the spacing to 40 for the left margin and 50 on the right margin.</span>
+<span class="err">&gt;a = ^ 40, 50</span>
 </pre></div>
 
 
@@ -282,6 +291,12 @@ contains a <code>:</code></p>
 <p>If the glyph already exists in the font, its current shape is displayed in the background in red for comparison.</p>
 <h3 id="status-bar">Status bar</h3>
 <p>The status bar at the bottom of the window displays information about the currently selected glyph: glyph name, width, left and right margins, component names, unicode, mark color, and note.</p>
+<h3 id="comment-variables">Comment variables</h3>
+<p>Preset build checkboxes in the comments of the constructions.</p>
+<div class="codehilite"><pre><span></span><span class="err"># OverwriteExistingGlyphs: True/False</span>
+<span class="err"># AutoUnicodes: True/False</span>
+<span class="err"># MarkGlyphs: False/r, g, b, a</span>
+</pre></div>
         </body>
         </html>
         

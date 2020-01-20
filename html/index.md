@@ -30,6 +30,7 @@ Table of Contents
         - [Width](#width)
         - [Left and Right Margins](#left-and-right-margins)
     - [Decompose glyph](#decompose-glyph)
+    - [Add Source glyph](#add-source-glyph)
     - [Ignore existing glyphs](#ignore-existing-glyphs)
     - [Positioning](#positioning)
         - [By Numbers](#by-numbers)
@@ -120,6 +121,15 @@ Width and margin values can also be defined using basic maths and references to 
 Add `*` before a glyph construction rule to explicitly tell the constructor to decompose the final result.
 
     *agrave = a + grave
+
+### Add Source Glyph
+
+Add `>` before a glyph construction rule to include the source font glyph name in the final result.
+
+    # include the the drawing of the source font 'a' 
+    # and set the spacing to 40 for the left margin and 50 on the right margin.
+    >a = ^ 40, 50
+
 
 ### Ignore existing glyphs
 
@@ -290,3 +300,11 @@ If the glyph already exists in the font, its current shape is displayed in the b
 ### Status bar
 
 The status bar at the bottom of the window displays information about the currently selected glyph: glyph name, width, left and right margins, component names, unicode, mark color, and note.
+
+### Comment variables
+
+Preset build checkboxes in the comments of the constructions.
+
+    # OverwriteExistingGlyphs: True/False
+    # AutoUnicodes: True/False
+    # MarkGlyphs: False/r, g, b, a

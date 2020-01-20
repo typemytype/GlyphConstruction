@@ -1,5 +1,6 @@
 from fontTools.misc.py23 import *
 from AppKit import *
+import re
 import weakref
 from vanilla import *
 from vanilla.dialogs import getFile
@@ -15,7 +16,7 @@ from mojo.extensions import getExtensionDefault, setExtensionDefault, getExtensi
 
 from lib.UI.splitter import Splitter
 from lib.UI.enterTextEditor import EnterTextEditor
-from lib.tools.misc import NSColorToRgba
+from lib.tools.misc import NSColorToRgba, rgbaToNSColor
 from lib.tools.glyphList import GN2UV
 from lib.UI.statusBar import StatusBar
 
@@ -147,6 +148,77 @@ L_aringacute=L & a+ring@center,top+acute@center,top
 """
 
 constructions = ""
+
+
+overWriteRE = re.compile(
+    r"^\s*"                     # space before, not required
+    r"#"                        # command symbol is required
+    r"\s*"                      # space before, not required
+    r"OverwriteExistingGlyphs"  # OverwriteExistingGlyphs, required, and ignore case
+    r"\s*"                      # space before, not required
+    r":"                        # : is required
+    r"\s*"                      # space before, not required
+    r"(True|False)"             # capture True, False
+    r"\s*"                      # space after, not required
+    r"$",                       # end of line
+    re.IGNORECASE | re.MULTILINE
+)
+
+autoUnicodesRE = re.compile(
+    r"^\s*"                     # space before, not required
+    r"#"                        # command symbol is required
+    r"\s*"                      # space before, not required
+    r"AutoUnicodes"             # AutoUnicodes, required, and ignore case
+    r"\s*"                      # space before, not required
+    r":"                        # : is required
+    r"\s*"                      # space before, not required
+    r"(True|False)"             # capture True, False
+    r"\s*"                      # space after, not required
+    r"$",                       # end of line
+    re.IGNORECASE | re.MULTILINE
+)
+
+
+markGlyphRE = re.compile(
+    r"^\s*"                     # space before, not required
+    r"#"                        # command symbol is required
+    r"\s*"                      # space before, not required
+    r"MarkGlyphs"               # MarkGlyphs, required, and ignore case
+    r"\s*"                      # space before, not required
+    r":"                        # : is required
+    r"\s*"                      # space before, not required
+    r"([-+]?\d*\.\d+|\d+)"      # a float number
+    r"\s*"                      # space before, not required
+    r","                        # comma
+    r"\s*"                      # space before, not required
+    r"([-+]?\d*\.\d+|\d+)"      # a float number
+    r"\s*"                      # space before, not required
+    r","                        # comma
+    r"\s*"                      # space before, not required
+    r"([-+]?\d*\.\d+|\d+)"      # a float number
+    r"\s*"                      # space before, not required
+    r","                        # comma
+    r"\s*"                      # space before, not required
+    r"([-+]?\d*\.\d+|\d+)"      # a float number
+    r"\s*"                      # space after, not required
+    r"$",                       # end of line
+    re.IGNORECASE | re.MULTILINE
+)
+
+dontMarkGlyphRE = re.compile(
+    r"^\s*"                     # space before, not required
+    r"#"                        # command symbol is required
+    r"\s*"                      # space before, not required
+    r"MarkGlyphs"               # MarkGlyphs, required, and ignore case
+    r"\s*"                      # space before, not required
+    r":"                        # : is required
+    r"\s*"                      # space before, not required
+    r"(False)"             # capture True, False
+    r"\s*"                      # space after, not required
+    r"$",                       # end of line
+    re.IGNORECASE | re.MULTILINE
+)
+
 
 
 class GlyphConstructorFont(object):
@@ -305,23 +377,36 @@ class BuildGlyphsSheet(BaseWindowController):
     overWriteKey = "%s.overWrite" % defaultKey
     useMarkColorKey = "%s.useMarkColor" % defaultKey
     markColorKey = "%s.markColor" % defaultKey
+    autoUnicodesKey = "%s.autoUnicodes" % defaultKey
 
-    def __init__(self, constructions, font, parentWindow):
-
+    def __init__(self, constructions, font, parentWindow, shouldOverWrite=None, shouldAutoUnicodes=None, shouldUseMarkColor=None):
         self.font = font
         self.constructions = constructions
 
         self.w = Sheet((300, 170), parentWindow=parentWindow)
         getExtensionDefault, setExtensionDefault, getExtensionDefaultColor, setExtensionDefaultColor
         y = 15
-        self.w.overWrite = CheckBox((15, y, 200, 22), "Overwrite Existing Glyphs", value=getExtensionDefault(self.overWriteKey, True))
+        if shouldOverWrite is None:
+            shouldOverWrite = getExtensionDefault(self.overWriteKey, True)
+
+        self.w.overWrite = CheckBox((15, y, 200, 22), "Overwrite Existing Glyphs", value=shouldOverWrite)
 
         y += 35
-        self.w.autoUnicodes = CheckBox((15, y, 200, 22), "Auto Unicodes", value=True)
+        if shouldAutoUnicodes is None:
+            shouldAutoUnicodes = getExtensionDefault(self.autoUnicodesKey, True)
+        self.w.autoUnicodes = CheckBox((15, y, 200, 22), "Auto Unicodes", value=shouldAutoUnicodes)
 
         y += 35
-        self.w.markGlyphs = CheckBox((15, y, 200, 22), "Mark Glyphs", value=getExtensionDefault(self.overWriteKey, True), callback=self.markGlyphsCallback)
-        self.w.markGlyphColor = ColorWell((130, y - 5, 50, 30), color=getExtensionDefaultColor(self.markColorKey, NSColor.redColor()))
+        if shouldUseMarkColor is None:
+            shouldUseMarkColor = getExtensionDefault(self.useMarkColorKey, True)
+            markColor = getExtensionDefaultColor(self.markColorKey, NSColor.redColor())
+        elif not shouldUseMarkColor:
+            markColor = getExtensionDefaultColor(self.markColorKey, NSColor.redColor())
+        else:
+            markColor = rgbaToNSColor(shouldUseMarkColor)
+            shouldUseMarkColor = True
+        self.w.markGlyphs = CheckBox((15, y, 200, 22), "Mark Glyphs", value=shouldUseMarkColor, callback=self.markGlyphsCallback)
+        self.w.markGlyphColor = ColorWell((130, y - 5, 50, 30), color=markColor)
 
         self.w.markGlyphColor.enable(getExtensionDefault(self.overWriteKey, True))
 
@@ -392,12 +477,15 @@ class BuildGlyphsSheet(BaseWindowController):
 
     def closeCallback(self, sender):
         overWrite = self.w.overWrite.get()
+        autoUnicodes = self.w.autoUnicodes.get()
+        useMarkColor = self.w.markGlyphs.get()
         markColor = None
-        if self.w.markGlyphs.get():
+        if useMarkColor:
             markColor = self.w.markGlyphColor.get()
 
-        setExtensionDefault(self.overWriteKey, overWrite)
-        setExtensionDefault(self.useMarkColorKey, bool(markColor))
+        setExtensionDefault(self.overWriteKey, bool(overWrite))
+        setExtensionDefault(self.autoUnicodesKey, bool(autoUnicodes))
+        setExtensionDefault(self.useMarkColorKey, bool(useMarkColor))
         if markColor is not None:
             setExtensionDefaultColor(self.markColorKey, markColor)
 
@@ -676,7 +764,28 @@ class GlyphBuilderController(BaseWindowController):
         if self.font is None:
             return
 
-        BuildGlyphsSheet(self._glyphs, self.font, self.w)
+        rawConstructions = self.constructions.get()
+
+        overWriteResult = overWriteRE.search(rawConstructions)
+        if overWriteResult:
+            overWriteResult = overWriteResult.groups()[0].strip().lower() == "true"
+
+        autoUnicodesResult = autoUnicodesRE.search(rawConstructions)
+        if autoUnicodesResult:
+            autoUnicodesResult = autoUnicodesResult.groups()[0].strip().lower() == "true"
+
+        dontMarkGlyphResult = dontMarkGlyphRE.search(rawConstructions)
+        if dontMarkGlyphResult:
+            markGlyphResult = False
+        else:
+            markGlyphResult = markGlyphRE.search(rawConstructions)
+            if markGlyphResult:
+                try:
+                    markGlyphResult = float(markGlyphResult.groups()[0]), float(markGlyphResult.groups()[1]), float(markGlyphResult.groups()[2]), float(markGlyphResult.groups()[3])
+                except Exception:
+                    pass
+
+        BuildGlyphsSheet(self._glyphs, self.font, self.w, shouldOverWrite=overWriteResult, shouldAutoUnicodes=autoUnicodesResult, shouldUseMarkColor=markGlyphResult)
 
     def reload(self, sender=None, update=True):
         self.constructionsCallback(self.constructions, update)

@@ -305,6 +305,7 @@ class BuildGlyphsSheet(BaseWindowController):
     overWriteKey = "%s.overWrite" % defaultKey
     useMarkColorKey = "%s.useMarkColor" % defaultKey
     markColorKey = "%s.markColor" % defaultKey
+    autoUnicodesKey = "%s.autoUnicodes" % defaultKey
 
     def __init__(self, constructions, font, parentWindow):
 
@@ -317,10 +318,10 @@ class BuildGlyphsSheet(BaseWindowController):
         self.w.overWrite = CheckBox((15, y, 200, 22), "Overwrite Existing Glyphs", value=getExtensionDefault(self.overWriteKey, True))
 
         y += 35
-        self.w.autoUnicodes = CheckBox((15, y, 200, 22), "Auto Unicodes", value=True)
+        self.w.autoUnicodes = CheckBox((15, y, 200, 22), "Auto Unicodes", value=getExtensionDefault(self.autoUnicodesKey, True))
 
         y += 35
-        self.w.markGlyphs = CheckBox((15, y, 200, 22), "Mark Glyphs", value=getExtensionDefault(self.overWriteKey, True), callback=self.markGlyphsCallback)
+        self.w.markGlyphs = CheckBox((15, y, 200, 22), "Mark Glyphs", value=getExtensionDefault(self.useMarkColorKey, True), callback=self.markGlyphsCallback)
         self.w.markGlyphColor = ColorWell((130, y - 5, 50, 30), color=getExtensionDefaultColor(self.markColorKey, NSColor.redColor()))
 
         self.w.markGlyphColor.enable(getExtensionDefault(self.overWriteKey, True))
@@ -392,12 +393,15 @@ class BuildGlyphsSheet(BaseWindowController):
 
     def closeCallback(self, sender):
         overWrite = self.w.overWrite.get()
+        autoUnicodes = self.w.autoUnicodes.get()
+        useMarkColor = self.w.markGlyphs.get()
         markColor = None
-        if self.w.markGlyphs.get():
+        if useMarkColor:
             markColor = self.w.markGlyphColor.get()
 
-        setExtensionDefault(self.overWriteKey, overWrite)
-        setExtensionDefault(self.useMarkColorKey, bool(markColor))
+        setExtensionDefault(self.overWriteKey, bool(overWrite))
+        setExtensionDefault(self.autoUnicodesKey, bool(autoUnicodes))
+        setExtensionDefault(self.useMarkColorKey, bool(useMarkColor))
         if markColor is not None:
             setExtensionDefaultColor(self.markColorKey, markColor)
 

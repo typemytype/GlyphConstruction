@@ -458,9 +458,11 @@ def parsePosition(markGlyph, font, positionName, direction, prefix="", isBase=Fa
     if markGlyph not in font:
         return position, angle, fixedPosition
 
-    glyph = font[markGlyph]
+    bounds = None
+    if markGlyph in font:
+        glyph = font[markGlyph]
+        bounds = glyph.bounds
 
-    bounds = glyph.bounds
     left = bottom = right = top = width = height = 0
     if bounds:
         left, bottom, right, top = bounds
@@ -570,7 +572,7 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             elif len(positions) == 2:
                 positionX, positionY = positions
             else:
-                raise GlyphBuilderError("mark positions should have 6 or 2 options")
+                raise GlyphBuilderError("Mark positions should have 6 or 2 options")
         else:
             positionX = positionY = position
 
@@ -643,7 +645,9 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
     transformMatrix = (xx, xy, yx, yy, x, y)
     unflippedMatrix = transformMatrix
     if flipX:
-        bounds = font[markGlyph].bounds
+        bounds = None
+        if markGlyph in font:
+            bounds = font[markGlyph].bounds
         if bounds:
             minx, miny, maxx, maxy = bounds
             bt = Transform(*transformMatrix)
@@ -657,7 +661,9 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             transformMatrix = t[:]
 
     if flipY:
-        bounds = font[markGlyph].bounds
+        bounds = None
+        if markGlyph in font:
+            bounds = font[markGlyph].bounds
         if bounds:
             minx, miny, maxx, maxy = bounds
             bt = Transform(*transformMatrix)

@@ -55,7 +55,8 @@ shouldDecomposeResult = "*"
 
 """
 $variableName = n
-Laringacute = L & a + ring@~center,~`top+10` + acute.cap@height,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a variable {variableName}
+# a comment
+?*>Laringacute = L & a + ring@~center,~`top+10` + acute.cap@height,top ^ 100, `l*2` | 159AFFF ! 1, 0, 0, 1 # this is an example, and this is a variable {variableName}
 """
 
 # legal positions

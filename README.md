@@ -300,3 +300,11 @@ If the glyph already exists in the font, its current shape is displayed in the b
 ### Status bar
 
 The status bar at the bottom of the window displays information about the currently selected glyph: glyph name, width, left and right margins, component names, unicode, mark color, and note.
+
+### Comment variables
+
+Preset build checkboxes in the comments of the constructions.
+
+    # OverwriteExistingGlyphs: True/False
+    # AutoUnicodes: True/False
+    # MarkGlyphs: False/r, g, b, a

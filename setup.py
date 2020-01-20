@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='glyphConstruction',
-    version="0.0.2",
+    version="0.0.3",
     author='Frederik Berlaen',
     author_email='frederik@typemytpye.com',
     url='https://github.com/typemytype/GlyphConstruction',

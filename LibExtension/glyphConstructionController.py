@@ -807,14 +807,17 @@ class GlyphBuilderController(BaseWindowController):
                 preferredName = self.font.lib.get(self.fileNameKey)
         self.showPutFile(["glyphConstruction"], fileName=preferredName, callback=self._saveFile)
 
+    def setFile(self, path):
+        f = open(path, "r")
+        txt = f.read()
+        f.close()
+
+        self.constructions.set(txt)
+
     def _openFile(self, paths):
         if paths:
             path = paths[0]
-            f = open(path, "r")
-            txt = f.read()
-            f.close()
-
-            self.constructions.set(txt)
+            self.setFile(path)
 
     def openFile(self, sender=None):
         directory = fileName = None
@@ -849,6 +852,3 @@ class GlyphBuilderController(BaseWindowController):
         removeObserver(self, "fontBecameCurrent")
         removeObserver(self, "fontResignCurrent")
         super(GlyphBuilderController, self).windowCloseCallback(sender)
-
-
-GlyphBuilderController(CurrentFont())

@@ -6,7 +6,7 @@
 	<array>
 		<dict>
 			<key>path</key>
-			<string>glyphConstructionUI.py</string>
+			<string>glyphConstructionUIMenu.py</string>
 			<key>preferredName</key>
 			<string>Glyph Builder</string>
 			<key>shortKey</key>
@@ -20,9 +20,9 @@
 	<key>html</key>
 	<true/>
 	<key>launchAtStartUp</key>
-	<integer>0</integer>
+	<true/>
 	<key>mainScript</key>
-	<string></string>
+	<string>glyphConstructionUIStartUp.py</string>
 	<key>name</key>
 	<string>Glyph Construction</string>
 	<key>requiresVersionMajor</key>
@@ -30,7 +30,7 @@
 	<key>requiresVersionMinor</key>
 	<string>5</string>
 	<key>timeStamp</key>
-	<real>1579554480.635704</real>
+	<real>1579555258.768214</real>
 	<key>version</key>
 	<string>0.7</string>
 </dict>

@@ -25,7 +25,7 @@ from lib.UI.statusBar import StatusBar
 # import importlib
 # importlib.reload(glyphConstruction)
 
-from glyphConstruction import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError
+from glyphConstruction import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError, ParseVariables
 from glyphConstructionLexer import GlyphConstructionLexer
 
 from lib.scripting.codeEditor import CodeEditor
@@ -494,6 +494,7 @@ class BuildGlyphsSheet(BaseWindowController):
 class GlyphBuilderController(BaseWindowController):
 
     fileNameKey = "%s.lastSavedFileName" % defaultKey
+    glyphLibConstructionKey = "%s.construction" % defaultKey
 
     def __init__(self, font):
         self.font = None
@@ -656,6 +657,7 @@ class GlyphBuilderController(BaseWindowController):
                     glyph = font._instantiateGlyphObject()
                 else:
                     glyph = font.layers.defaultLayer.instantiateGlyphObject()
+                glyph.lib[self.glyphLibConstructionKey] = construction
                 glyph.name = constructionGlyph.name
                 glyph.unicode = constructionGlyph.unicode
                 glyph.note = constructionGlyph.note
@@ -717,6 +719,19 @@ class GlyphBuilderController(BaseWindowController):
                 status.append("note: %s" % (glyph.note[:30] + (glyph.note[30:] and unichr(0x2026))))
             if glyph.markColor:
                 status.append("mark: %s" % ", ".join([str(c) for c in glyph.markColor]))
+
+            rawConstructions = self.constructions.get()
+
+            searchConstruction = glyph.lib.get(self.glyphLibConstructionKey)
+            if searchConstruction is not None:
+                if searchConstruction not in rawConstructions:
+                    _, variables = ParseVariables(rawConstructions)
+                    for variableName, variableValue in variables.items():
+                        searchConstruction = searchConstruction.replace(variableValue, "{%s}" % variableName)
+
+                if searchConstruction in rawConstructions:
+                    selectedRange = NSMakeRange(rawConstructions.index(searchConstruction), len(searchConstruction))
+                    self.constructions.getNSTextView().setSelectedRange_(selectedRange)
 
         self.w.statusBar.set(status)
 
@@ -851,3 +866,7 @@ class GlyphBuilderController(BaseWindowController):
         removeObserver(self, "fontBecameCurrent")
         removeObserver(self, "fontResignCurrent")
         super(GlyphBuilderController, self).windowCloseCallback(sender)
+
+
+if __name__=='__main__':
+    GlyphBuilderController(CurrentFont())

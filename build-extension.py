@@ -28,14 +28,14 @@ B.name = "Glyph Construction"
 B.developer = 'Frederk Berlaen'
 B.developerURL = 'http://typemytype.com/'
 B.version = '0.7'
-B.launchAtStartUp = 0
-B.mainScript = ''
+B.launchAtStartUp = True
+B.mainScript = 'glyphConstructionUIStartUp.py'
 B.html = True
 B.requiresVersionMajor = '1'
 B.requiresVersionMinor = '5'
 B.addToMenu = [
     {
-        'path'         : 'glyphConstructionUI.py',
+        'path'         : 'glyphConstructionUIMenu.py',
         'preferredName': 'Glyph Builder',
         'shortKey'     : '',
     },

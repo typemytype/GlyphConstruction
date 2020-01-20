@@ -22,6 +22,7 @@ glyphConstructionOperations = [
     gc.applyKerningSplit,
     gc.glyphAtrributeAlternateSplit,
     gc.shouldDecomposeResult,
+    gc.shouldAddSourceGlyphIfExists,
 
     # gc.variableDeclarationStart,
     # gc.variableDeclarationEnd,

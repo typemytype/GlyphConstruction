@@ -613,6 +613,8 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             intersection = _intersectAngles(markPoint1, markAngle1, markPoint2, markAngle2)
             if intersection is not None:
                 markX, markY = intersection
+            elif (markPoint1, markAngle1) == (markPoint2, markAngle2):
+                markX, markY = markPoint1
 
             if baseGlyphX in font and baseGlyphY in font:
                 basePoint1, baseAngle1, _ = parsePosition(baseGlyphX, font, positionX, direction="x", isBase=True)
@@ -620,6 +622,8 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
                 intersection = _intersectAngles(basePoint1, baseAngle1, basePoint2, baseAngle2)
                 if intersection is not None:
                     baseX, baseY = intersection
+                elif (basePoint1, baseAngle1) == (basePoint2, baseAngle2):
+                    baseX, baseY = basePoint1
 
             # calculate the offset
             if not markFixedX:
@@ -1481,6 +1485,22 @@ def testGlyphConstructionBuilder_Positioning():
     >>> result = GlyphConstructionBuilder("*agrave = a + grave", font)
     >>> testDigestGlyph(result)
     ('agrave', 60, None, None, '', (('beginPath', None), ((100, 100), 'line', False, None), ((200, 100), 'line', False, None), ((200, 200), 'line', False, None), 'endPath', ('beginPath', None), ((100, 100), 'line', False, None), ((220, 120), 'line', False, None), ((220, 220), 'line', False, None), 'endPath'))
+
+    # font guide position
+
+    >>> font.appendGuideline(dict(x=100, y=200, angle=0, name="guide"))
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave@guide", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 50, 0), None)))
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave@guide,guide", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 50, 0), None)))
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave@0,guide", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, -100, 0), None)))
     """
 
 

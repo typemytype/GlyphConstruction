@@ -51,7 +51,7 @@ Table of Contents
     - [Analysis](#analysis)
     - [Selection preview](#selection-preview)
     - [Status bar](#status-bar)
-
+    - [Comment variables](#comment-variables)
 
 - - -
 
@@ -240,7 +240,8 @@ To install the Glyph Construction extension in RoboFont, follow the instructions
 - [Installing extensions manually](http://robofont.com/documentation/extensions/installing-extensions/)
 - [Installing extensions with Mechanic 2](http://robofont.com/documentation/extensions/installing-extensions-mechanic/)
 
-Once the extension is installed, the Glyph Builder can be opened from the menu *Extensions > Glyph Construction*.
+Once the extension is installed, the Glyph Builder can be opened from the menu *Extensions > Glyph Construction*. 
+Saved *.glyphConstruction* files can be opend directly in RoboFont by dragging the file on RoboFont.
 
 ![](GlyphBuilder.png)
 

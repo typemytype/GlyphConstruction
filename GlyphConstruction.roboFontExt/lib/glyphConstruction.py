@@ -19,6 +19,8 @@ except ImportError:
     # < RF3.2
     from ufoLib.pointPen import SegmentToPointPen
 
+__versions__ = "0.0.3"
+
 # splitters
 
 glyphNameSplit = "="
@@ -1184,6 +1186,7 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
                     if kern:
                         t = Transform(*transformMatrix).translate(kern, 0)
                         transformMatrix = t[:]
+                        advanceWidth += kern
 
                 baseTransformMatrix = transformMatrix
             destination.addComponent(component, transformMatrix)
@@ -1504,7 +1507,22 @@ def testGlyphConstructionBuilder_Positioning():
     """
 
 
-def testGlyphConstructionBuilder_():
+def testGlyphConstructionBuilder_kerning():
+    """
+    >>> font = testDummyFont()
+    >>> font.kerning["a", "i"] = -100
+
+    >>> result = GlyphConstructionBuilder("r = a & i", font)
+    >>> testDigestGlyph(result)
+    ('r', 150, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, 60, 0), None)))
+
+    >>> result = GlyphConstructionBuilder("r = a & \\i", font)
+    >>> testDigestGlyph(result)
+    ('r', 50, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, -40, 0), None)))
+    """
+
+
+def testGlyphConstructionBuilder():
     """
     >>> font = testDummyFont()
 

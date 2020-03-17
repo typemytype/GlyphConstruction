@@ -116,6 +116,11 @@ Width and margin values can also be defined using basic maths and references to 
     # right margin is equal to twice the right margin of B
     Aacute = A + acute ^ A / 3, B * 2
 
+Use a `'` to flip to the opposite side of given glyph margin.
+    
+    # left margin is used for the right margin of the generate d.alt
+    d.alt = d ^ d', d'
+
 ### Decompose glyph
 
 Add `*` before a glyph construction rule to explicitly tell the constructor to decompose the final result.

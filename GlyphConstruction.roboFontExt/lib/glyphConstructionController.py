@@ -868,5 +868,5 @@ class GlyphBuilderController(BaseWindowController):
         super(GlyphBuilderController, self).windowCloseCallback(sender)
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     GlyphBuilderController(CurrentFont())

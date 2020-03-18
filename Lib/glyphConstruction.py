@@ -954,6 +954,7 @@ def kernValueForGlyphPair(font, pair):
     """
     side1Prefix = "public.kern1."
     side2Prefix = "public.kern2."
+    kern = None
 
     if pair in font.kerning:
         # the pair exists
@@ -971,11 +972,11 @@ def kernValueForGlyphPair(font, pair):
                 groupName2Found = True
             if groupName1Found and groupName2Found:
                 break
-        if (side1, groupName2) in font.kerning:
+        if groupName2 is not None and (side1, groupName2) in font.kerning:
             kern = font.kerning[side1, groupName2]
-        elif (groupName1, side2) in font.kerning:
+        elif groupName1 is not None and (groupName1, side2) in font.kerning:
             kern = font.kerning[groupName1, side2]
-        else:
+        elif groupName1 is not None and groupName2 is not None:
             kern = font.kerning.get((groupName1, groupName2))
 
     if kern is None:
@@ -1516,9 +1517,13 @@ def testGlyphConstructionBuilder_kerning():
     >>> testDigestGlyph(result)
     ('r', 150, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, 60, 0), None)))
 
-    >>> result = GlyphConstructionBuilder("r = a & \\i", font)
+    >>> result = GlyphConstructionBuilder(r"dest = a & \\i", font)
     >>> testDigestGlyph(result)
-    ('r', 50, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, -40, 0), None)))
+    ('dest', 50, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, -40, 0), None)))
+
+    >>> result = GlyphConstructionBuilder(r"dest = a & \\foo", font)
+    >>> testDigestGlyph(result)
+    ('dest', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('foo', (1, 0, 0, 1, 60, 0), None)))
     """
 
 

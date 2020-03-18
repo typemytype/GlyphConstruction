@@ -808,7 +808,7 @@ class GlyphBuilderController(BaseWindowController):
         if self.font is not None:
             self.font.lib[self.fileNameKey] = os.path.splitext(os.path.basename(path))[0]
         txt = self.constructions.get()
-        f = open(path, "w")
+        f = open(path, "w", encoding="utf-8")
         f.write(txt)
         f.close()
 
@@ -822,7 +822,7 @@ class GlyphBuilderController(BaseWindowController):
         self.showPutFile(["glyphConstruction"], fileName=preferredName, callback=self._saveFile)
 
     def setFile(self, path):
-        f = open(path, "r")
+        f = open(path, "r", encoding="utf-8")
         txt = f.read()
         f.close()
 

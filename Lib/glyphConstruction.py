@@ -19,7 +19,7 @@ except ImportError:
     # < RF3.2
     from ufoLib.pointPen import SegmentToPointPen
 
-__versions__ = "0.0.3"
+__version__ = "0.0.3"
 
 # splitters
 

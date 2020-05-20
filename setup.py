@@ -3,7 +3,7 @@ from setuptools import setup
 
 _versionRE = re.compile(r'__version__\s*=\s*\"([^\"]+)\"')
 # read the version number for the settings file
-with open('lib/glyphConstruction.py', "r") as settings:
+with open('Lib/glyphConstruction.py', "r") as settings:
     code = settings.read()
     found = _versionRE.search(code)
     assert found is not None, "glyphConstruction __version__ not found"

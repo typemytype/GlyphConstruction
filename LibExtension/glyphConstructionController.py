@@ -27,6 +27,7 @@ from lib.UI.statusBar import StatusBar
 
 from glyphConstruction import GlyphConstructionBuilder, ParseGlyphConstructionListFromString, GlyphBuilderError, ParseVariables
 from glyphConstructionLexer import GlyphConstructionLexer
+from glyphConstructionWindow import GlyphConstructionWindow
 
 from lib.scripting.codeEditor import CodeEditor
 import os
@@ -499,10 +500,12 @@ class GlyphBuilderController(BaseWindowController):
     def __init__(self, font):
         self.font = None
         self._glyphs = []
+        self._filePath = None
 
         statusBarHeight = 20
 
-        self.w = Window((900, 700), "Glyph Builder", minSize=(400, 400))
+        self.w = GlyphConstructionWindow((900, 700), "Glyph Builder", minSize=(400, 400))
+        self.w.getNSWindow().setSave_saveAsCallback_(self.saveFile, self.saveFileAs)
         self.w.getNSWindow().setCollectionBehavior_(128)  # NSWindowCollectionBehaviorFullScreenPrimary
 
         toolbarItems = [
@@ -811,22 +814,30 @@ class GlyphBuilderController(BaseWindowController):
         f = open(path, "w", encoding="utf-8")
         f.write(txt)
         f.close()
+        self._filePath = path
 
     def saveFile(self, sender=None):
-        preferredName = None
-        if self.font is not None and self.font.path is not None:
-            preferredName = os.path.splitext(os.path.basename(self.font.path))[0]
-            if self.fileNameKey in self.font.lib.keys():
-                # see if we have saved this file before and use that as first choice
-                preferredName = self.font.lib.get(self.fileNameKey)
-        self.showPutFile(["glyphConstruction"], fileName=preferredName, callback=self._saveFile)
+        if self._filePath is None:
+            preferredName = None
+            if self.font is not None and self.font.path is not None:
+                preferredName = os.path.splitext(os.path.basename(self.font.path))[0]
+                if self.fileNameKey in self.font.lib.keys():
+                    # see if we have saved this file before and use that as first choice
+                    preferredName = self.font.lib.get(self.fileNameKey)
+            self.showPutFile(["glyphConstruction"], fileName=preferredName, callback=self._saveFile)
+        else:
+            self._saveFile(self._filePath)
+
+    def saveFileAs(self, sender=None):
+        self._filePath = None
+        self.saveFile(sender)
 
     def setFile(self, path):
         f = open(path, "r", encoding="utf-8")
         txt = f.read()
         f.close()
-
         self.constructions.set(txt)
+        self._filePath = path
 
     def _openFile(self, paths):
         if paths:

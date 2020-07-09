@@ -1,4 +1,6 @@
 import asyncio
+import functools
+
 from fontTools.misc.py23 import *
 from AppKit import *
 import re
@@ -36,10 +38,18 @@ import os
 
 def asyncTask(func):
     
-    def wrapper(*args, **kwargs):
-        task = asyncio.create_task(func(*args, **kwargs))
-
-    return wrapper
+    taskAttributeName = f"_{func.__name__}_autoCancelTask"
+    @functools.wraps(func)    
+    def createFuncTask(self, *args, **kwargs):
+        oldTask = getattr(self, taskAttributeName, None)
+        if oldTask is not None:
+            oldTask.cancel()
+        coro = func(self, *args, **kwargs)
+        task = asyncio.create_task(coro)
+        setattr(self, taskAttributeName, task)
+        return task
+        
+    return createFuncTask
 
 
 defaultKey = "com.typemytype.glyphBuilder"

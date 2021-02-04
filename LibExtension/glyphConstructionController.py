@@ -346,7 +346,7 @@ def analyseConstructions(font, constructionGlyphs):
             if name in other:
                 other.remove(name)
             else:
-                if name not in unusedComponents:
+                if name not in missingComponents:
                     missingComponents[glyph.name] = []
                 missingComponents[glyph.name].append(name)
 

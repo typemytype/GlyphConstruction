@@ -1,3 +1,4 @@
+import asyncio
 from fontTools.misc.py23 import *
 from AppKit import *
 import re
@@ -31,6 +32,15 @@ from glyphConstructionWindow import GlyphConstructionWindow
 
 from lib.scripting.codeEditor import CodeEditor
 import os
+
+
+def asyncTask(func):
+    
+    def wrapper(*args, **kwargs):
+        task = asyncio.create_task(func(*args, **kwargs))
+
+    return wrapper
+
 
 defaultKey = "com.typemytype.glyphBuilder"
 
@@ -622,8 +632,12 @@ class GlyphBuilderController(BaseWindowController):
             self.preview.set([])
             self.font.removeObserver(self, notification="Font.Changed")
             self.font = None
-
-    def constructionsCallback(self, sender, update=True):
+    
+    @asyncTask
+    async def constructionsCallback(self, sender, update=True):        
+        await asyncio.gather(self._constructionsCallback(sender, update))
+        
+    async def _constructionsCallback(self, sender, update=True): 
         if self.font is None:
             return
 

@@ -14,7 +14,7 @@
 		</dict>
 	</array>
 	<key>developer</key>
-	<string>Frederik Berlaen</string>
+	<string>Frederk Berlaen</string>
 	<key>developerURL</key>
 	<string>http://typemytype.com/</string>
 	<key>html</key>
@@ -30,8 +30,8 @@
 	<key>requiresVersionMinor</key>
 	<string>5</string>
 	<key>timeStamp</key>
-	<real>1594285837.2753458</real>
+	<real>1635321543.9031091</real>
 	<key>version</key>
-	<string>0.8.4</string>
+	<string>0.9</string>
 </dict>
 </plist>

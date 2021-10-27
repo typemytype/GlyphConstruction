@@ -1,5 +1,5 @@
 from fontTools.misc.py23 import *
-from AppKit import *
+import AppKit
 import re
 import weakref
 from vanilla import *
@@ -258,7 +258,7 @@ class AnalyserTextEditor(EnterTextEditor):
 
     def __init__(self, *args, **kwargs):
         super(AnalyserTextEditor, self).__init__(*args, **kwargs)
-        self.getNSScrollView().setBorderType_(NSNoBorder)
+        self.getNSScrollView().setBorderType_(AppKit.NSNoBorder)
 
         try:
             self.getNSTextView().setUsesFindBar_(True)
@@ -266,7 +266,7 @@ class AnalyserTextEditor(EnterTextEditor):
             self.getNSTextView().setUsesFindPanel_(True)
 
         # basicAttrs = getBasicTextAttributes()
-        font = NSFont.fontWithName_size_("Menlo", 10)
+        font = AppKit.NSFont.fontWithName_size_("Menlo", 10)
 
         # self.getNSTextView().setTypingAttributes_(basicAttrs)
         self.getNSTextView().setFont_(font)
@@ -399,9 +399,9 @@ class BuildGlyphsSheet(BaseWindowController):
         y += 35
         if shouldUseMarkColor is None:
             shouldUseMarkColor = getExtensionDefault(self.useMarkColorKey, True)
-            markColor = getExtensionDefaultColor(self.markColorKey, NSColor.redColor())
+            markColor = getExtensionDefaultColor(self.markColorKey, AppKit.NSColor.redColor())
         elif not shouldUseMarkColor:
-            markColor = getExtensionDefaultColor(self.markColorKey, NSColor.redColor())
+            markColor = getExtensionDefaultColor(self.markColorKey, AppKit.NSColor.redColor())
         else:
             markColor = rgbaToNSColor(shouldUseMarkColor)
             shouldUseMarkColor = True
@@ -521,21 +521,21 @@ class GlyphBuilderController(BaseWindowController):
                 imageNamed="toolbarScriptOpen",
                 callback=self.openFile,
             ),
-            dict(itemIdentifier=NSToolbarSpaceItemIdentifier),
+            dict(itemIdentifier=AppKit.NSToolbarSpaceItemIdentifier),
             dict(
                 itemIdentifier="reload",
                 label="Update",
                 imageNamed="toolbarScriptReload",
                 callback=self.reload,
             ),
-            dict(itemIdentifier=NSToolbarSpaceItemIdentifier),
+            dict(itemIdentifier=AppKit.NSToolbarSpaceItemIdentifier),
             dict(
                 itemIdentifier="analyse",
                 label="Analyse",
                 imageNamed="prefToolbarSort",
                 callback=self.analyse,
             ),
-            dict(itemIdentifier=NSToolbarFlexibleSpaceItemIdentifier),
+            dict(itemIdentifier=AppKit.NSToolbarFlexibleSpaceItemIdentifier),
             dict(
                 itemIdentifier="buildGlyphs",
                 label="Build Glyphs",
@@ -548,7 +548,7 @@ class GlyphBuilderController(BaseWindowController):
         self.constructions = CodeEditor((0, 0, -0, -0), constructions, lexer=GlyphConstructionLexer())
         # self.constructions.wrapWord(False) # in only availbel in the RoboFont 1.7 beta
 
-        self.constructions.getNSScrollView().setBorderType_(NSNoBorder)
+        self.constructions.getNSScrollView().setBorderType_(AppKit.NSNoBorder)
         self.preview = MultiLineView(
             (0, 0, -0, -0),
             pointSize=50,
@@ -564,10 +564,10 @@ class GlyphBuilderController(BaseWindowController):
         self.analyser = AnalyserTextEditor((0, 0, -0, -0), readOnly=True)
         self.analyserPreview = Group((0, 0, -0, -0))
 
-        constructionColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(0, 0, 0, .6)
+        constructionColor = AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(0, 0, 0, .6)
         self.analyserPreview.construction = GlyphPreview((0, 0, -0, -0), contourColor=constructionColor, componentColor=constructionColor)
         self.analyserPreview.construction.getNSView()._buffer = 100
-        originColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(1, 0, 0, .6)
+        originColor = AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(1, 0, 0, .6)
         self.analyserPreview.origin = GlyphPreview((0, 0, -0, -0), contourColor=originColor, componentColor=originColor)
         self.analyserPreview.origin.getNSView()._buffer = 100
 
@@ -591,13 +591,13 @@ class GlyphBuilderController(BaseWindowController):
         self.w.statusBar = StatusBar((0, -statusBarHeight, -0, statusBarHeight))
         self.w.statusBar.hiddenReload = Button((0, 0, -0, -0), "Reload", self.reload)
         button = self.w.statusBar.hiddenReload.getNSButton()
-        button.setBezelStyle_(NSRoundRectBezelStyle)
+        button.setBezelStyle_(AppKit.NSRoundRectBezelStyle)
         button.setAlphaValue_(0)
         self.w.statusBar.hiddenReload.bind("\r", ["command"])
 
         self.w.statusBar.hiddenSave = Button((0, 0, -0, -0), "Reload", self.saveFile)
         button = self.w.statusBar.hiddenSave.getNSButton()
-        button.setBezelStyle_(NSRoundRectBezelStyle)
+        button.setBezelStyle_(AppKit.NSRoundRectBezelStyle)
         button.setAlphaValue_(0)
         self.w.statusBar.hiddenSave.bind("s", ["command"])
 
@@ -733,7 +733,7 @@ class GlyphBuilderController(BaseWindowController):
                         searchConstruction = searchConstruction.replace(variableValue, "{%s}" % variableName)
 
                 if searchConstruction in rawConstructions:
-                    selectedRange = NSMakeRange(rawConstructions.index(searchConstruction), len(searchConstruction))
+                    selectedRange = AppKit.NSMakeRange(rawConstructions.index(searchConstruction), len(searchConstruction))
                     self.constructions.getNSTextView().setSelectedRange_(selectedRange)
 
         self.w.statusBar.set(status)

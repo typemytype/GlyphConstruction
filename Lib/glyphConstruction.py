@@ -122,7 +122,7 @@ def _diffPoint(pt1, pt2):
 
 if variableDeclarationEnd:
     variableDeclarationEnd = r"\%s" % variableDeclarationEnd
-varialbesRE = re.compile(r"\%s\s*(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(?P<value>.*)%s" % (variableDeclarationStart, variableDeclarationEnd))
+variablesRE = re.compile(r"\%s\s*(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(?P<value>.*)%s" % (variableDeclarationStart, variableDeclarationEnd))
 
 simpleVariableRe = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]*")
 
@@ -813,7 +813,7 @@ def parseBaseGlyphs(construction):
 
 def parseGlyphattributes(construction, font):
     """
-    Parse glyph attributes from constructtion.
+    Parse glyph attributes from construction.
     width splitter: ^ (could be a tuple referring to leftMargin and rightMargin)
     mark splitter:  !
     unicode splitter: |
@@ -1136,79 +1136,76 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
     # create a construction glyph
     destination = ConstructionGlyph(font)
     # test if the input is a proper string
-    try:
-        construction = str(construction)
-    except Exception:
-        return destination
-    # parse flags
-    flags, construction = parseFlags(construction)
-    # parse the note
-    destination.note, construction = parseNote(construction)
-    # check if there is a = sing
-    if glyphNameSplit not in construction:
-        return destination
-    # remove all spaces and tabs
-    construction = removeSpacesAndTabs(construction)
-    # escape math formulas inside a ` `
-    construction = forceEscapingMathOperations(construction)
-    # extract the name
-    destination.name, construction = parseGlyphName(construction)
-    # extract glyph attributes
-    glyphAttributes, construction = parseGlyphattributes(construction, font)
-    # extract base glyphs, ligatures
-    baseGlyphs = parseBaseGlyphs(construction)
+    if isinstance(construction, str):
+        # parse flags
+        flags, construction = parseFlags(construction)
+        # parse the note
+        destination.note, construction = parseNote(construction)
+        # check if there is a = sing
+        if glyphNameSplit not in construction:
+            return destination
+        # remove all spaces and tabs
+        construction = removeSpacesAndTabs(construction)
+        # escape math formulas inside a ` `
+        construction = forceEscapingMathOperations(construction)
+        # extract the name
+        destination.name, construction = parseGlyphName(construction)
+        # extract glyph attributes
+        glyphAttributes, construction = parseGlyphattributes(construction, font)
+        # extract base glyphs, ligatures
+        baseGlyphs = parseBaseGlyphs(construction)
 
-    advanceWidth = 0
-    previousBaseGlyph = None
-    # start
-    if flags.shouldAddSourceGlyphIfExists and destination.name in font:
-        font[destination.name].draw(destination.source)
-    for baseGlyph in baseGlyphs:
-        applyKerning, baseGlyph = parseApplyKerning(baseGlyph)
-        # split into mark glyphs
-        markGlyphs = baseGlyph.split(markGlyphSplit)
-        baseGlyph = None
-        baseMarkGlyph = None
-        baseTransformMatrix = [1, 0, 0, 1, 0, 0]
-        markTransformMap = {}
+        advanceWidth = 0
+        previousBaseGlyph = None
+        # start
+        if flags.shouldAddSourceGlyphIfExists and destination.name in font:
+            font[destination.name].draw(destination.source)
+        for baseGlyph in baseGlyphs:
+            applyKerning, baseGlyph = parseApplyKerning(baseGlyph)
+            # split into mark glyphs
+            markGlyphs = baseGlyph.split(markGlyphSplit)
+            baseGlyph = None
+            baseMarkGlyph = None
+            baseTransformMatrix = [1, 0, 0, 1, 0, 0]
+            markTransformMap = {}
 
-        advanceHeight = 0
+            advanceHeight = 0
 
-        for markGlyph in markGlyphs:
-            markGlyph = reEscapeMathOperations(markGlyph)
-            component, transformMatrix = parsePositions(baseMarkGlyph, markGlyph, font, markTransformMap, advanceWidth, advanceHeight)
+            for markGlyph in markGlyphs:
+                markGlyph = reEscapeMathOperations(markGlyph)
+                component, transformMatrix = parsePositions(baseMarkGlyph, markGlyph, font, markTransformMap, advanceWidth, advanceHeight)
 
-            baseMarkGlyph = component
+                baseMarkGlyph = component
 
-            if baseGlyph is None:
-                baseGlyph = component
-                if applyKerning:
-                    kern = kernValueForGlyphPair(font, (previousBaseGlyph, baseGlyph))
-                    if kern:
-                        t = Transform(*transformMatrix).translate(kern, 0)
-                        transformMatrix = t[:]
-                        advanceWidth += kern
+                if baseGlyph is None:
+                    baseGlyph = component
+                    if applyKerning:
+                        kern = kernValueForGlyphPair(font, (previousBaseGlyph, baseGlyph))
+                        if kern:
+                            t = Transform(*transformMatrix).translate(kern, 0)
+                            transformMatrix = t[:]
+                            advanceWidth += kern
 
-                baseTransformMatrix = transformMatrix
-            destination.addComponent(component, transformMatrix)
+                    baseTransformMatrix = transformMatrix
+                destination.addComponent(component, transformMatrix)
 
-        if baseGlyph in font:
-            width = font[baseGlyph].width
-            t = Transform(*baseTransformMatrix)
-            x0, y = t.transformPoint((0, 0))
-            x1, y = t.transformPoint((width, 0))
-            advanceWidth += abs(x1 - x0)
+            if baseGlyph in font:
+                width = font[baseGlyph].width
+                t = Transform(*baseTransformMatrix)
+                x0, y = t.transformPoint((0, 0))
+                x1, y = t.transformPoint((width, 0))
+                advanceWidth += abs(x1 - x0)
 
-        previousBaseGlyph = baseGlyph
+            previousBaseGlyph = baseGlyph
 
-    destination.width = advanceWidth
-    for key, value in glyphAttributes.items():
-        setattr(destination, key, value)
+        destination.width = advanceWidth
+        for key, value in glyphAttributes.items():
+            setattr(destination, key, value)
 
-    if characterMap and destination.name in characterMap:
-        destination.unicodes = [characterMap[destination.name]]
+        if characterMap and destination.name in characterMap:
+            destination.unicodes = [characterMap[destination.name]]
 
-    destination.shouldDecompose = flags.shouldDecompose
+        destination.shouldDecompose = flags.shouldDecompose
     return destination
 
 
@@ -1229,7 +1226,7 @@ def ParseVariables(txt):
     True
     """
     variables = {}
-    for i in varialbesRE.finditer(txt):
+    for i in variablesRE.finditer(txt):
         name = i.group("name")
         value = i.group("value")
         variables[name] = value

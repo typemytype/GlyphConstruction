@@ -457,8 +457,6 @@ class BuildGlyphsSheet(BaseWindowController):
                 glyph.unicode = construction.unicode
             elif characterMap and construction.name in characterMap:
                 glyph.unicode = characterMap[construction.name]
-            else:
-                glyph.unicode = None
 
             glyph.note = construction.note
 

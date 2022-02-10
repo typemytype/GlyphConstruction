@@ -290,7 +290,7 @@ def analyseConstructions(font, constructionGlyphs):
     done = []
 
     for construction in constructionGlyphs:
-        if construction.name is None:
+        if construction.name in [None, "\n"]:
             continue
         if construction.name not in font:
             missingGlyphs.append(construction.name)
@@ -442,7 +442,7 @@ class BuildGlyphsSheet(BaseWindowController):
         for construction in self.constructions:
             progress.update()
 
-            if construction.name is None:
+            if construction.name in [None, "\n"]:
                 continue
 
             if construction.name in font and not overWrite:

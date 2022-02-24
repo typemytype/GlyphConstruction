@@ -13,7 +13,7 @@ setup(
     name='glyphConstruction',
     version=__version__,
     author='Frederik Berlaen',
-    author_email='frederik@typemytpye.com',
+    author_email='frederik@typemytype.com',
     url='https://github.com/typemytype/GlyphConstruction',
     license='LICENSE.txt',
     description='Letter shape description language',

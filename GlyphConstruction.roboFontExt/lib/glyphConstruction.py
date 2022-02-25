@@ -222,6 +222,13 @@ class ConstructionGlyph(object):
         self.width = xMax + value
 
     rightMargin = property(_get_rightMargin, _set_rightMargin)
+    
+    def _get_unicode(self):
+        if self.unicodes:
+            return self.unicodes[0] 
+        return None
+
+    unicode = property(_get_unicode)
 
     def move(self, move):
         moveX, moveY = move
@@ -1383,14 +1390,29 @@ def testGlyphConstructionBuilder_GlyphAttributes():
     ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
 
     # unicode
+    >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    >>> result.unicode is None
+    True
+    >>> result.unicodes is None
+    True
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0", font)
     >>> testDigestGlyph(result)
     ('agrave', 60, (224,), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    >>> result.unicode
+    224
+    >>> result.unicodes
+    (224,)
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0, 00C0", font)
     >>> testDigestGlyph(result)
     ('agrave', 60, (224, 192), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    >>> result.unicode
+    224
+    >>> result.unicodes
+    (224, 192)
 
     # mark
 

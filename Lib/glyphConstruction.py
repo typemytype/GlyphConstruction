@@ -222,10 +222,10 @@ class ConstructionGlyph(object):
         self.width = xMax + value
 
     rightMargin = property(_get_rightMargin, _set_rightMargin)
-    
+
     def _get_unicode(self):
         if self.unicodes:
-            return self.unicodes[0] 
+            return self.unicodes[0]
         return None
 
     unicode = property(_get_unicode)
@@ -761,12 +761,10 @@ def parseUnicode(construction, font=None):
     unicodeValues = None
     if unicodeSplit in construction:
         construction, unicodeStr = construction.split(unicodeSplit)
-        
         try:
-            unicodeValues = tuple([int(u, 16) for u in unicodeStr.split(",")])
+            unicodeValues = tuple([int(u, 16) for u in unicodeStr.split(positionXYSplit)])
         except Exception:
             unicodeValues = None
-            
     return unicodeValues, construction
 
 

@@ -87,8 +87,12 @@ A comment `#` at the end of a glyph construction is a note.
 
 ### Unicodes
 
-    <destGlyphName> = <glyphName> + <glyphName> | <unicode>
+Unicodes in hexidecimal notation. Multiple Unicodes accepted, separated by commas.
+*Glyph Builder: If Unicodes are provided, they will be used even if "AutoUnicodes: True" is set.*
+
+    <destGlyphName> = <glyphName> + <glyphName> | <unicode>, <unicodes>*
     Aacute = A + acute | 00C1
+    Tcommaaccent = T + commaaccent @ bottom | 021A, 0162
 
 ### Mark Color
 

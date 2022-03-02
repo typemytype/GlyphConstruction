@@ -19,7 +19,7 @@ except ImportError:
     # < RF3.2
     from ufoLib.pointPen import SegmentToPointPen
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 # splitters
 
@@ -154,7 +154,7 @@ class ConstructionGlyph(object):
         self._glyphset = weakref.ref(glyphset)
         self.name = None
         self.width = 0
-        self.unicode = None
+        self.unicodes = None
         self.components = []
         self.note = ""
         self.markColor = None
@@ -222,6 +222,13 @@ class ConstructionGlyph(object):
         self.width = xMax + value
 
     rightMargin = property(_get_rightMargin, _set_rightMargin)
+    
+    def _get_unicode(self):
+        if self.unicodes:
+            return self.unicodes[0] 
+        return None
+
+    unicode = property(_get_unicode)
 
     def move(self, move):
         moveX, moveY = move
@@ -748,17 +755,19 @@ def parseUnicode(construction, font=None):
     Parse unicode from construction.
     unicode splitter: |
 
-    >>> parseUnicode(removeSpacesAndTabs("agrave = a + grave | 00E0"))
-    (224, 'agrave=a+grave')
+    >>> parseUnicode(removeSpacesAndTabs("agrave = a + grave | 00E0, 00C0"))
+    ((224, 192), 'agrave=a+grave')
     """
-    unicodeValue = None
+    unicodeValues = None
     if unicodeSplit in construction:
-        construction, unicodeValue = construction.split(unicodeSplit)
+        construction, unicodeStr = construction.split(unicodeSplit)
+        
         try:
-            unicodeValue = int(unicodeValue, 16)
+            unicodeValues = tuple([int(u, 16) for u in unicodeStr.split(",")])
         except Exception:
-            unicodeValue = None
-    return unicodeValue, construction
+            unicodeValues = None
+            
+    return unicodeValues, construction
 
 
 def parseMark(construction, font=None):
@@ -786,7 +795,7 @@ def parseMark(construction, font=None):
 
 
 glyphAttrFuncMap = {
-    "unicode": parseUnicode,
+    "unicodes": parseUnicode,
     "markColor": parseMark,
     "width": parseWidth,
     "leftMargin": parseLeftMargin,
@@ -821,23 +830,23 @@ def parseGlyphattributes(construction, font):
     >>> font = testDummyFont()
     >>> data, name = parseGlyphattributes(removeSpacesAndTabs("name | 0000 ! 1, 0, 0, 1 ^ 100"), font)
     >>> sorted(data.items()), name
-    ([('markColor', (1.0, 0.0, 0.0, 1.0)), ('unicode', 0), ('width', 100.0)], 'name')
+    ([('markColor', (1.0, 0.0, 0.0, 1.0)), ('unicodes', (0,)), ('width', 100.0)], 'name')
 
     >>> data, name = parseGlyphattributes(removeSpacesAndTabs("name ! 1, 0, 0, 1 ^ 100 | 0000"), font)
     >>> sorted(data.items()), name
-    ([('markColor', (1.0, 0.0, 0.0, 1.0)), ('unicode', 0), ('width', 100.0)], 'name')
+    ([('markColor', (1.0, 0.0, 0.0, 1.0)), ('unicodes', (0,)), ('width', 100.0)], 'name')
 
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 100 | 0000 ! 1, 0, 0, 1"), font)
-    ({'width': 100.0, 'unicode': 0, 'markColor': (1.0, 0.0, 0.0, 1.0)}, 'name')
+    ({'width': 100.0, 'unicodes': (0,), 'markColor': (1.0, 0.0, 0.0, 1.0)}, 'name')
 
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 100 | 0000"), font)
-    ({'width': 100.0, 'unicode': 0}, 'name')
+    ({'width': 100.0, 'unicodes': (0,)}, 'name')
 
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 100"), font)
     ({'width': 100.0}, 'name')
 
     >>> parseGlyphattributes(removeSpacesAndTabs("name | 0000"), font)
-    ({'unicode': 0}, 'name')
+    ({'unicodes': (0,)}, 'name')
 
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ 100"), font)
     ({'width': 100.0}, 'name')
@@ -875,7 +884,7 @@ def parseGlyphattributes(construction, font):
             currentKey = "markColor"
             currentValue = ""
         elif c == unicodeSplit:
-            currentKey = "unicode"
+            currentKey = "unicodes"
             currentValue = ""
         if currentKey:
             currentValue += c
@@ -1365,7 +1374,7 @@ def testDigestGlyph(glyph):
     return (
         glyph.name,
         glyph.width,
-        glyph.unicode,
+        glyph.unicodes,
         glyph.markColor,
         glyph.note,
         pen.getDigest()
@@ -1381,10 +1390,29 @@ def testGlyphConstructionBuilder_GlyphAttributes():
     ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
 
     # unicode
+    >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    >>> result.unicode is None
+    True
+    >>> result.unicodes is None
+    True
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, 224, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 60, (224,), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    >>> result.unicode
+    224
+    >>> result.unicodes
+    (224,)
+
+    >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0, 00C0", font)
+    >>> testDigestGlyph(result)
+    ('agrave', 60, (224, 192), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    >>> result.unicode
+    224
+    >>> result.unicodes
+    (224, 192)
 
     # mark
 
@@ -1412,15 +1440,15 @@ def testGlyphConstructionBuilder_GlyphAttributes():
 
     # all glyph attributes
 
-    >>> result = GlyphConstructionBuilder("agrave = a + grave ^ 300, 200 ! 1, 0, 0, 1 | 00E0 # this is a note ", font)
+    >>> result = GlyphConstructionBuilder("agrave = a + grave ^ 300, 200 ! 1, 0, 0, 1 | 00E0, 00C0 # this is a note ", font)
     >>> testDigestGlyph(result)
-    ('agrave', 620.0, 224, (1.0, 0.0, 0.0, 1.0), 'this is a note', (('a', (1, 0, 0, 1, 200, 0), None), ('grave', (1, 0, 0, 1, 200, 0), None)))
+    ('agrave', 620.0, (224, 192), (1.0, 0.0, 0.0, 1.0), 'this is a note', (('a', (1, 0, 0, 1, 200, 0), None), ('grave', (1, 0, 0, 1, 200, 0), None)))
 
     # all glyph attributes, different order
 
-    >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0 ! 1, 0, 0, 1 ^ 300, 200 # this is a note ", font)
+    >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0, 00C0 ! 1, 0, 0, 1 ^ 300, 200 # this is a note ", font)
     >>> testDigestGlyph(result)
-    ('agrave', 620.0, 224, (1.0, 0.0, 0.0, 1.0), 'this is a note', (('a', (1, 0, 0, 1, 200, 0), None), ('grave', (1, 0, 0, 1, 200, 0), None)))
+    ('agrave', 620.0, (224, 192), (1.0, 0.0, 0.0, 1.0), 'this is a note', (('a', (1, 0, 0, 1, 200, 0), None), ('grave', (1, 0, 0, 1, 200, 0), None)))
     """
 
 

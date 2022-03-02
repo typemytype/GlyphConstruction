@@ -5,8 +5,6 @@ import os
 from math import cos, sin, radians
 import operator
 
-from fontTools.misc.py23 import basestring
-
 from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.transformPen import TransformPen
@@ -122,7 +120,7 @@ def _diffPoint(pt1, pt2):
 
 if variableDeclarationEnd:
     variableDeclarationEnd = r"\%s" % variableDeclarationEnd
-varialbesRE = re.compile(r"\%s\s*(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(?P<value>.*)%s" % (variableDeclarationStart, variableDeclarationEnd))
+variablesRE = re.compile(r"\%s\s*(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\s*\=\s*(?P<value>.*)%s" % (variableDeclarationStart, variableDeclarationEnd))
 
 simpleVariableRe = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]*")
 
@@ -820,7 +818,7 @@ def parseBaseGlyphs(construction):
 
 def parseGlyphattributes(construction, font):
     """
-    Parse glyph attributes from constructtion.
+    Parse glyph attributes from construction.
     width splitter: ^ (could be a tuple referring to leftMargin and rightMargin)
     mark splitter:  !
     unicode splitter: |
@@ -1143,9 +1141,7 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
     # create a construction glyph
     destination = ConstructionGlyph(font)
     # test if the input is a proper string
-    try:
-        construction = str(construction)
-    except Exception:
+    if not isinstance(construction, str):
         return destination
     # parse flags
     flags, construction = parseFlags(construction)
@@ -1236,7 +1232,7 @@ def ParseVariables(txt):
     True
     """
     variables = {}
-    for i in varialbesRE.finditer(txt):
+    for i in variablesRE.finditer(txt):
         name = i.group("name")
         value = i.group("value")
         variables[name] = value
@@ -1299,7 +1295,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     True
     """
     txt = None
-    if isinstance(source, basestring):
+    if isinstance(source, str):
         if os.path.exists(source):
             with open(source) as f:
                 txt = f.read()

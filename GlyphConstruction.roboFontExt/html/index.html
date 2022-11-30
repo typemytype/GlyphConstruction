@@ -8,7 +8,7 @@
         
         </head>
         <body>
-        <h1>Glyph Construction</h1>
+        <h1 id="glyph-construction">Glyph Construction</h1>
 <p><strong>Glyph Construction is a simple, powerful, human-readable language for describing how glyph shapes are built.</strong></p>
 <p>Glyph Construction can be used to create new glyphs from components. It is specially useful for creating accented glyphs.</p>
 <p>Collections of Glyph Construction rules can be saved as <code>*.glyphConstruction</code> files, and can be shared between fonts.</p>
@@ -69,112 +69,96 @@
 <h2 id="glyph-construction-language">Glyph Construction language</h2>
 <h3 id="assigning-a-construction-to-a-glyph">Assigning a construction to a glyph</h3>
 <p>Build <code>&lt;destGlyphName&gt;</code> out of one or more components.</p>
-<div class="codehilite"><pre><span></span><span class="err">&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt;</span>
-<span class="err">Aacute = A + acute</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt;
+Aacute = A + acute
+</code></pre></div>
 
 <p>Optionally, a suffix can be provided. If a glyph with the given suffix does not exist in the font, the suffix is ignored.</p>
-<div class="codehilite"><pre><span></span><span class="err">Aacute = A + acute.cap</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>Aacute = A + acute.cap
+</code></pre></div>
 
 <h3 id="comments">Comments</h3>
 <p>A line starting with (or anything after) a <code>#</code> is a comment and will not be used during execution.</p>
-<div class="codehilite"><pre><span></span><span class="err"># this is a comment</span>
-<span class="err">Aacute = A + acute</span>
-<span class="err">Agrave = A + grave # this is a note</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code># this is a comment
+Aacute = A + acute
+Agrave = A + grave # this is a note
+</code></pre></div>
 
 <h3 id="notes">Notes</h3>
 <p>A comment <code>#</code> at the end of a glyph construction is a note.</p>
-<div class="codehilite"><pre><span></span><span class="err">&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; # &lt;note&gt;</span>
-<span class="err">Aacute = A + acute # this is a note</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; # &lt;note&gt;
+Aacute = A + acute # this is a note
+</code></pre></div>
 
 <h3 id="unicodes">Unicodes</h3>
 <p>Unicodes in hexidecimal notation. Multiple Unicodes accepted, separated by commas.
 <em>Glyph Builder: If Unicodes are provided, they will be used even if "AutoUnicodes: True" is set.</em></p>
-<div class="codehilite"><pre><span></span><span class="err">&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; | &lt;unicode&gt;, &lt;unicodes&gt;*</span>
-<span class="err">Aacute = A + acute | 00C1</span>
-<span class="err">Tcommaaccent = T + commaaccent @ bottom | 021A, 0162</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; | &lt;unicode&gt;, &lt;unicodes&gt;*
+Aacute = A + acute | 00C1
+Tcommaaccent = T + commaaccent @ bottom | 021A, 0162
+</code></pre></div>
 
 <h3 id="mark-color">Mark Color</h3>
-<div class="codehilite"><pre><span></span><span class="err">&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ! &lt;rgba&gt;</span>
-<span class="err">Aacute = A + acute ! 1, 0, 0, 1</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ! &lt;rgba&gt;
+Aacute = A + acute ! 1, 0, 0, 1
+</code></pre></div>
 
 <h3 id="metrics">Metrics</h3>
-<h4>Width</h4>
-<div class="codehilite"><pre><span></span><span class="err">&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;width&gt;</span>
-<span class="err">Aacute = A + acute ^ 400</span>
-</pre></div>
+<h4 id="width">Width</h4>
+<div class="codehilite"><pre><span></span><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;width&gt;
+Aacute = A + acute ^ 400
+</code></pre></div>
 
-
-<h4>Left and Right Margins</h4>
-<div class="codehilite"><pre><span></span><span class="err">&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;leftmargin&gt;, &lt;rightMargin&gt;</span>
-<span class="err">Aacute = A + acute ^ 30, 30</span>
-</pre></div>
-
+<h4 id="left-and-right-margins">Left and Right Margins</h4>
+<div class="codehilite"><pre><span></span><code>&lt;destGlyphName&gt; = &lt;glyphName&gt; + &lt;glyphName&gt; ^ &lt;leftmargin&gt;, &lt;rightMargin&gt;
+Aacute = A + acute ^ 30, 30
+</code></pre></div>
 
 <p>Width and margin values can also be defined using basic maths and references to <code>width</code>, <code>leftMargin</code> or <code>rightMargin</code> of other glyphs.</p>
-<div class="codehilite"><pre><span></span><span class="o">#</span> <span class="n">width</span> <span class="k">is</span> <span class="n">equal</span> <span class="k">to</span> <span class="n">twice</span> <span class="n">the</span> <span class="n">width</span> <span class="k">of</span> <span class="n">A</span>
-<span class="n">Aacute</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">acute</span> <span class="o">^</span> <span class="n">A</span> <span class="o">*</span> <span class="mi">2</span>
+<div class="codehilite"><pre><span></span><code># width is equal to twice the width of A
+Aacute = A + acute ^ A * 2
 
-<span class="o">#</span> <span class="k">left</span> <span class="n">margin</span> <span class="k">is</span> <span class="n">equal</span> <span class="k">to</span> <span class="n">one</span> <span class="n">third</span> <span class="k">of</span> <span class="n">the</span> <span class="k">left</span> <span class="n">margin</span> <span class="k">of</span> <span class="n">A</span>
-<span class="o">#</span> <span class="k">right</span> <span class="n">margin</span> <span class="k">is</span> <span class="n">equal</span> <span class="k">to</span> <span class="n">twice</span> <span class="n">the</span> <span class="k">right</span> <span class="n">margin</span> <span class="k">of</span> <span class="n">B</span>
-<span class="n">Aacute</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">acute</span> <span class="o">^</span> <span class="n">A</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="n">B</span> <span class="o">*</span> <span class="mi">2</span>
-</pre></div>
-
+# left margin is equal to one third of the left margin of A
+# right margin is equal to twice the right margin of B
+Aacute = A + acute ^ A / 3, B * 2
+</code></pre></div>
 
 <p>Use a <code>'</code> to flip to the opposite side of given glyph margin.</p>
-<div class="codehilite"><pre><span></span><span class="err"># left margin is used for the right margin of the generate d.alt</span>
-<span class="err">d.alt = d ^ d&#39;, d&#39;</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>#<span class="w"> </span><span class="nv">left</span><span class="w"> </span><span class="nv">margin</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">used</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">right</span><span class="w"> </span><span class="nv">margin</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">generate</span><span class="w"> </span><span class="nv">d</span>.<span class="nv">alt</span><span class="w"></span>
+<span class="nv">d</span>.<span class="nv">alt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">d</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="nv">d</span><span class="s1">&#39;, d&#39;</span><span class="w"></span>
+</code></pre></div>
 
 <h3 id="decompose-glyph">Decompose glyph</h3>
 <p>Add <code>*</code> before a glyph construction rule to explicitly tell the constructor to decompose the final result.</p>
-<div class="codehilite"><pre><span></span><span class="err">*agrave = a + grave</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>*agrave = a + grave
+</code></pre></div>
 
 <h3 id="add-source-glyph">Add Source Glyph</h3>
 <p>Add <code>&gt;</code> before a glyph construction rule to include the source font glyph name in the final result.</p>
-<div class="codehilite"><pre><span></span><span class="err"># include the the drawing of the source font &#39;a&#39; </span>
-<span class="err"># and set the spacing to 40 for the left margin and 50 on the right margin.</span>
-<span class="err">&gt;a = ^ 40, 50</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>#<span class="w"> </span><span class="k">include</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">drawing</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">source</span><span class="w"> </span><span class="nv">font</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="w"> </span>
+#<span class="w"> </span><span class="nv">and</span><span class="w"> </span><span class="nv">set</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">spacing</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="mi">40</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">left</span><span class="w"> </span><span class="nv">margin</span><span class="w"> </span><span class="nv">and</span><span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="nv">on</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">right</span><span class="w"> </span><span class="nv">margin</span>.<span class="w"></span>
+<span class="o">&gt;</span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mi">40</span>,<span class="w"> </span><span class="mi">50</span><span class="w"></span>
+</code></pre></div>
 
 <h3 id="ignore-existing-glyphs">Ignore existing glyphs</h3>
 <p>Add <code>?</code> before a glyph construction rule to ignore this glyph if it already exists in the font.</p>
-<div class="codehilite"><pre><span></span><span class="err">?Aacute = A + acute</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>?Aacute = A + acute
+</code></pre></div>
 
 <h3 id="positioning">Positioning</h3>
 <p>The Glyph Construction language offers different ways to position the added components in relation to the current glyph.</p>
-<h4>By Numbers</h4>
-<div class="codehilite"><pre><span></span><span class="n">Aacute</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">acute</span><span class="mi">@100</span>
-<span class="n">Aacute</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">acute</span><span class="mi">@100</span><span class="p">,</span><span class="mi">100</span>
-</pre></div>
+<h4 id="by-numbers">By Numbers</h4>
+<div class="codehilite"><pre><span></span><code><span class="n">Aacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="mi">@100</span><span class="w"></span>
+<span class="n">Aacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="mi">@100</span><span class="p">,</span><span class="mi">100</span><span class="w"></span>
+</code></pre></div>
 
+<h4 id="by-percentages">By Percentages</h4>
+<div class="codehilite"><pre><span></span><code><span class="n">Aacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="mi">@50</span><span class="o">%</span><span class="p">,</span><span class="mi">50</span><span class="o">%</span><span class="w"></span>
+</code></pre></div>
 
-<h4>By Percentages</h4>
-<div class="codehilite"><pre><span></span><span class="n">Aacute</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">acute</span><span class="mi">@50</span><span class="o">%</span><span class="p">,</span><span class="mi">50</span><span class="o">%</span>
-</pre></div>
-
-
-<h4>By Reference</h4>
-<div class="codehilite"><pre><span></span><span class="err">Aacute = A + acute@center,top</span>
-</pre></div>
-
+<h4 id="by-reference">By Reference</h4>
+<div class="codehilite"><pre><span></span><code><span class="n">Aacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="nv">@center</span><span class="p">,</span><span class="k">top</span><span class="w"></span>
+</code></pre></div>
 
 <p>A reference could be (in this order):</p>
 <ul>
@@ -185,13 +169,12 @@
 <li>a font dimension attribute: <code>descender</code>, <code>xHeight</code>, <code>capHeight</code>, <code>ascender</code></li>
 <li>a calculated reference position: <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>, <code>innerLeft</code>, <code>innerRight</code>, <code>center</code>, <code>origin</code>, <code>width</code></li>
 </ul>
-<h4>By Transformation Matrix</h4>
+<h4 id="by-transformation-matrix">By Transformation Matrix</h4>
 <p><code>@</code> followed by a transformation matrix: 6 values <code>xx, xy, yx, yy, x, y</code></p>
-<div class="codehilite"><pre><span></span><span class="n">Aacute</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">acute</span><span class="mi">@1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span>
-</pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">Aacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="mi">@1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+</code></pre></div>
 
-
-<h4>Change the current glyph</h4>
+<h4 id="change-the-current-glyph">Change the current glyph</h4>
 <p>The current glyph is always the last component added.</p>
 <p>For example, <code>Aacute = A + acute</code> will:</p>
 <ul>
@@ -199,19 +182,17 @@
 <li>add component with name <code>acute</code> (the current glyph is <code>A</code>)</li>
 </ul>
 <p>Force the current glyph with <code>@&lt;glyphName&gt;:&lt;pos&gt;</code>:</p>
-<div class="codehilite"><pre><span></span><span class="err">Ocircumflexdotaccent =  O + circumflex@center,top + dotaccent@O:center,bottom</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Ocircumflexdotaccent</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">O</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">circumflex</span><span class="nv">@center</span><span class="p">,</span><span class="k">top</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dotaccent</span><span class="nv">@O</span><span class="err">:</span><span class="n">center</span><span class="p">,</span><span class="n">bottom</span><span class="w"></span>
+</code></pre></div>
 
 <p>The forced <code>glyphName</code> can also be escapped with <code>"</code> in case the glyph name
 contains a <code>:</code></p>
-<div class="codehilite"><pre><span></span><span class="n">Ocircumflexdotaccent</span> <span class="o">=</span>  <span class="n">O</span> <span class="o">+</span> <span class="n">circumflex</span><span class="p">@</span><span class="n">center</span><span class="p">,</span><span class="n">top</span> <span class="o">+</span> <span class="n">dotaccent</span><span class="s">@&quot;O:latn&quot;</span><span class="o">:</span><span class="n">center</span><span class="p">,</span><span class="n">bottom</span>
-</pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">Ocircumflexdotaccent</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">O</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">circumflex</span><span class="p">@</span><span class="n">center</span><span class="p">,</span><span class="n">top</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dotaccent</span><span class="s">@&quot;O:latn&quot;</span><span class="o">:</span><span class="n">center</span><span class="p">,</span><span class="n">bottom</span><span class="w"></span>
+</code></pre></div>
 
-
-<h4>Flipping</h4>
+<h4 id="flipping">Flipping</h4>
 <p><code>~</code> followed by a position will flip a component:</p>
-<div class="codehilite"><pre><span></span><span class="err">#</span><span class="w"> </span><span class="n">flip</span><span class="w"> </span><span class="n">horizontally</span><span class="w"></span>
+<div class="codehilite"><pre><span></span><code><span class="err">#</span><span class="w"> </span><span class="n">flip</span><span class="w"> </span><span class="n">horizontally</span><span class="w"></span>
 <span class="n">Aacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="err">@</span><span class="o">~</span><span class="n">center</span><span class="p">,</span><span class="k">top</span><span class="w"></span>
 
 <span class="err">#</span><span class="w"> </span><span class="n">flip</span><span class="w"> </span><span class="n">vertically</span><span class="w"></span>
@@ -219,39 +200,33 @@ contains a <code>:</code></p>
 
 <span class="err">#</span><span class="w"> </span><span class="n">flip</span><span class="w"> </span><span class="k">both</span><span class="w"> </span><span class="n">horizontally</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">vertically</span><span class="w"></span>
 <span class="n">Aacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="err">@</span><span class="o">~</span><span class="n">center</span><span class="p">,</span><span class="o">~</span><span class="k">top</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <h3 id="stacking-vertically">Stacking Vertically</h3>
-<div class="codehilite"><pre><span></span><span class="err">Aringacute = A + ring@center,top + acute@center,top</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Aringacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ring</span><span class="nv">@center</span><span class="p">,</span><span class="k">top</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="nv">@center</span><span class="p">,</span><span class="k">top</span><span class="w"></span>
+</code></pre></div>
 
 <h3 id="positioning-formulas">Positioning formulas</h3>
-<div class="codehilite"><pre><span></span><span class="err">Aringacute = A + ring@center,`top+10` + acute@center,`top-10`</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Aringacute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ring</span><span class="nv">@center</span><span class="p">,</span><span class="err">`</span><span class="k">top</span><span class="o">+</span><span class="mi">10</span><span class="err">`</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">acute</span><span class="nv">@center</span><span class="p">,</span><span class="err">`</span><span class="k">top</span><span class="o">-</span><span class="mi">10</span><span class="err">`</span><span class="w"></span>
+</code></pre></div>
 
 <h3 id="stacking-horizontally">Stacking Horizontally</h3>
-<div class="codehilite"><pre><span></span><span class="err">ffi = f &amp; f &amp; i</span>
-</pre></div>
+<div class="codehilite"><pre><span></span><code>ffi = f &amp; f &amp; i
+</code></pre></div>
 
-
-<h4>Apply kerning while stacking horizontally</h4>
+<h4 id="apply-kerning-while-stacking-horizontally">Apply kerning while stacking horizontally</h4>
 <p>Start a sub-glyphConstruction with a backslash to indicate kerning should be applied while stacking horizotally.</p>
-<div class="codehilite"><pre><span></span><span class="err">A_V = A &amp;\ V</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>A_V = A &amp;\ V
+</code></pre></div>
 
 <h3 id="variables">Variables</h3>
 <p>Glyph Construction supports variables, which can be defined once at the top of the document and used multiple times.</p>
-<div class="codehilite"><pre><span></span><span class="err">$</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">something</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">declaration</span><span class="w"></span>
+<div class="codehilite"><pre><span></span><code><span class="err">$</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">something</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">declaration</span><span class="w"></span>
 <span class="err">{</span><span class="n">name</span><span class="err">}</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="k">usage</span><span class="w"></span>
 
 <span class="err">$</span><span class="n">myColorMark</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">declaration</span><span class="w"></span>
 <span class="n">agrave</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">grave</span><span class="nv">@center</span><span class="p">,</span><span class="k">top</span><span class="w"> </span><span class="err">!</span><span class="w"> </span><span class="err">{</span><span class="n">myColorMark</span><span class="err">}</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="k">usage</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h2 id="glyph-builder-interface">Glyph Builder interface</h2>
@@ -304,10 +279,10 @@ Saved <em>.glyphConstruction</em> files can be opend directly in RoboFont by dra
 <p>The status bar at the bottom of the window displays information about the currently selected glyph: glyph name, width, left and right margins, component names, unicode, mark color, and note.</p>
 <h3 id="comment-variables">Comment variables</h3>
 <p>Preset build checkboxes in the comments of the constructions.</p>
-<div class="codehilite"><pre><span></span><span class="err"># OverwriteExistingGlyphs: True/False</span>
-<span class="err"># AutoUnicodes: True/False</span>
-<span class="err"># MarkGlyphs: False/r, g, b, a</span>
-</pre></div>
+<div class="codehilite"><pre><span></span><code># OverwriteExistingGlyphs: True/False
+# AutoUnicodes: True/False
+# MarkGlyphs: False/r, g, b, a
+</code></pre></div>
         </body>
         </html>
         

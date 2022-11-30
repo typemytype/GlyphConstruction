@@ -1218,8 +1218,7 @@ def GlyphConstructionBuilder(construction, font, characterMap=None):
 def ParseVariables(txt):
     """
     Parse all variables from all constructions and remove them.
-    >>> from fontTools.misc.py23 import unichr
-    >>> txt = unichr(10).join([
+    >>> txt = chr(10).join([
     ...    "$name = test",
     ...    "$positionX = center",
     ...    "$positionY = 100",
@@ -1228,7 +1227,7 @@ def ParseVariables(txt):
     >>> txt, variables = ParseVariables(txt)
     >>> variables == {'positionX': 'center', 'positionY': '100', 'name': 'test'}
     True
-    >>> txt.replace(unichr(10), "") == 'aacute = a + acute@positionX, positionY'
+    >>> txt.replace(chr(10), "") == 'aacute = a + acute@positionX, positionY'
     True
     """
     variables = {}
@@ -1248,8 +1247,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     This returns a list of optimized glyph constructions.
 
     # Basic parsing with comment
-    >>> from fontTools.misc.py23 import unichr
-    >>> txt = unichr(10).join([
+    >>> txt = chr(10).join([
     ...    "agrave = a + grave",
     ...    "# a comment",
     ...    "aacute = a + acute"
@@ -1259,7 +1257,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     True
 
     # Basic parsing with variable
-    >>> txt = unichr(10).join([
+    >>> txt = chr(10).join([
     ...    "$name = grave",
     ...    "agrave = a + {name}",
     ...    "# a comment",
@@ -1272,7 +1270,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     # Parsing with ignore glyph existing glyph names without a font
     >>> font = testDummyFont()
 
-    >>> txt = unichr(10).join([
+    >>> txt = chr(10).join([
     ...    "$name = grave",
     ...    "?agrave = a + {name}",
     ...    "# a comment",
@@ -1283,7 +1281,7 @@ def ParseGlyphConstructionListFromString(source, font=None):
     True
 
     # Parsing with ignore glyph existing glyph names
-    >>> txt = unichr(10).join([
+    >>> txt = chr(10).join([
     ...    "$name = grave",
     ...    # the next line will be ignored",
     ...    "?agrave = a + {name}",

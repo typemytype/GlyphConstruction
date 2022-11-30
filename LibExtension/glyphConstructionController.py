@@ -1,4 +1,3 @@
-from fontTools.misc.py23 import *
 import AppKit
 import re
 import weakref
@@ -415,7 +414,7 @@ class BuildGlyphsSheet(BaseWindowController):
 
         self.w.closeButton = Button((-140, -30, -80, 20), "Cancel", callback=self.closeCallback, sizeStyle="small")
         self.w.closeButton.bind(".", ["command"])
-        self.w.closeButton.bind(unichr(27), [])
+        self.w.closeButton.bind(chr(27), [])
 
         self.w.open()
 
@@ -717,7 +716,7 @@ class GlyphBuilderController(BaseWindowController):
             if glyph.unicode:
                 status.append("unicode: %04X" % glyph.unicode)
             if glyph.note:
-                status.append("note: %s" % (glyph.note[:30] + (glyph.note[30:] and unichr(0x2026))))
+                status.append("note: %s" % (glyph.note[:30] + (glyph.note[30:] and chr(0x2026))))
             if glyph.markColor:
                 status.append("mark: %s" % ", ".join([str(c) for c in glyph.markColor]))
 

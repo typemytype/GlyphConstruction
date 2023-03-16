@@ -152,7 +152,7 @@ class ConstructionGlyph(object):
         self._glyphset = weakref.ref(glyphset)
         self.name = None
         self.width = 0
-        self.unicodes = None
+        self.unicodes = tuple()
         self.components = []
         self.note = ""
         self.markColor = None
@@ -764,9 +764,8 @@ def parseUnicode(construction, font=None):
                 unicodeValues.append(int(u, 16))
             except ValueError:
                 pass
-        unicodeValues = tuple(unicodeValues)
-    if not unicodeValues:
-        unicodeValues = None
+    unicodeValues = tuple(unicodeValues)
+    
     return unicodeValues, construction
 
 
@@ -1383,15 +1382,15 @@ def testGlyphConstructionBuilder_GlyphAttributes():
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
 
     # unicode
     >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
     >>> result.unicode is None
     True
-    >>> result.unicodes is None
+    >>> result.unicodes is tuple()
     True
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave | 00E0", font)
@@ -1414,25 +1413,25 @@ def testGlyphConstructionBuilder_GlyphAttributes():
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave ! 1, 0, 0, 1", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, (1.0, 0.0, 0.0, 1.0), '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 60, (), (1.0, 0.0, 0.0, 1.0), '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
 
     # note
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave # this is a note", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, 'this is a note', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 60, (), None, 'this is a note', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
 
     # width
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave ^ 300", font)
     >>> testDigestGlyph(result)
-    ('agrave', 300.0, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 300.0, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
 
     # left and right margin
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave ^ 300, 200", font)
     >>> testDigestGlyph(result)
-    ('agrave', 620.0, None, None, '', (('a', (1, 0, 0, 1, 200, 0), None), ('grave', (1, 0, 0, 1, 200, 0), None)))
+    ('agrave', 620.0, (), None, '', (('a', (1, 0, 0, 1, 200, 0), None), ('grave', (1, 0, 0, 1, 200, 0), None)))
 
     # all glyph attributes
 
@@ -1454,19 +1453,19 @@ def testGlyphConstructionBuilder_Marks():
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
 
     Multiple marks, same width, like staked accents
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave + anotherGlyph", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None), ('anotherGlyph', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None), ('anotherGlyph', (1, 0, 0, 1, 0, 0), None)))
 
     Multiple marks, adjust width, like ligatures
 
     >>> result = GlyphConstructionBuilder("f_f_i = f & f & i", font)
     >>> testDigestGlyph(result)
-    ('f_f_i', 250, None, None, '', (('f', (1, 0, 0, 1, 0, 0), None), ('f', (1, 0, 0, 1, 80, 0), None), ('i', (1, 0, 0, 1, 160, 0), None)))
+    ('f_f_i', 250, (), None, '', (('f', (1, 0, 0, 1, 0, 0), None), ('f', (1, 0, 0, 1, 80, 0), None), ('i', (1, 0, 0, 1, 160, 0), None)))
     """
 
 
@@ -1478,41 +1477,41 @@ def testGlyphConstructionBuilder_Positioning():
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave @ 0, 0", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, -100, -100), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, -100, -100), None)))
 
     # postion mark at center, top
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave @ center, top", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, -10, 100), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, -10, 100), None)))
 
     # postion mark at center of 'i', top
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave @i: center, top", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 20, 100), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 20, 100), None)))
 
     # postion mark at center of 'i', top of 'i'
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave @i: center, i: top", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 20, 160), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 20, 160), None)))
 
     # postion mark at 100%
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave @100%", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 100, 100), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 100, 100), None)))
 
     # decompose
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 0, 0), None)))
 
     >>> result = GlyphConstructionBuilder("*agrave = a + grave", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('beginPath', None), ((100, 100), 'line', False, None), ((200, 100), 'line', False, None), ((200, 200), 'line', False, None), 'endPath', ('beginPath', None), ((100, 100), 'line', False, None), ((220, 120), 'line', False, None), ((220, 220), 'line', False, None), 'endPath'))
+    ('agrave', 60, (), None, '', (('beginPath', None), ((100, 100), 'line', False, None), ((200, 100), 'line', False, None), ((200, 200), 'line', False, None), 'endPath', ('beginPath', None), ((100, 100), 'line', False, None), ((220, 120), 'line', False, None), ((220, 220), 'line', False, None), 'endPath'))
 
     # font guide position
 
@@ -1520,15 +1519,15 @@ def testGlyphConstructionBuilder_Positioning():
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave@guide", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 50, 0), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 50, 0), None)))
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave@guide,guide", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 50, 0), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, 50, 0), None)))
 
     >>> result = GlyphConstructionBuilder("agrave = a + grave@0,guide", font)
     >>> testDigestGlyph(result)
-    ('agrave', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, -100, 0), None)))
+    ('agrave', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('grave', (1, 0, 0, 1, -100, 0), None)))
     """
 
 
@@ -1539,15 +1538,15 @@ def testGlyphConstructionBuilder_kerning():
 
     >>> result = GlyphConstructionBuilder("r = a & i", font)
     >>> testDigestGlyph(result)
-    ('r', 150, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, 60, 0), None)))
+    ('r', 150, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, 60, 0), None)))
 
     >>> result = GlyphConstructionBuilder(r"dest = a & \\i", font)
     >>> testDigestGlyph(result)
-    ('dest', 50, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, -40, 0), None)))
+    ('dest', 50, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('i', (1, 0, 0, 1, -40, 0), None)))
 
     >>> result = GlyphConstructionBuilder(r"dest = a & \\foo", font)
     >>> testDigestGlyph(result)
-    ('dest', 60, None, None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('foo', (1, 0, 0, 1, 60, 0), None)))
+    ('dest', 60, (), None, '', (('a', (1, 0, 0, 1, 0, 0), None), ('foo', (1, 0, 0, 1, 60, 0), None)))
     """
 
 
@@ -1557,11 +1556,11 @@ def testGlyphConstructionBuilder():
 
     >>> result = GlyphConstructionBuilder("space = ^ 100", font)
     >>> testDigestGlyph(result)
-    ('space', 100.0, None, None, '', ())
+    ('space', 100.0, (), None, '', ())
 
     >>> result = GlyphConstructionBuilder(">a = ^ 11, 22", font)
     >>> testDigestGlyph(result)
-    ('a', 133.0, None, None, '', (('beginPath', None), ((11.0, 100), 'line', False, None), ((111.0, 100), 'line', False, None), ((111.0, 200), 'line', False, None), 'endPath'))
+    ('a', 133.0, (), None, '', (('beginPath', None), ((11.0, 100), 'line', False, None), ((111.0, 100), 'line', False, None), ((111.0, 200), 'line', False, None), 'endPath'))
     >>> result.leftMargin
     11.0
     >>> result.rightMargin
@@ -1569,7 +1568,7 @@ def testGlyphConstructionBuilder():
 
     >>> result = GlyphConstructionBuilder(">doesNotExits = ^ 11, 22", font)
     >>> testDigestGlyph(result)
-    ('doesNotExits', 0, None, None, '', ())
+    ('doesNotExits', 0, (), None, '', ())
     """
 
 

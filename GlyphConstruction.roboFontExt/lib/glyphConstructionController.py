@@ -452,8 +452,8 @@ class BuildGlyphsSheet(BaseWindowController):
 
             glyph.width = construction.width
 
-            if construction.unicode is not None:
-                glyph.unicode = construction.unicode
+            if construction.unicodes is not None:
+                glyph.unicodes = construction.unicodes
             elif characterMap and construction.name in characterMap:
                 glyph.unicode = characterMap[construction.name]
 

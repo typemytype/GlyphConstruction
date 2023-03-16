@@ -659,7 +659,7 @@ class GlyphBuilderController(BaseWindowController):
                     glyph = font.layers.defaultLayer.instantiateGlyphObject()
                 glyph.lib[self.glyphLibConstructionKey] = construction
                 glyph.name = constructionGlyph.name
-                glyph.unicodes = constructionGlyph.unicodes if constructionGlyph.unicodes else []
+                glyph.unicodes = constructionGlyph.unicodes
                 glyph.note = constructionGlyph.note
                 glyph.markColor = constructionGlyph.markColor
                 if RoboFontVersion < "2.0":

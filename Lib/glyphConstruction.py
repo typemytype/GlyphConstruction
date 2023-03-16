@@ -756,13 +756,17 @@ def parseUnicode(construction, font=None):
     >>> parseUnicode(removeSpacesAndTabs("agrave = a + grave | 00E0, 00C0"))
     ((224, 192), 'agrave=a+grave')
     """
-    unicodeValues = None
+    unicodeValues = []
     if unicodeSplit in construction:
         construction, unicodeStr = construction.split(unicodeSplit)
-        try:
-            unicodeValues = tuple([int(u, 16) for u in unicodeStr.split(positionXYSplit)])
-        except Exception:
-            unicodeValues = None
+        for u in unicodeStr.split(positionXYSplit):
+            try:
+                unicodeValues.append(int(u, 16))
+            except ValueError:
+                pass
+        unicodeValues = tuple(unicodeValues)
+    if not unicodeValues:
+        unicodeValues = None
     return unicodeValues, construction
 
 

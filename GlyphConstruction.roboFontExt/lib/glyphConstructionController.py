@@ -646,7 +646,13 @@ class GlyphBuilderController(BaseWindowController):
         if self.pauseState == False:
             try:
                 font = self.pausedFont 
-                self.subscribeFont(font)
+
+                if font is not None:
+                    ## donʻt set font again, this scrolls up to top of window which is annoying
+                    #self.preview.setFont(font)
+                    self.font.naked().addObserver(self, "fontChanged", "Font.Changed")
+
+                #self.subscribeFont(font)
                 #print("unpaused", self.pauseState)
             except:
                 #print("font = None")

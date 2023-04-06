@@ -597,7 +597,7 @@ class GlyphBuilderController(BaseWindowController):
         yPos = -20 
         checkBoxSize = 18
         self.w.pauseOnOff = CheckBox((leftMargin, yPos, checkBoxSize, checkBoxSize), "", sizeStyle="small", callback=self.pause)
-        self.w.pauseLabel = TextBox((checkBoxSize+5, yPos+2, -leftMargin, checkBoxSize), "Pause Updates", sizeStyle="small")
+        self.w.pauseLabel = TextBox((checkBoxSize+5, yPos+2, -leftMargin, checkBoxSize), "Pause Observer", sizeStyle="small")
 
 
 

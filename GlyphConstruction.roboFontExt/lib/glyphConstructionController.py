@@ -383,7 +383,6 @@ class BuildGlyphsSheet(BaseWindowController):
         self.constructions = constructions
 
         self.w = Sheet((300, 170), parentWindow=parentWindow)
-        getExtensionDefault, setExtensionDefault, getExtensionDefaultColor, setExtensionDefaultColor
         y = 15
         if shouldOverWrite is None:
             shouldOverWrite = getExtensionDefault(self.overWriteKey, True)
@@ -493,12 +492,17 @@ class GlyphBuilderController(BaseWindowController):
 
     fileNameKey = "%s.lastSavedFileName" % defaultKey
     glyphLibConstructionKey = "%s.construction" % defaultKey
+    
+    isLiveUpdatingKey = "%s.liveUpdating" % defaultKey
+
 
     def __init__(self, font):
         self.font = None
         self._glyphs = []
         self._filePath = None
-
+        
+        self.isLiveUpdating = getExtensionDefault(self.isLiveUpdatingKey, True)
+        
         statusBarHeight = 20
 
         self.w = GlyphConstructionWindow((900, 700), "Glyph Builder", minSize=(400, 400))
@@ -586,26 +590,19 @@ class GlyphBuilderController(BaseWindowController):
         # self.w.split.showPane("analyser", True)
 
         self.w.statusBar = StatusBar((0, -statusBarHeight, -0, statusBarHeight))
-        self.w.statusBar.hiddenReload = Button((0, 0, -0, -0), "Reload", self.reload)
+        self.w.statusBar.hiddenReload = Button((0, 0, 1, 1), "Reload", self.reload)
         button = self.w.statusBar.hiddenReload.getNSButton()
         button.setBezelStyle_(AppKit.NSRoundRectBezelStyle)
         button.setAlphaValue_(0)
         self.w.statusBar.hiddenReload.bind("\r", ["command"])
-
-        ## pause updates toggle 
-        leftMargin = 5
-        yPos = -20 
-        checkBoxSize = 18
-        self.w.pauseOnOff = CheckBox((leftMargin, yPos, checkBoxSize, checkBoxSize), "", sizeStyle="small", callback=self.pause)
-        self.w.pauseLabel = TextBox((checkBoxSize+5, yPos+2, -leftMargin, checkBoxSize), "Pause Observer", sizeStyle="small")
-
-
-
-        self.w.statusBar.hiddenSave = Button((0, 0, -0, -0), "Reload", self.saveFile)
+        
+        self.w.statusBar.hiddenSave = Button((0, 0, 1, 1), "Reload", self.saveFile)
         button = self.w.statusBar.hiddenSave.getNSButton()
         button.setBezelStyle_(AppKit.NSRoundRectBezelStyle)
         button.setAlphaValue_(0)
         self.w.statusBar.hiddenSave.bind("s", ["command"])
+        
+        self.w.statusBar.liveUpdating = CheckBox((10, 0, 100, 18), "Live Updates", value=self.isLiveUpdating, sizeStyle="mini", callback=self.liveUpdatingCallback)
 
         self.subscribeFont(font)
         self.setUpBaseWindowBehavior()
@@ -630,36 +627,8 @@ class GlyphBuilderController(BaseWindowController):
             self.font = None
 
 
-    def pause(self, sender):
-        self.pauseState = self.w.pauseOnOff.get()
-
-        if self.pauseState == True:
-
-            ## first I tried self.unsubscribeFont(), but then self.font = None and had trouble setting self.font after this. 
-            ## I tried ʻʻʻself.font = CurrentFont()ʻʻʻ but didnʻt work 
-            self.font.removeObserver(self, notification="Font.Changed")
-            ## save the self.font until unpaused. 
-            self.pausedFont = self.font 
-
-            #print("paused", self.pauseState)
-
-        if self.pauseState == False:
-            try:
-                font = self.pausedFont 
-
-                if font is not None:
-                    ## donʻt set font again, this scrolls up to top of window which is annoying
-                    #self.preview.setFont(font)
-                    self.font.naked().addObserver(self, "fontChanged", "Font.Changed")
-
-                #self.subscribeFont(font)
-                #print("unpaused", self.pauseState)
-            except:
-                #print("font = None")
-                pass
-
-
-
+    def liveUpdatingCallback(self, sender):
+        self.isLiveUpdating = sender.get()
 
     def constructionsCallback(self, sender, update=True):
         if self.font is None:
@@ -901,7 +870,8 @@ class GlyphBuilderController(BaseWindowController):
     # notifications
 
     def fontChanged(self, notification):
-        self.reload()
+        if self.isLiveUpdating:
+            self.reload()
 
     def fontBecameCurrent(self, notification):
         font = notification["font"]
@@ -914,6 +884,7 @@ class GlyphBuilderController(BaseWindowController):
         self.unsubscribeFont()
         removeObserver(self, "fontBecameCurrent")
         removeObserver(self, "fontResignCurrent")
+        setExtensionDefault(self.isLiveUpdatingKey, self.w.statusBar.liveUpdating.get())
         super(GlyphBuilderController, self).windowCloseCallback(sender)
 
 

@@ -592,6 +592,15 @@ class GlyphBuilderController(BaseWindowController):
         button.setAlphaValue_(0)
         self.w.statusBar.hiddenReload.bind("\r", ["command"])
 
+        ## pause updates toggle 
+        leftMargin = 5
+        yPos = -20 
+        checkBoxSize = 18
+        self.w.pauseOnOff = CheckBox((leftMargin, yPos, checkBoxSize, checkBoxSize), "", sizeStyle="small", callback=self.pause)
+        self.w.pauseLabel = TextBox((checkBoxSize+5, yPos+2, -leftMargin, checkBoxSize), "Pause Updates", sizeStyle="small")
+
+
+
         self.w.statusBar.hiddenSave = Button((0, 0, -0, -0), "Reload", self.saveFile)
         button = self.w.statusBar.hiddenSave.getNSButton()
         button.setBezelStyle_(AppKit.NSRoundRectBezelStyle)
@@ -619,6 +628,32 @@ class GlyphBuilderController(BaseWindowController):
             self.preview.set([])
             self.font.removeObserver(self, notification="Font.Changed")
             self.font = None
+
+
+    def pause(self, sender):
+        self.pauseState = self.w.pauseOnOff.get()
+
+        if self.pauseState == True:
+
+            ## first I tried self.unsubscribeFont(), but then self.font = None and had trouble setting self.font after this. 
+            ## I tried ʻʻʻself.font = CurrentFont()ʻʻʻ but didnʻt work 
+            self.font.removeObserver(self, notification="Font.Changed")
+            ## save the self.font until unpaused. 
+            self.pausedFont = self.font 
+
+            #print("paused", self.pauseState)
+
+        if self.pauseState == False:
+            try:
+                font = self.pausedFont 
+                self.subscribeFont(font)
+                #print("unpaused", self.pauseState)
+            except:
+                #print("font = None")
+                pass
+
+
+
 
     def constructionsCallback(self, sender, update=True):
         if self.font is None:

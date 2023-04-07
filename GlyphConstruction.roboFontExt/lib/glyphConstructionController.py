@@ -492,17 +492,16 @@ class GlyphBuilderController(BaseWindowController):
 
     fileNameKey = "%s.lastSavedFileName" % defaultKey
     glyphLibConstructionKey = "%s.construction" % defaultKey
-    
-    isLiveUpdatingKey = "%s.liveUpdating" % defaultKey
 
+    isLiveUpdatingKey = "%s.liveUpdating" % defaultKey
 
     def __init__(self, font):
         self.font = None
         self._glyphs = []
         self._filePath = None
-        
+
         self.isLiveUpdating = getExtensionDefault(self.isLiveUpdatingKey, True)
-        
+
         statusBarHeight = 20
 
         self.w = GlyphConstructionWindow((900, 700), "Glyph Builder", minSize=(400, 400))
@@ -595,13 +594,13 @@ class GlyphBuilderController(BaseWindowController):
         button.setBezelStyle_(AppKit.NSRoundRectBezelStyle)
         button.setAlphaValue_(0)
         self.w.statusBar.hiddenReload.bind("\r", ["command"])
-        
+
         self.w.statusBar.hiddenSave = Button((0, 0, 1, 1), "Reload", self.saveFile)
         button = self.w.statusBar.hiddenSave.getNSButton()
         button.setBezelStyle_(AppKit.NSRoundRectBezelStyle)
         button.setAlphaValue_(0)
         self.w.statusBar.hiddenSave.bind("s", ["command"])
-        
+
         self.w.statusBar.liveUpdating = CheckBox((10, 0, 100, 18), "Live Updates", value=self.isLiveUpdating, sizeStyle="mini", callback=self.liveUpdatingCallback)
 
         self.subscribeFont(font)
@@ -625,7 +624,6 @@ class GlyphBuilderController(BaseWindowController):
             self.preview.set([])
             self.font.removeObserver(self, notification="Font.Changed")
             self.font = None
-
 
     def liveUpdatingCallback(self, sender):
         self.isLiveUpdating = sender.get()
@@ -879,6 +877,9 @@ class GlyphBuilderController(BaseWindowController):
 
     def fontResignCurrent(self, notification):
         self.unsubscribeFont()
+
+    def windowSelectCallback(self, sender):
+        self.reload()
 
     def windowCloseCallback(self, sender):
         self.unsubscribeFont()

@@ -452,10 +452,10 @@ class BuildGlyphsSheet(BaseWindowController):
 
             glyph.width = construction.width
 
-            if construction.unicode is not None:
-                glyph.unicode = construction.unicode
+            if len(construction.unicodes):
+                glyph.unicodes = construction.unicodes
             elif characterMap and construction.name in characterMap:
-                glyph.unicode = characterMap[construction.name]
+                glyph.unicodes = tuple([characterMap[construction.name]])
 
             glyph.note = construction.note
 
@@ -659,7 +659,7 @@ class GlyphBuilderController(BaseWindowController):
                     glyph = font.layers.defaultLayer.instantiateGlyphObject()
                 glyph.lib[self.glyphLibConstructionKey] = construction
                 glyph.name = constructionGlyph.name
-                glyph.unicode = constructionGlyph.unicode
+                glyph.unicodes = constructionGlyph.unicodes
                 glyph.note = constructionGlyph.note
                 glyph.markColor = constructionGlyph.markColor
                 if RoboFontVersion < "2.0":
@@ -713,8 +713,8 @@ class GlyphBuilderController(BaseWindowController):
                 "width: %s left: %s right: %s" % (width, leftMargin, rightMargin),
                 "components: %s" % (", ".join([component.baseGlyph for component in glyph.components]))
             ]
-            if glyph.unicode:
-                status.append("unicode: %04X" % glyph.unicode)
+            if glyph.unicodes:
+                status.append("unicodes: %s" % ", ".join(["%04X" % u for u in glyph.unicodes]))
             if glyph.note:
                 status.append("note: %s" % (glyph.note[:30] + (glyph.note[30:] and chr(0x2026))))
             if glyph.markColor:
@@ -761,7 +761,7 @@ class GlyphBuilderController(BaseWindowController):
 
         glyph.draw(dest.getPen())
 
-        dest.unicode = glyph.unicode
+        dest.unicodes = glyph.unicodes
         dest.note = glyph.note
         if glyph.markColor:
             dest.markColor = glyph.markColor

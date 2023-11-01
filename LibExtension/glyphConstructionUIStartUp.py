@@ -5,7 +5,7 @@ from mojo.tools import registerFileExtension
 from glyphConstructionController import GlyphBuilderController
 
 
-fileExtension = "glyphConstruction"
+fileExtension = "glyphconstruction"
 registerFileExtension(fileExtension)
 
 
@@ -16,9 +16,9 @@ class GlyphConstructionFileOpener(object):
 
     def applicationOpenFile(self, notification):
         path = notification["path"]
-        ext = notification["ext"]
+        ext = notification["ext"][1:].lower()
         fileHandler = notification["fileHandler"]
-        if ext == ".%s" % fileExtension:
+        if ext == fileExtension:
             controller = GlyphBuilderController(CurrentFont())
             controller.setFile(path)
             fileHandler["opened"] = True

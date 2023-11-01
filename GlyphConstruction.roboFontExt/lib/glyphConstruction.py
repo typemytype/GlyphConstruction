@@ -623,7 +623,7 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
             elif (markPoint1, markAngle1) == (markPoint2, markAngle2):
                 markX, markY = markPoint1
 
-            if baseGlyphX in font and baseGlyphY in font:
+            if baseGlyphX is not None and baseGlyphY is not None and baseGlyphX in font and baseGlyphY in font:
                 basePoint1, baseAngle1, _ = parsePosition(baseGlyphX, font, positionX, direction="x", isBase=True)
                 basePoint2, baseAngle2, _ = parsePosition(baseGlyphY, font, positionY, direction="y", isBase=True)
                 intersection = _intersectAngles(basePoint1, baseAngle1, basePoint2, baseAngle2)
@@ -765,7 +765,7 @@ def parseUnicode(construction, font=None):
             except ValueError:
                 pass
     unicodeValues = tuple(unicodeValues)
-    
+
     return unicodeValues, construction
 
 

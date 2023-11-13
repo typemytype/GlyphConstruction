@@ -126,6 +126,7 @@ simpleVariableRe = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]*")
 
 percentageRe = re.compile(r"[0-9]*%")
 
+# glyphNameRe = re.compile(r'([a-zA-Z_][a-zA-Z0-9_.\-\+\:\*\~\|]*|.notdef)')
 glyphNameRe = re.compile(r'([a-zA-Z_][a-zA-Z0-9_.]*|.notdef)')
 
 explicitMathRe = re.compile(r'\%s(?P<explicitMath>.*?)\%s' % (explicitMathStart, explicitMathEnd))
@@ -711,9 +712,19 @@ def _parseGlyphMetric(construction, font, attr):
                 lastIndex = 0
                 newText = "result="
                 glyphAttribute = attr
-                for i in glyphNameRe.finditer(value):
+
+                if explicitGlyphNameStart in value and explicitGlyphNameEnd in value:
+                    search = explicitGlyphNameRe
+                    trimIndex = 1
+                else:
+                    search = glyphNameRe
+                    trimIndex = 0
+
+                for i in search.finditer(value):
                     newText += value[lastIndex:i.start()]
                     glyphName = i.group()
+                    if trimIndex:
+                        glyphName = glyphName[trimIndex:-trimIndex]
                     try:
                         if value[i.end()] == glyphAtrributeAlternateSplit:
                             glyphAttribute = glyphAttributeAlternateMap.get(attr, attr)
@@ -722,6 +733,7 @@ def _parseGlyphMetric(construction, font, attr):
                     if glyphName in font:
                         newText += "%s" % getattr(font[glyphName], glyphAttribute)
                     lastIndex = i.end()
+
                 newText += value[lastIndex:]
                 newText = newText.replace(glyphAtrributeAlternateSplit, "")
                 try:
@@ -856,19 +868,37 @@ def parseGlyphattributes(construction, font):
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a, 20"), font)
     ({'leftMargin': 100, 'rightMargin': 20.0}, 'name')
 
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ \\"a\\", 20"), font)
+    ({'leftMargin': 100, 'rightMargin': 20.0}, 'name')
+
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a, agrave"), font)
+    ({'leftMargin': 100, 'rightMargin': -180}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ \\"a\\", \\"agrave\\""), font)
+    ({'leftMargin': 100, 'rightMargin': -180}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ \\"a\\", agrave"), font)
     ({'leftMargin': 100, 'rightMargin': -180}, 'name')
 
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a+10, agrave"), font)
     ({'leftMargin': 110, 'rightMargin': -180}, 'name')
 
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ \\"a\\"+10, \\"agrave\\""), font)
+    ({'leftMargin': 110, 'rightMargin': -180}, 'name')
+
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a*2, agrave"), font)
+    ({'leftMargin': 200, 'rightMargin': -180}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ \\"a\\"*2, \\"agrave\\""), font)
     ({'leftMargin': 200, 'rightMargin': -180}, 'name')
 
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a', agrave"), font)
     ({'leftMargin': -140, 'rightMargin': -180}, 'name')
 
     >>> parseGlyphattributes(removeSpacesAndTabs("name ^ a', agrave'"), font)
+    ({'leftMargin': -140, 'rightMargin': 100}, 'name')
+
+    >>> parseGlyphattributes(removeSpacesAndTabs("name ^ \\"a\\"', \\"agrave\\"'"), font)
     ({'leftMargin': -140, 'rightMargin': 100}, 'name')
     """
     attrs = {}
@@ -1084,7 +1114,7 @@ def parseGlyphName(construction):
 
 escapeMathOperatorMap = {
     "+": "<<add>>",
-    "-": "<<sub>>"
+    "-": "<<sub>>",
 }
 
 escapeMathOperatorMapReversed = {value: key for key, value in escapeMathOperatorMap.items()}
@@ -1576,3 +1606,8 @@ if __name__ == "__main__":
     import sys
     import doctest
     sys.exit(doctest.testmod().failed)
+
+    import defcon
+    font = defcon.Font('/Users/frederik/Downloads/glyph-contruction-issue-#76/glyph-contruction-issue.ufo')
+    result = GlyphConstructionBuilder("a = ^ noHyphen - 10", font)
+    print(result.leftMargin, result.rightMargin, result.width)

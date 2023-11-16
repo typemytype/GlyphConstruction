@@ -121,9 +121,14 @@ Width and margin values can also be defined using basic maths and references to 
     Aacute = A + acute ^ A / 3, B * 2
 
 Use a `'` to flip to the opposite side of given glyph margin.
-    
+
     # left margin is used for the right margin of the generate d.alt
     d.alt = d ^ d', d'
+
+Use `"` to explictly provide a glyph name, required to use `"` for each named glyph name. Glyph names can contain math symbols like `-`, `+`, `*`.
+
+    # left and right margins is used from a explict glyph name.
+    A = ^ "T", "T-1" * 2
 
 ### Decompose glyph
 
@@ -135,7 +140,7 @@ Add `*` before a glyph construction rule to explicitly tell the constructor to d
 
 Add `>` before a glyph construction rule to include the source font glyph name in the final result.
 
-    # include the the drawing of the source font 'a' 
+    # include the the drawing of the source font 'a'
     # and set the spacing to 40 for the left margin and 50 on the right margin.
     >a = ^ 40, 50
 
@@ -249,7 +254,7 @@ To install the Glyph Construction extension in RoboFont, follow the instructions
 - [Installing extensions manually](http://robofont.com/documentation/extensions/installing-extensions/)
 - [Installing extensions with Mechanic 2](http://robofont.com/documentation/extensions/installing-extensions-mechanic/)
 
-Once the extension is installed, the Glyph Builder can be opened from the menu *Extensions > Glyph Construction*. 
+Once the extension is installed, the Glyph Builder can be opened from the menu *Extensions > Glyph Construction*.
 Saved *.glyphConstruction* files can be opend directly in RoboFont by dragging the file on RoboFont.
 
 ![](GlyphBuilder.png)
@@ -262,7 +267,7 @@ Here’s a description of each part of the Glyph Builder interface:
 The toolbar at the top of the window gives access to the following actions:
 
 <dl>
-    
+
 <dt>Save</dt>
 <dd>Save all rules as a <code>.glyphConstruction</code> file.</dd>
 
@@ -274,7 +279,7 @@ The toolbar at the top of the window gives access to the following actions:
 
 <dt>Analyse</dt>
 <dd>Show/hide the <em>Analysis</em> column.</dd>
-                       
+
 <dt>Build Glyphs</dt>
 <dd>Build all described glyphs in the current font.</dd>
 
@@ -302,7 +307,7 @@ Individual glyphs can be selected with a click – see *Selection preview* (belo
 The right column displays useful information about the glyph construction rules defined in the editor: missing and existing glyphs, existing glyphs with missing components, and existing glyphs with different components.
 
 ### Selection preview
- 
+
 At the bottom of the right column is a preview of the glyph which is currently selected in the preview area.
 
 If the glyph already exists in the font, its current shape is displayed in the background in red for comparison.

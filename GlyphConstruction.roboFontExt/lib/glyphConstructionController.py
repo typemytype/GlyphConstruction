@@ -801,8 +801,14 @@ class GlyphBuilderController(BaseWindowController):
 
         BuildGlyphsSheet(self._glyphs, self.font, self.w, shouldOverWrite=overWriteResult, shouldAutoUnicodes=autoUnicodesResult, shouldUseMarkColor=markGlyphResult)
 
+    _isReloading = False
+
     def reload(self, sender=None, update=True):
+        if self._isReloading:
+            return
+        self._isReloading = True
         self.constructionsCallback(self.constructions, update)
+        self._isReloading = True
 
     def _saveFile(self, path):
         if self.font is not None:

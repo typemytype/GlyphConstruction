@@ -808,7 +808,7 @@ class GlyphBuilderController(BaseWindowController):
             return
         self._isReloading = True
         self.constructionsCallback(self.constructions, update)
-        self._isReloading = True
+        self._isReloading = False
 
     def _saveFile(self, path):
         if self.font is not None:

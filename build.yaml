@@ -1,6 +1,7 @@
 libFolder: source/lib
 resourcesFolder: source/resources
 htmlFolder: source/html
+path: GlyphConstruction.roboFontExt
 license: |
   The MIT License (MIT)
 

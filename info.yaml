@@ -1,0 +1,13 @@
+name: Glyph Construction
+developer: Frederk Berlaen
+developerURL: http://typemytype.com/
+launchAtStartUp: true
+mainScript: glyphConstructionUIStartUp.py
+version: '0.16'
+addToMenu:
+- path: glyphConstructionUIMenu.py
+  preferredName: Glyph Builder
+  shortKey: ''
+html: true
+requiresVersionMajor: '1'
+requiresVersionMinor: '5'

@@ -1,0 +1,12 @@
+name: Validate and Build the Extension
+on:
+  push
+
+jobs:
+  validate_and_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate and Build
+        uses: typemytype/roboFont-Extension-action@v0.1.0
+        with:
+          autotagging: true

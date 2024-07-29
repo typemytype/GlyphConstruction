@@ -316,7 +316,7 @@ def analyseConstructions(font, constructionGlyphs):
             if name in other:
                 other.remove(name)
             else:
-                if name not in unusedComponents:
+                if glyph.name not in unusedComponents:
                     unusedComponents[glyph.name] = []
                 unusedComponents[glyph.name].append(name)
 
@@ -325,7 +325,7 @@ def analyseConstructions(font, constructionGlyphs):
             if name in other:
                 other.remove(name)
             else:
-                if name not in missingComponents:
+                if glyph.name not in missingComponents:
                     missingComponents[glyph.name] = []
                 missingComponents[glyph.name].append(name)
 

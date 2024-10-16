@@ -562,7 +562,7 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
     xx, xy, yx, yy, x, y = 1, 0, 0, 1, advanceWidth, advanceHeight
 
     baseGlyphX = baseGlyphY = baseGlyph
-    markFixedX = markFixedY = False
+    markFixedX = markFixedY = matrix = False
 
     flipX = flipY = False
 
@@ -572,7 +572,10 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
         if positionXYSplit in position:
             positions = position.split(positionXYSplit)
             if len(positions) == 6:
+                matrix = True if not baseGlyph else False
                 xx, xy, yx, yy, positionX, positionY = positions
+                x  = float(positionX)
+                y  = float(positionY)
                 xx = float(xx)
                 xy = float(xy)
                 yx = float(yx)
@@ -633,16 +636,17 @@ def parsePositions(baseGlyph, markGlyph, font, markTransformMap, advanceWidth, a
                 elif (basePoint1, baseAngle1) == (basePoint2, baseAngle2):
                     baseX, baseY = basePoint1
 
-            # calculate the offset
-            if not markFixedX:
-                x += baseX - markX
-            else:
-                x += markX
+            if not matrix:
+                # calculate the offset
+                if not markFixedX:
+                    x += baseX - markX
+                else:
+                    x += markX
 
-            if not markFixedY:
-                y += baseY - markY
-            else:
-                y += markY
+                if not markFixedY:
+                    y += baseY - markY
+                else:
+                    y += markY
 
         if not markFixedX:
             baseTransform = markTransformMap.get(baseGlyphX)
